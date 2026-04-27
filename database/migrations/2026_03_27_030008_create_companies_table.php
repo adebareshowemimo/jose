@@ -1,0 +1,49 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('companies', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('owner_id')->constrained('users')->cascadeOnDelete();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('website')->nullable();
+            $table->text('about')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('cover_image')->nullable();
+            $table->year('founded_in')->nullable();
+            $table->enum('company_size', ['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+'])->nullable();
+            $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
+            $table->string('address')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+            $table->json('social_links')->nullable();
+            $table->decimal('review_score', 3, 2)->default(0);
+            $table->boolean('is_featured')->default(false);
+            $table->boolean('is_verified')->default(false);
+            $table->boolean('allow_search')->default(true);
+            $table->enum('status', ['active', 'inactive', 'pending', 'suspended'])->default('pending');
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('companies');
+    }
+};

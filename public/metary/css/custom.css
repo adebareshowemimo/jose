@@ -1,0 +1,562 @@
+/*
+ * ============================================================
+ *  JCL Brand Color Override
+ *  Replaces Metary's default palette with Jose Consulting Ltd
+ *  brand colors across all compiled theme classes.
+ *
+ *  Metary default  → JCL brand
+ *  #FC5220 (orange-red)  → #1AAD94 (teal accent)
+ *  #121c22 (near-black)  → #073057 (navy primary)
+ * ============================================================
+ */
+
+/* ----------------------------------------------------------
+   1. CSS Custom Properties — Brand Palette + Tints
+   ---------------------------------------------------------- */
+:root {
+  /* Core brand colors */
+  --primary-color:        #1AAD94;   /* JCL Teal   */
+  --primary-rgb:          26, 173, 148;
+  --secondary-color:      #073057;   /* JCL Navy   */
+  --secondary-rgb:        7, 48, 87;
+
+  /* Navy tints (mixed with white) */
+  --navy-80:  #1F4467;
+  --navy-60:  #516E89;
+  --navy-40:  #8397AB;
+  --navy-20:  #CDD6DD;
+
+  /* Teal tints */
+  --teal-80:  #47BDA9;
+  --teal-60:  #75CDBE;
+  --teal-40:  #A3DED4;
+  --teal-20:  #D1EEE9;
+}
+
+/* ----------------------------------------------------------
+   2-A. Typography — Brand Typeface
+   -------------------------------------------------------
+   Gilroy (commercial) is served as self-hosted WOFF2/WOFF
+   files placed in /public/fonts/gilroy/. Plus Jakarta Sans
+   (Google Fonts) is the live fallback until those files land.
+   ---------------------------------------------------------- */
+
+/* @font-face rules for Gilroy are inactive — font files not yet on server.
+   Plus Jakarta Sans (Google Fonts CDN) is the active fallback.
+   To activate Gilroy: place woff2/woff files in /public/fonts/gilroy/
+   and uncomment the blocks below.
+
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/gilroy-bold.woff2') format('woff2'),
+       url('/fonts/gilroy/gilroy-bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/gilroy-medium.woff2') format('woff2'),
+       url('/fonts/gilroy/gilroy-medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Gilroy';
+  src: url('/fonts/gilroy/gilroy-regular.woff2') format('woff2'),
+       url('/fonts/gilroy/gilroy-regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+*/
+
+/* Brand font stack — Gilroy first, Plus Jakarta Sans as fallback */
+body,
+.navbar-nav,
+.btn-style1,
+.btn-style2 {
+  font-family: 'Gilroy', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Headings — Gilroy Bold, 80% line-height (brand spec) */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  font-family: 'Gilroy', 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  line-height: 0.8;
+}
+
+/* Override line-height for smaller headings (0.8 is too tight below ~2rem) */
+h4, h5, h6, .h4, .h5, .h6 {
+  line-height: 1.2;
+}
+
+/* Hero / display headline — 48px per brand guide */
+.display-heading,
+.banner-title,
+.hero-heading {
+  font-size: 3rem;      /* 48px */
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: 0;
+}
+
+/* Body copy — 18px, 110% line-height, 1% letter-spacing */
+body,
+p,
+.body-text {
+  font-size: 1.125rem;  /* 18px */
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+
+/* Slightly relax line-height for single-sentence paragraphs */
+p {
+  line-height: 1.65;
+}
+
+/* ----------------------------------------------------------
+   2. General Links
+   ---------------------------------------------------------- */
+a:hover,
+a:active {
+  color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+   3. Overlays
+   ---------------------------------------------------------- */
+.primary-overlay[data-overlay-dark]:before {
+  background: #1AAD94;
+}
+
+.secondary-overlay[data-overlay-dark]:before {
+  background: #073057;
+}
+
+.left-overlay-secondary[data-overlay-dark]:before {
+  background: rgba(7, 48, 87, 0.76);
+  background: linear-gradient(-90deg, transparent, #073057 65%);
+}
+
+/* ----------------------------------------------------------
+   4. Utility Color Classes
+   ---------------------------------------------------------- */
+.text-primary,
+.text-primary-hover:hover {
+  color: #1AAD94 !important;
+}
+
+.bg-primary {
+  background-color: #1AAD94 !important;
+}
+
+.text-secondary,
+.text-secondary-hover:hover {
+  color: #073057 !important;
+}
+
+.bg-secondary {
+  background-color: #073057 !important;
+}
+
+.text-dark,
+.text-dark-hover:hover {
+  color: #073057 !important;
+}
+
+.border-primary {
+  border-color: #1AAD94 !important;
+}
+
+.border-secondary {
+  border-color: #073057 !important;
+}
+
+/* ----------------------------------------------------------
+   5. Page Preloader
+   ---------------------------------------------------------- */
+#preloader:before,
+#preloader:after {
+  border-color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+   6. Scroll-to-top percentage circle
+   ---------------------------------------------------------- */
+.scroll-top-percentage {
+  border-color: #1AAD94;
+  color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+   7. Buttons
+   ---------------------------------------------------------- */
+.btn-style1 {
+  background: #1AAD94;
+  color: #ffffff;
+}
+
+.btn-style1:hover {
+  background: #073057;
+}
+
+.btn-style1.secondary {
+  background: #073057;
+}
+
+.btn-style1.secondary:hover {
+  background: #1AAD94;
+}
+
+.btn-style1.white-hover:hover,
+.btn-style1.white-hover:active,
+.btn-style1.white-hover:focus {
+  background: #fff;
+}
+
+.btn-style1.white-hover:hover span,
+.btn-style1.white-hover:active span,
+.btn-style1.white-hover:focus span {
+  color: #073057;
+}
+
+.btn-style1.border-primary {
+  border: 1px solid #1AAD94 !important;
+}
+
+.btn-style1.border-primary:hover {
+  border: 1px solid #fff !important;
+}
+
+.btn-style2 {
+  background-color: #1AAD94;
+}
+
+.btn-style2:hover,
+.btn-style2:active {
+  background: #073057;
+}
+
+/* ----------------------------------------------------------
+   8. Navigation — Desktop Active / Hover Indicators
+   ---------------------------------------------------------- */
+
+/* Arrow/chevron indicator on active menu items */
+.navbar > ul > li.current > a:after {
+  border-color: transparent #1AAD94 #1AAD94 transparent !important;
+}
+
+.navbar-nav li.current > a,
+.navbar-nav li.active > a,
+.navbar-nav li.has-sub a:hover,
+.navbar-nav > li > a:hover,
+.navbar-nav > li > a:active,
+.navbar-nav > li > a:focus,
+.navbar > ul > li.has-sub > a:hover,
+.navbar ul ul li.active > a {
+  color: #1AAD94;
+}
+
+.navbar > ul > li.has-sub > a:hover:after,
+.navbar > ul > li.current > a:hover:after,
+.navbar > ul > li.has-sub.current > a:hover:after {
+  border-color: transparent #1AAD94 #1AAD94 transparent;
+}
+
+/* header-style1 scroll state */
+@media screen and (min-width: 992px) {
+  .header-style1.scrollHeader .attr-nav > ul > li > a.btn-style1:hover,
+  .header-style1.scrollHeader .attr-nav > ul > li > a.btn-style1:active,
+  .header-style1.scrollHeader .attr-nav > ul > li > a.btn-style1:focus {
+    color: #1AAD94;
+    border: 1px solid #1AAD94;
+  }
+
+  .header-style3.scrollHeader .attr-nav > ul > li > a.btn-style1:hover,
+  .header-style3.scrollHeader .attr-nav > ul > li > a.btn-style1:active,
+  .header-style3.scrollHeader .attr-nav > ul > li > a.btn-style1:focus {
+    color: #1AAD94;
+    border: 1px solid #1AAD94;
+  }
+}
+
+/* header-style2 */
+.header-style2 .navbar-nav li.current > a,
+.header-style2.scrollHeader .navbar-nav li.current > a,
+.header-style2 .navbar ul ul li.active > a {
+  color: #1AAD94;
+}
+
+.header-style2 .navbar > ul > li.current > a:after,
+.header-style2.scrollHeader .navbar > ul > li.current > a:after {
+  border-color: transparent #1AAD94 #1AAD94 transparent;
+}
+
+/* header-style3 */
+.header-style3 .navbar-nav li.current > a,
+.header-style3 .navbar-nav li.active > a,
+.header-style3 .navbar ul ul li.active > a,
+.header-style3.scrollHeader .navbar-nav > li.active > a,
+.header-style3.scrollHeader .navbar-nav li.current > a,
+.header-style3 .navbar-nav li.has-sub a:hover,
+.header-style3 .navbar-nav > li.has-sub > a:hover {
+  color: #1AAD94;
+}
+
+.header-style3 .navbar > ul > li.has-sub > a:hover:after,
+.header-style3 .navbar > ul > li.current > a:after,
+.header-style3.scrollHeader .navbar > ul > li.has-sub > a:hover:after,
+.header-style3.scrollHeader .navbar > ul > li.current > a:after {
+  border-color: transparent #1AAD94 #1AAD94 transparent;
+}
+
+/* ----------------------------------------------------------
+   9. Mobile Nav Hamburger Toggler
+   ---------------------------------------------------------- */
+@media screen and (max-width: 991px) {
+  .header-style1 .navbar-toggler,
+  .header-style3 .navbar-toggler {
+    background: #1AAD94;
+  }
+}
+
+/* ----------------------------------------------------------
+  10. Top Search Bar
+   ---------------------------------------------------------- */
+.top-search {
+  background: #073057 !important;
+}
+
+/* ----------------------------------------------------------
+  11. Banner style02 — button-arrow circle
+   ---------------------------------------------------------- */
+.banner-style02 .banner-button .button-arrow {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+.banner-style02 .banner-button .button-arrow:hover {
+  background: #1AAD94;
+  border-color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  12. Section Title decorative dot
+   ---------------------------------------------------------- */
+.section-title-01 span:before {
+  background-color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  13. Page Title breadcrumb separator
+   ---------------------------------------------------------- */
+.page-title-section li:after {
+  background-color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  14. Banner contact box (banner-style01)
+   ---------------------------------------------------------- */
+.banner-style01 .banner-contact {
+  background-color: #073057;
+}
+
+/* ----------------------------------------------------------
+  15. Background: dark sections that used #121c22 directly
+   ---------------------------------------------------------- */
+.scrollHeader .navbar-default {
+  background-color: #073057;
+}
+
+/* ----------------------------------------------------------
+  16. Card styles
+   ---------------------------------------------------------- */
+
+/* card-style01 (service carousel) */
+.card-style01 .card-body h3 a:hover {
+  color: #1AAD94;
+}
+
+/* card-style04 (blog) */
+.card-style04 .post-date,
+.card-style04 .post-date span {
+  background-color: #1AAD94;
+  color: #fff;
+}
+
+.card-style04 h4 a:hover,
+.card-style04 .blog-tag:hover {
+  color: #1AAD94;
+}
+
+/* card-style07 (team) */
+.card-style07 .card-body h3 a:hover {
+  color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  17. Portfolio grid
+   ---------------------------------------------------------- */
+.portfolio-style-01 .portfolio-link:hover,
+.portfolio-style-01 .content a:hover,
+.portfolio-style-01 .title a:hover {
+  color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  18. Accordion
+   ---------------------------------------------------------- */
+.accordion-style .card-header .btn-link {
+  color: #073057;
+}
+
+.accordion-style .card-header .btn-link:focus,
+.accordion-style .card-header .btn-link:not(.collapsed) {
+  color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  19. Form elements — focus border
+   ---------------------------------------------------------- */
+.form-control:focus {
+  border-color: #1AAD94;
+  box-shadow: 0 0 0 0.2rem rgba(26, 173, 148, 0.15);
+}
+
+.quform-input input:focus,
+.quform-input textarea:focus {
+  border-color: #1AAD94;
+}
+
+/* Newsletter submit button */
+.newsletter-form .quform-submit-inner .btn-white {
+  background-color: #1AAD94;
+  border-color: #1AAD94;
+}
+
+.newsletter-form .quform-submit-inner .btn-white:hover {
+  background-color: #073057;
+  border-color: #073057;
+}
+
+/* ----------------------------------------------------------
+  20. Pagination
+   ---------------------------------------------------------- */
+.pagination a:hover,
+.pagination a:active,
+.pagination a:focus {
+  background-color: #073057;
+  color: #ffffff;
+}
+
+/* ----------------------------------------------------------
+  21. Lightgallery / gallery
+   ---------------------------------------------------------- */
+.lg-outer .lg-thumb-item.active,
+.lg-outer .lg-thumb-item:hover {
+  border-color: #1AAD94;
+}
+
+.lg-progress-bar .lg-progress {
+  background-color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  22. Portfolio lightbox (magnific popup)
+   ---------------------------------------------------------- */
+.mfp-close:hover {
+  color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  23. Owl Carousel dots & arrows
+   ---------------------------------------------------------- */
+.owl-theme .owl-dots .owl-dot.active span,
+.owl-theme .owl-dots .owl-dot:hover span {
+  background: #1AAD94;
+}
+
+.owl-theme .owl-nav [class*="owl-"]:hover {
+  background: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  23-A. Logo — JCL brand logo (JPG with white background)
+         On dark sections (footer, mobile drawer) we drop it
+         into a white-background pill so it sits cleanly.
+   ---------------------------------------------------------- */
+.navbar-brand img#logo {
+  height: 60px;
+  width: auto;
+}
+
+/* White pill wrapper for logo on dark/navy backgrounds */
+a.jcl-logo-on-dark {
+  display: inline-block;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 6px 14px;
+  line-height: 0;
+}
+
+a.jcl-logo-on-dark img {
+  height: 40px;
+  width: auto;
+}
+
+/* ----------------------------------------------------------
+  24. Footer
+   ---------------------------------------------------------- */
+.footer-style01 .links-wrap li a:after {
+  background-color: #1AAD94;
+}
+
+.footer-style01 .links-wrap li a:hover {
+  color: #fff;
+}
+
+footer .email a:hover,
+footer .email a:active,
+footer .email a:focus,
+footer .phone a:hover,
+footer .phone a:active,
+footer .phone a:focus {
+  color: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  25. Testimonial Carousel nav (if using slider nav buttons)
+   ---------------------------------------------------------- */
+.testimonial-carousel1 + .owl-nav .owl-prev:hover,
+.testimonial-carousel1 + .owl-nav .owl-next:hover {
+  background: #1AAD94;
+}
+
+/* ----------------------------------------------------------
+  26. Miscellanous inline-#121c22 overrides
+   ---------------------------------------------------------- */
+.banner-style01 .banner-contact,
+.wp-caption,
+.mean-container a.meanmenu-reveal {
+  background-color: #073057;
+}
+
+/* ----------------------------------------------------------
+  27. Header left-text stripe
+   ---------------------------------------------------------- */
+.banner-style02 .left-text {
+  background-color: rgba(7, 48, 87, 0.85);
+}
+
+/* ----------------------------------------------------------
+  28. Border-color utility (Metary uses border-color-light-white
+      which is fine; this targets primary-toned borders)
+   ---------------------------------------------------------- */
+.btn-style1.border-primary,
+.progress-bar {
+  background-color: #1AAD94;
+}
+

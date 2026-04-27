@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php -l app/Http/Controllers/Auth/PasswordResetController.php app/Http/Controllers/Auth/AuthController.php app/Notifications/TemplatedResetPassword.php)",
+      "Bash(php -l app/Http/Controllers/Admin/AdminController.php)",
+      "Bash(php -l app/Models/RecruitmentRequest.php app/Models/RecruitmentRequestCandidate.php app/Http/Controllers/Frontend/RecruitmentRequestController.php app/Http/Controllers/Admin/RecruitmentRequestController.php app/Http/Requests/StoreRecruitmentRequest.php app/Http/Requests/QuoteRecruitmentRequest.php app/Observers/OrderObserver.php app/Providers/AppServiceProvider.php database/seeders/RecruitmentEmailTemplateSeeder.php)",
+      "Bash(grep -n \"use App.Models.Order\\\\|App\\\\\\\\\\\\\\\\Models\\\\\\\\\\\\\\\\Order\" app/Http/Controllers/Admin/AdminController.php)",
+      "Bash(php -l app/Services/PaystackService.php app/Http/Controllers/PaymentController.php app/Http/Controllers/Admin/AdminController.php app/Http/Controllers/Frontend/TransactionPageController.php)"
+    ]
+  }
+}

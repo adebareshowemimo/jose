@@ -1,0 +1,18 @@
+[
+  {
+    "title": "About JCL",
+    "prompt": "About page for JCL maritime consulting firm. Sections: (1) Hero banner with breadcrumbs, page-header component with label pill, title, description, full-bleed background image with navy gradient overlay. (2) Who We Are section: light gray bg, 2 columns - Left: white card with teal pill, company name heading, summary paragraph, feature image of safety officer, then 2x2 grid of stat info-cards. Right: navy card with edge/differentiators list using check-circle-2 icons. (3) Vision and Mission section: white bg, 3-image strip across top, then 2-column with Vision card (white, pillars in gray pill boxes) and Mission card (white, actions with arrow-right icons in gray pill boxes). (4) Values section: light gray bg, heading with teal pill, 3-column grid of 6 value cards each with icon, title, description. (5) Final CTA section: large rounded card with full-bleed bg image, dark navy overlay, heading and description on left, 2 CTA buttons on right."
+  },
+  {
+    "title": "Leadership and Experts",
+    "prompt": "Leadership page for JCL. Sections: (1) Hero banner with breadcrumbs, page-header, business meeting background image with navy gradient overlay. (2) Leader cards section: light gray bg, 2-column grid of leader cards. Each card: white bg, rounded corners, avatar circle with initials (navy bg, white bold text), category pill (teal), name (large bold), title (teal uppercase), summary text, then highlights list in gray pill boxes with badge-check icons. (3) Delivery section: white bg, 2-column layout. Left: white card with navy pill What this means for delivery, large heading about combined capability, description paragraph, and a feature image. Right: narrow navy card with Explore further pill and 3 stacked buttons."
+  },
+  {
+    "title": "Partnerships and Expertise",
+    "prompt": "Partnerships page for JCL. Sections: (1) Hero banner with breadcrumbs, page-header, aerial container terminal background with navy gradient overlay. (2) Capability model section: light gray bg, 2 columns. Left: white card with teal pill, heading about scaling specialist delivery, description, feature image of container port, then 2x2 grid of expertise area pills in gray boxes. Right: navy card with Mobilization promise pill, heading about responsive support, description. (3) Strategic partnerships section: white bg, heading with navy pill, 2-column grid of partnership cards. Each card has a header image, lead name pill (teal), partner name large bold, network icon, focus line bold, strength description. (4) Why it matters section: light gray bg, 2-column. Left: white card with teal pill, heading about connecting local to international, checklist with check-circle-2 icons. Right: narrow navy card with Take the next step pill, description, 2 stacked buttons."
+  },
+  {
+    "title": "Contact JCL",
+    "prompt": "Contact page for JCL. Sections: (1) Hero banner with breadcrumbs, page-header, maritime officer hero background with navy gradient overlay. (2) Main contact section: light gray bg, 2-column layout. Left: large white card with 3 contact pathway mini-cards at top in gray pill boxes, then Send a Message heading, form with Full Name, Email, Subject, Message textarea inputs, and 2 buttons (Submit Inquiry dark plus Start Your Pathway outline). Right column: top white card with Best way to reach JCL heading and description. Bottom navy card with deck officer image, compass icon Next steps pill, heading Prefer a self-service route, description, and 2 link rows with arrow-right icons for Browse jobs and Learn about JCL."
+  }
+]
