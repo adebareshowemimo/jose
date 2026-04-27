@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use App\Support\Settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class SettingsController extends Controller
 {
@@ -113,5 +114,37 @@ class SettingsController extends Controller
         $settings->flush();
 
         return back()->with('success', 'Settings updated successfully.');
+    }
+
+    public function testMail(Request $request)
+    {
+        $data = $request->validate([
+            'test_recipient' => 'required|email|max:255',
+        ]);
+
+        try {
+            Mail::raw(
+                "This is a test email from " . config('app.name', 'Jose Ocean Jobs') . ".\n\n"
+                . "If you received this, your SMTP configuration is working.\n\n"
+                . "Sent at: " . now()->toDateTimeString() . " UTC\n"
+                . "From: " . config('mail.from.address') . " (" . config('mail.from.name') . ")\n"
+                . "Mailer: " . config('mail.default') . "\n"
+                . "SMTP host: " . config('mail.mailers.smtp.host') . ":" . config('mail.mailers.smtp.port'),
+                function ($message) use ($data) {
+                    $message->to($data['test_recipient'])
+                            ->subject('SMTP test from ' . config('app.name', 'Jose Ocean Jobs'));
+                }
+            );
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Test failed: ' . $e->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Test email sent to ' . $data['test_recipient'] . '. Check the inbox (and spam folder).',
+        ]);
     }
 }

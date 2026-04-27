@@ -154,6 +154,56 @@
                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
                     </div>
                 </div>
+
+                {{-- Test SMTP --}}
+                <div class="pt-4 mt-2 border-t border-gray-100"
+                     x-data="{
+                         recipient: '{{ auth()->user()->email ?? '' }}',
+                         loading: false,
+                         result: null,
+                         async send() {
+                             if (! this.recipient) return;
+                             this.loading = true;
+                             this.result = null;
+                             try {
+                                 const res = await fetch('{{ route('admin.settings.mail.test') }}', {
+                                     method: 'POST',
+                                     headers: {
+                                         'Content-Type': 'application/json',
+                                         'Accept': 'application/json',
+                                         'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                     },
+                                     body: JSON.stringify({ test_recipient: this.recipient }),
+                                 });
+                                 const data = await res.json();
+                                 this.result = { ok: res.ok && data.success, message: data.message || (res.ok ? 'Sent.' : 'Request failed.') };
+                             } catch (e) {
+                                 this.result = { ok: false, message: 'Network error: ' + e.message };
+                             } finally {
+                                 this.loading = false;
+                             }
+                         }
+                     }">
+                    <div class="flex items-end gap-3 flex-wrap">
+                        <div class="flex-1 min-w-[260px]">
+                            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Send Test Email</label>
+                            <input type="email" x-model="recipient" placeholder="recipient@example.com"
+                                   class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                        </div>
+                        <button type="button" @click="send()" :disabled="loading || !recipient"
+                                :class="loading ? 'opacity-60 cursor-not-allowed' : ''"
+                                class="px-5 py-2.5 bg-[#073057] hover:bg-[#0a4275] text-white text-sm font-semibold rounded-lg transition">
+                            <span x-show="!loading">Send Test</span>
+                            <span x-show="loading">Sending…</span>
+                        </button>
+                    </div>
+                    <p class="mt-2 text-xs text-gray-500">Save your changes first — the test uses the currently saved SMTP settings, not unsaved form values.</p>
+                    <template x-if="result">
+                        <div class="mt-3 rounded-lg px-4 py-3 text-sm"
+                             :class="result.ok ? 'bg-emerald-50 border border-emerald-200 text-emerald-700' : 'bg-red-50 border border-red-200 text-red-700'"
+                             x-text="result.message"></div>
+                    </template>
+                </div>
             </div>
 
             {{-- Reminders tab --}}

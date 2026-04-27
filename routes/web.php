@@ -313,6 +313,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Settings
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('admin.settings.index');
     Route::put('/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
+    Route::post('/settings/mail/test', [AdminSettingsController::class, 'testMail'])->name('admin.settings.mail.test');
 
     // Email Templates
     Route::get('/email-templates', [AdminEmailTemplateController::class, 'index'])->name('admin.email-templates.index');
