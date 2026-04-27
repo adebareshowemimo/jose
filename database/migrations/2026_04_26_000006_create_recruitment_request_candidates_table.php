@@ -27,7 +27,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->index(['recruitment_request_id', 'employer_decision']);
+            $table->index(['recruitment_request_id', 'employer_decision'], 'rrc_request_decision_idx');
         });
     }
 
