@@ -10,21 +10,54 @@
 
 <div class="grid gap-6 xl:grid-cols-[360px_1fr]">
     <div class="space-y-6">
-        <div class="rounded-xl border border-gray-200 bg-white p-4">
+        <div class="rounded-xl border border-gray-200 bg-white p-4"
+             x-data="{
+                 q: '',
+                 results: [],
+                 loading: false,
+                 hasSearched: false,
+                 timer: null,
+                 init() { this.fetch(); },
+                 onInput() {
+                     clearTimeout(this.timer);
+                     this.timer = setTimeout(() => this.fetch(), 250);
+                 },
+                 async fetch() {
+                     this.loading = true;
+                     try {
+                         const url = new URL('{{ route('admin.chat.candidates.search') }}', window.location.origin);
+                         if (this.q) url.searchParams.set('q', this.q);
+                         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                         const data = await res.json();
+                         this.results = data.results || [];
+                     } catch (e) {
+                         this.results = [];
+                     } finally {
+                         this.loading = false;
+                         this.hasSearched = true;
+                     }
+                 },
+                 gotoCandidate(id) {
+                     window.location.href = '{{ route('admin.chat.index') }}?candidate_id=' + id;
+                 }
+             }">
             <h2 class="font-semibold text-gray-900 mb-3">Start Candidate Chat</h2>
-            <form method="GET" action="{{ route('admin.chat.index') }}" class="mb-4">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Search name or email..."
-                    class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
-            </form>
+            <div class="relative mb-3">
+                <input type="text" x-model="q" @input="onInput()" placeholder="Type a name or email..."
+                    class="w-full px-3 py-2 pr-9 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
+                <span x-show="loading" class="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">…</span>
+            </div>
             <div class="space-y-2 max-h-72 overflow-y-auto">
-                @forelse($candidateSearch as $candidate)
-                    <a href="{{ route('admin.chat.index', ['candidate_id' => $candidate->id]) }}" class="block rounded-lg border border-gray-100 p-3 hover:bg-gray-50">
-                        <p class="text-sm font-semibold text-gray-900">{{ $candidate->user?->name ?? 'Candidate' }}</p>
-                        <p class="text-xs text-gray-500">{{ $candidate->user?->email }}</p>
-                    </a>
-                @empty
-                    <p class="text-sm text-gray-400 text-center py-6">No platform candidates found.</p>
-                @endforelse
+                <template x-for="c in results" :key="c.id">
+                    <button type="button" @click="gotoCandidate(c.id)"
+                            class="w-full text-left rounded-lg border border-gray-100 p-3 hover:bg-gray-50 transition">
+                        <p class="text-sm font-semibold text-gray-900" x-text="c.name"></p>
+                        <p class="text-xs text-gray-500" x-text="c.email"></p>
+                    </button>
+                </template>
+                <p x-show="hasSearched && !loading && results.length === 0"
+                   class="text-sm text-gray-400 text-center py-6"
+                   x-text="q ? 'No matches for &quot;' + q + '&quot;.' : 'No candidates found.'"></p>
             </div>
         </div>
 

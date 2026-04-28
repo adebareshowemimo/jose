@@ -286,6 +286,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Chat
     Route::get('/chat', [AdminChatController::class, 'index'])->name('admin.chat.index');
+    Route::get('/chat/candidates/search', [AdminChatController::class, 'searchCandidates'])->name('admin.chat.candidates.search');
     Route::post('/chat/{conversation}/messages', [AdminChatController::class, 'send'])->name('admin.chat.messages.store');
 
     // Events

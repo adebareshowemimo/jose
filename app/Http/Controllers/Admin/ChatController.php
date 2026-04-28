@@ -13,18 +13,6 @@ class ChatController extends Controller
 {
     public function index(Request $request)
     {
-        $candidateSearch = Candidate::with(['user', 'location'])
-            ->whereHas('user', function ($query) use ($request) {
-                if ($request->filled('search')) {
-                    $search = (string) $request->input('search');
-                    $query->where('name', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                }
-            })
-            ->orderByDesc('updated_at')
-            ->take(25)
-            ->get();
-
         $conversations = ChatConversation::with(['candidate.user', 'latestMessage.sender'])
             ->where('type', ChatConversation::TYPE_ADMIN_CANDIDATE)
             ->orderByDesc('last_message_at')
@@ -46,17 +34,17 @@ class ChatController extends Controller
                     'last_message_at' => now(),
                 ]
             );
+
+            $conversations = ChatConversation::with(['candidate.user', 'latestMessage.sender'])
+                ->where('type', ChatConversation::TYPE_ADMIN_CANDIDATE)
+                ->orderByDesc('last_message_at')
+                ->orderByDesc('created_at')
+                ->get();
         } elseif ($request->filled('conversation')) {
             $selectedConversation = $conversations->firstWhere('id', $request->integer('conversation'));
         } else {
             $selectedConversation = $conversations->first();
         }
-
-        $conversations = ChatConversation::with(['candidate.user', 'latestMessage.sender'])
-            ->where('type', ChatConversation::TYPE_ADMIN_CANDIDATE)
-            ->orderByDesc('last_message_at')
-            ->orderByDesc('created_at')
-            ->get();
 
         if ($selectedConversation) {
             $selectedConversation->load(['candidate.user', 'messages.sender']);
@@ -69,7 +57,34 @@ class ChatController extends Controller
             $messages = collect();
         }
 
-        return view('admin.chat.index', compact('candidateSearch', 'conversations', 'selectedConversation', 'messages'));
+        return view('admin.chat.index', compact('conversations', 'selectedConversation', 'messages'));
+    }
+
+    public function searchCandidates(Request $request)
+    {
+        $query = trim((string) $request->input('q', ''));
+
+        $candidates = Candidate::with('user:id,name,email,avatar')
+            ->whereHas('user', function ($q) use ($query) {
+                if ($query !== '') {
+                    $q->where(function ($inner) use ($query) {
+                        $inner->where('name', 'like', "%{$query}%")
+                              ->orWhere('email', 'like', "%{$query}%");
+                    });
+                }
+            })
+            ->orderByDesc('updated_at')
+            ->take(15)
+            ->get();
+
+        return response()->json([
+            'results' => $candidates->map(fn ($c) => [
+                'id' => $c->id,
+                'name' => $c->user?->name ?? 'Candidate',
+                'email' => $c->user?->email,
+                'avatar' => $c->user?->avatar,
+            ])->values(),
+        ]);
     }
 
     public function send(Request $request, ChatConversation $conversation)
