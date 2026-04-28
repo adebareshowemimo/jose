@@ -303,7 +303,7 @@ class AdminController extends Controller
 
     public function orders(Request $request)
     {
-        $query = Order::with(['user', 'payments']);
+        $query = Order::with(['user', 'payments', 'items']);
 
         if ($request->filled('search')) {
             $query->where('order_number', 'like', "%{$request->search}%");
@@ -311,9 +311,23 @@ class AdminController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+        if ($request->filled('orderable_type')) {
+            $type = (string) $request->input('orderable_type');
+            $query->whereHas('items', fn ($q) => $q->where('orderable_type', $type));
+        }
 
         $orders = $query->latest()->paginate(20)->withQueryString();
-        return view('admin.orders.index', compact('orders'));
+
+        // Distinct orderable types currently in use, for the filter dropdown.
+        $orderableTypes = \App\Models\OrderItem::query()
+            ->select('orderable_type')
+            ->whereNotNull('orderable_type')
+            ->distinct()
+            ->orderBy('orderable_type')
+            ->pluck('orderable_type')
+            ->all();
+
+        return view('admin.orders.index', compact('orders', 'orderableTypes'));
     }
 
     public function showOrder(Order $order)

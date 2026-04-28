@@ -19,6 +19,7 @@ class Candidate extends Model
         'experience_years', 'expected_salary', 'salary_type', 'website',
         'video_url', 'social_links', 'location_id', 'address',
         'latitude', 'longitude', 'allow_search', 'is_available', 'skills_list',
+        'featured_until',
     ];
 
     protected function casts(): array
@@ -36,7 +37,28 @@ class Candidate extends Model
             'longitude' => 'decimal:7',
             'allow_search' => 'boolean',
             'is_available' => 'boolean',
+            'featured_until' => 'datetime',
         ];
+    }
+
+    public function boosts(): HasMany
+    {
+        return $this->hasMany(CandidateBoost::class);
+    }
+
+    public function orderItems(): MorphMany
+    {
+        return $this->morphMany(OrderItem::class, 'orderable');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->whereNotNull('featured_until')->where('featured_until', '>', now());
+    }
+
+    public function isFeatured(): bool
+    {
+        return $this->featured_until && $this->featured_until->isFuture();
     }
 
     public function user(): BelongsTo

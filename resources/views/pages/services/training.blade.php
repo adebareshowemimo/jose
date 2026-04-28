@@ -68,28 +68,123 @@
             <h2 class="text-[38px] font-extrabold text-[#073057] leading-tight">All Training Programs</h2>
             <p class="mt-3 max-w-2xl mx-auto text-lg text-[#6B7280]">Courses designed to international standards, delivered in-person and hybrid.</p>
         </div>
-        <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            @foreach ($programs as $prog)
-            <div class="flex flex-col rounded-[24px] border border-[#E5E7EB] bg-white p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#073057]/8 text-[#073057]">
-                    <iconify-icon icon="{{ $prog['icon'] ?? 'lucide:graduation-cap' }}" class="text-xl"></iconify-icon>
-                </div>
-                <span class="inline-block mb-3 rounded-full bg-[#1AAD94]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#1AAD94]">{{ $prog['category'] }}</span>
-                <h4 class="text-[17px] font-extrabold text-[#073057] mb-2 leading-snug">{{ $prog['title'] }}</h4>
-                <p class="text-[#6B7280] text-sm leading-relaxed flex-grow mb-5">{{ $prog['description'] }}</p>
-                <div class="flex items-center gap-4 text-[12px] text-[#9CA3AF] font-semibold border-t border-[#F3F4F6] pt-4">
-                    <span class="flex items-center gap-1.5">
-                        <iconify-icon icon="lucide:clock" class="text-[#1AAD94]"></iconify-icon>
-                        {{ $prog['duration'] }}
-                    </span>
-                    <span class="flex items-center gap-1.5">
-                        <iconify-icon icon="lucide:monitor" class="text-[#1AAD94]"></iconify-icon>
-                        {{ $prog['mode'] }}
-                    </span>
-                </div>
+
+        @if (! empty($dbPrograms) && $dbPrograms->isNotEmpty())
+            {{-- DB-backed programs (real TrainingProgram records — admin-managed) --}}
+            <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                @foreach ($dbPrograms as $program)
+                    <article class="flex flex-col rounded-[24px] border border-[#E5E7EB] bg-white shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                        @if ($program->image_url)
+                            <a href="{{ route('training.show', $program->slug) }}" class="block aspect-[16/10] bg-gray-100 overflow-hidden">
+                                <img src="{{ $program->image_url }}" alt="{{ $program->title }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" loading="lazy">
+                            </a>
+                        @endif
+
+                        <div class="p-7 flex-1 flex flex-col">
+                            @if (! $program->image_url)
+                                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#073057]/8 text-[#073057]">
+                                    <iconify-icon icon="lucide:graduation-cap" class="text-xl"></iconify-icon>
+                                </div>
+                            @endif
+
+                            <div class="flex flex-wrap items-center gap-2 mb-3">
+                                @if ($program->category)
+                                    <span class="inline-block rounded-full bg-[#1AAD94]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#1AAD94]">{{ $program->category }}</span>
+                                @endif
+                                @if ($program->is_featured)
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold uppercase tracking-wider">
+                                        <iconify-icon icon="lucide:star" class="text-xs"></iconify-icon>
+                                        Featured
+                                    </span>
+                                @endif
+                            </div>
+
+                            <h4 class="text-[17px] font-extrabold text-[#073057] mb-2 leading-snug">
+                                <a href="{{ route('training.show', $program->slug) }}" class="hover:text-[#1AAD94] transition-colors">{{ $program->title }}</a>
+                            </h4>
+
+                            @if ($program->short_description)
+                                <p class="text-[#6B7280] text-sm leading-relaxed flex-grow mb-5 line-clamp-3">{{ $program->short_description }}</p>
+                            @endif
+
+                            <div class="flex items-center flex-wrap gap-4 text-[12px] text-[#9CA3AF] font-semibold border-t border-[#F3F4F6] pt-4 mb-5">
+                                @if ($program->duration)
+                                    <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:clock" class="text-[#1AAD94]"></iconify-icon> {{ $program->duration }}</span>
+                                @endif
+                                @if ($program->level)
+                                    <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:bar-chart-2" class="text-[#1AAD94]"></iconify-icon> {{ $program->level }}</span>
+                                @endif
+                                @if ($program->starts_at)
+                                    <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:calendar" class="text-[#1AAD94]"></iconify-icon> {{ $program->starts_at->format('M d') }}</span>
+                                @endif
+                            </div>
+
+                            <div class="flex items-center justify-between gap-3">
+                                <span class="text-base font-extrabold text-[#073057]">
+                                    @if ($program->isFree())
+                                        <span class="text-[#1AAD94]">Free</span>
+                                    @else
+                                        {{ $program->currency }} {{ number_format((float) $program->price, 2) }}
+                                    @endif
+                                </span>
+                                <div class="flex items-center gap-2">
+                                    <a href="{{ route('training.show', $program->slug) }}"
+                                       class="inline-flex items-center gap-1.5 px-3.5 py-2 border-2 border-[#073057] hover:bg-[#073057] hover:text-white text-[#073057] text-[11px] font-bold uppercase tracking-wider rounded-lg transition">
+                                        <iconify-icon icon="lucide:eye" class="text-xs"></iconify-icon>
+                                        View
+                                    </a>
+                                    @auth
+                                        <form method="POST" action="{{ route('training.enrol', $program) }}" class="m-0">
+                                            @csrf
+                                            <button type="submit" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1AAD94] hover:brightness-110 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition shadow">
+                                                <iconify-icon icon="lucide:graduation-cap" class="text-xs"></iconify-icon>
+                                                {{ $program->isFree() ? 'Join' : 'Apply' }}
+                                            </button>
+                                        </form>
+                                    @else
+                                        <a href="{{ route('auth.login', ['redirect' => route('training.show', $program->slug)]) }}"
+                                           class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1AAD94] hover:brightness-110 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition shadow">
+                                            <iconify-icon icon="lucide:graduation-cap" class="text-xs"></iconify-icon>
+                                            {{ $program->isFree() ? 'Join' : 'Apply' }}
+                                        </a>
+                                    @endauth
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
             </div>
-            @endforeach
-        </div>
+        @else
+            {{-- Static fallback — kept until admin creates real TrainingProgram records via /admin/training. --}}
+            <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                @foreach ($programs as $prog)
+                <div class="flex flex-col rounded-[24px] border border-[#E5E7EB] bg-white p-7 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#073057]/8 text-[#073057]">
+                        <iconify-icon icon="{{ $prog['icon'] ?? 'lucide:graduation-cap' }}" class="text-xl"></iconify-icon>
+                    </div>
+                    <span class="inline-block mb-3 rounded-full bg-[#1AAD94]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[#1AAD94]">{{ $prog['category'] }}</span>
+                    <h4 class="text-[17px] font-extrabold text-[#073057] mb-2 leading-snug">{{ $prog['title'] }}</h4>
+                    <p class="text-[#6B7280] text-sm leading-relaxed flex-grow mb-5">{{ $prog['description'] }}</p>
+                    <div class="flex items-center gap-4 text-[12px] text-[#9CA3AF] font-semibold border-t border-[#F3F4F6] pt-4 mb-5">
+                        <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:clock" class="text-[#1AAD94]"></iconify-icon> {{ $prog['duration'] }}</span>
+                        <span class="flex items-center gap-1.5"><iconify-icon icon="lucide:monitor" class="text-[#1AAD94]"></iconify-icon> {{ $prog['mode'] }}</span>
+                    </div>
+                    <div class="flex items-center justify-end gap-2 mt-auto">
+                        <a href="{{ route('training.index') }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 border-2 border-[#073057] hover:bg-[#073057] hover:text-white text-[#073057] text-[11px] font-bold uppercase tracking-wider rounded-lg transition">
+                            <iconify-icon icon="lucide:eye" class="text-xs"></iconify-icon>
+                            View
+                        </a>
+                        <a href="{{ route('contact.index') }}"
+                           class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#1AAD94] hover:brightness-110 text-white text-[11px] font-bold uppercase tracking-wider rounded-lg transition shadow">
+                            <iconify-icon icon="lucide:graduation-cap" class="text-xs"></iconify-icon>
+                            Apply
+                        </a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </section>
 

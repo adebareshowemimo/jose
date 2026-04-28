@@ -38,6 +38,21 @@
         padding: 0.45rem 0.75rem 0 0;
         color: #073057;
     }
+    .article-prose h1, .article-prose h2 { font-weight: 800; color: #073057; line-height: 1.2; margin: 2rem 0 0.7rem; }
+    .article-prose h1 { font-size: 1.85rem; }
+    .article-prose h2 { font-size: 1.5rem; }
+    .article-prose h3 { font-weight: 700; color: #073057; font-size: 1.2rem; margin: 1.5rem 0 0.5rem; }
+    .article-prose ul, .article-prose ol { padding-left: 1.5rem; margin-bottom: 1.35rem; }
+    .article-prose ul { list-style: disc; }
+    .article-prose ol { list-style: decimal; }
+    .article-prose li { margin-bottom: 0.45rem; line-height: 1.7; }
+    .article-prose a { color: #1AAD94; text-decoration: underline; }
+    .article-prose a:hover { color: #0F8B75; }
+    .article-prose blockquote { border-left: 4px solid #1AAD94; padding: 0.6rem 1.1rem; margin: 1.4rem 0; background: #F9FAFB; color: #4B5563; font-style: italic; }
+    .article-prose code { background: #F3F4F6; padding: 0.1rem 0.4rem; border-radius: 0.25rem; font-family: ui-monospace, SFMono-Regular, monospace; font-size: 0.9em; color: #073057; }
+    .article-prose pre { background: #0A1929; color: #E5E7EB; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1.2rem 0; }
+    .article-prose pre code { background: transparent; color: inherit; padding: 0; }
+    .article-prose strong { color: #073057; }
     @media (max-width: 640px) {
         .article-prose p:first-of-type::first-letter { font-size: 3rem; padding-right: 0.5rem; }
     }
@@ -208,11 +223,17 @@
                     @endif
 
                     <div class="article-prose max-w-2xl mx-auto">
-                        @forelse ($content as $paragraph)
-                            <p>{{ $paragraph }}</p>
-                        @empty
+                        @if (empty($content))
                             <p class="text-gray-400 italic">This article has no content yet.</p>
-                        @endforelse
+                        @elseif (count($content) === 1 && str_contains($content[0] ?? '', '<'))
+                            {{-- Quill-produced HTML --}}
+                            {!! $content[0] !!}
+                        @else
+                            {{-- Legacy plain-text paragraphs --}}
+                            @foreach ($content as $paragraph)
+                                <p>{{ $paragraph }}</p>
+                            @endforeach
+                        @endif
                     </div>
 
                     {{-- End-of-article divider --}}

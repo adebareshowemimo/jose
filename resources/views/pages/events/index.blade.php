@@ -3,6 +3,22 @@
 @section('title', $pageTitle . ' — Jose Consulting Limited')
 @section('meta_description', $pageDescription)
 
+@push('styles')
+<style>
+    .event-prose p { margin-bottom: 0.85rem; }
+    .event-prose p:last-child { margin-bottom: 0; }
+    .event-prose h2, .event-prose h3 { font-weight: 700; color: #073057; margin: 1.1rem 0 0.4rem; }
+    .event-prose h2 { font-size: 1.2rem; }
+    .event-prose h3 { font-size: 1.05rem; }
+    .event-prose ul, .event-prose ol { padding-left: 1.4rem; margin-bottom: 0.8rem; }
+    .event-prose ul { list-style: disc; }
+    .event-prose ol { list-style: decimal; }
+    .event-prose li { margin-bottom: 0.3rem; }
+    .event-prose a { color: #1AAD94; text-decoration: underline; }
+    .event-prose strong { color: #073057; }
+</style>
+@endpush
+
 @section('content')
 @php
     $img = $jclImages ?? [];
@@ -105,15 +121,42 @@
                         </span>
                     </div>
 
-                    <p class="text-[#4B5563] leading-relaxed mb-7">{{ $featured['description'] }}</p>
+                    @php $featuredDesc = (string) ($featured['description'] ?? ''); @endphp
+                    @if (str_contains($featuredDesc, '<'))
+                        <div class="event-prose text-[#4B5563] leading-relaxed mb-7">{!! $featuredDesc !!}</div>
+                    @else
+                        <p class="text-[#4B5563] leading-relaxed mb-7">{{ $featuredDesc }}</p>
+                    @endif
 
                     <div class="flex flex-wrap gap-3">
-                        <a href="{{ $featured['register_url'] ?? route('contact.index') }}"
-                           {{ ! empty($featured['register_url']) ? 'target=_blank rel=noopener' : '' }}
-                           class="inline-flex items-center gap-2 px-6 py-3 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
-                            <iconify-icon icon="lucide:ticket"></iconify-icon>
-                            Register Interest
-                        </a>
+                        @if (! empty($featured['register_url']))
+                            <a href="{{ $featured['register_url'] }}" target="_blank" rel="noopener"
+                               class="inline-flex items-center gap-2 px-6 py-3 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
+                                <iconify-icon icon="lucide:external-link"></iconify-icon>
+                                Register on partner site
+                            </a>
+                        @elseif (! empty($featured['is_sold_out']))
+                            <span class="inline-flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-500 text-sm font-bold uppercase tracking-widest rounded-xl">
+                                Sold out
+                            </span>
+                        @elseif (! empty($featured['is_paid']))
+                            <a href="{{ $featured['register_show_url'] ?? '#' }}"
+                               class="inline-flex items-center gap-2 px-6 py-3 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
+                                <iconify-icon icon="lucide:ticket"></iconify-icon>
+                                Register & pay · {{ $featured['currency'] }} {{ number_format((float) $featured['price'], 2) }}
+                            </a>
+                        @elseif (! empty($featured['is_free_internal']))
+                            <a href="{{ $featured['register_show_url'] ?? '#' }}"
+                               class="inline-flex items-center gap-2 px-6 py-3 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
+                                <iconify-icon icon="lucide:check"></iconify-icon>
+                                Reserve your spot
+                            </a>
+                        @else
+                            <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
+                                <iconify-icon icon="lucide:mail"></iconify-icon>
+                                Contact us
+                            </a>
+                        @endif
                         <a href="#hosted" class="inline-flex items-center gap-2 px-6 py-3 border-2 border-[#073057] hover:bg-[#073057] hover:text-white text-[#073057] text-sm font-bold uppercase tracking-widest rounded-xl transition">
                             More events
                         </a>
@@ -191,15 +234,34 @@
                                     </p>
                                 </div>
 
-                                <p class="text-[#4B5563] text-sm leading-relaxed mb-5 line-clamp-3">{{ $event['description'] }}</p>
+                                <p class="text-[#4B5563] text-sm leading-relaxed mb-5 line-clamp-3">{{ \Illuminate\Support\Str::limit(strip_tags((string) $event['description']), 220) }}</p>
 
-                                <div class="mt-auto pt-4 border-t border-gray-100">
-                                    <a href="{{ $event['register_url'] ?? route('contact.index') }}"
-                                       {{ ! empty($event['register_url']) ? 'target=_blank rel=noopener' : '' }}
-                                       class="inline-flex items-center gap-1.5 text-sm font-bold text-[#073057] hover:text-[#1AAD94] transition group/btn">
-                                        Register interest
-                                        <iconify-icon icon="lucide:arrow-right" class="transition-transform group-hover/btn:translate-x-1"></iconify-icon>
-                                    </a>
+                                <div class="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between gap-2">
+                                    @if (! empty($event['register_url']))
+                                        <a href="{{ $event['register_url'] }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-bold text-[#073057] hover:text-[#1AAD94] transition group/btn">
+                                            Register on partner site
+                                            <iconify-icon icon="lucide:external-link"></iconify-icon>
+                                        </a>
+                                    @elseif (! empty($event['is_sold_out']))
+                                        <span class="inline-flex px-2.5 py-1 rounded-full bg-gray-200 text-gray-500 text-xs font-bold uppercase tracking-wider">Sold out</span>
+                                    @elseif (! empty($event['is_paid']))
+                                        <span class="text-sm font-extrabold text-[#073057]">{{ $event['currency'] }} {{ number_format((float) $event['price'], 2) }}</span>
+                                        <a href="{{ $event['register_show_url'] ?? '#' }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1AAD94] hover:brightness-110 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition">
+                                            Register
+                                            <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                                        </a>
+                                    @elseif (! empty($event['is_free_internal']))
+                                        <span class="inline-flex px-2.5 py-1 rounded-full bg-[#1AAD94]/10 text-[#1AAD94] text-xs font-bold uppercase tracking-wider">Free</span>
+                                        <a href="{{ $event['register_show_url'] ?? '#' }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#073057] hover:brightness-110 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition">
+                                            Reserve
+                                            <iconify-icon icon="lucide:arrow-right"></iconify-icon>
+                                        </a>
+                                    @else
+                                        <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-1.5 text-sm font-bold text-[#073057] hover:text-[#1AAD94] transition group/btn">
+                                            Contact us
+                                            <iconify-icon icon="lucide:arrow-right" class="transition-transform group-hover/btn:translate-x-1"></iconify-icon>
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         </article>
@@ -288,7 +350,7 @@
                                     {{ $ie['location'] }}
                                 </p>
                             </div>
-                            <p class="text-[#4B5563] text-sm leading-relaxed line-clamp-3">{{ $ie['description'] }}</p>
+                            <p class="text-[#4B5563] text-sm leading-relaxed line-clamp-3">{{ \Illuminate\Support\Str::limit(strip_tags((string) $ie['description']), 220) }}</p>
 
                             @if (! empty($ie['register_url']))
                                 <a href="{{ $ie['register_url'] }}" target="_blank" rel="noopener" class="mt-4 pt-3 border-t border-gray-100 inline-flex items-center gap-1.5 text-sm font-bold text-[#073057] hover:text-[#1AAD94] transition group/btn">

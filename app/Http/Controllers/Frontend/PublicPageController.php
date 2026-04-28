@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Frontend;
 use App\Models\Event;
 use App\Models\JobListing;
 use App\Models\NewsArticle;
+use App\Models\TrainingProgram;
 use App\Support\JclProfileContent;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
 class PublicPageController extends BasePageController
@@ -62,22 +64,67 @@ class PublicPageController extends BasePageController
             ],
         ));
     }
-    public function training()
+    public function training(Request $request)
     {
-        $profile = JclProfileContent::company();
+        return $this->renderTrainingListing($request, 'training');
+    }
 
-        return view('pages.training.index', $this->buildJclPageData(
-            title: 'Trainings',
-            description: 'Building workforce competence through internationally recognized programmes.',
+    public function trainingShow(string $slug)
+    {
+        $program = \App\Models\TrainingProgram::where('slug', $slug)->where('is_active', true)->first();
+        if (! $program) {
+            abort(404);
+        }
+        $isApprenticeship = $program->type === 'apprenticeship';
+        $listingRoute = $isApprenticeship ? 'career.apprenticeship' : 'training.index';
+        $listingLabel = $isApprenticeship ? 'Apprenticeships' : 'Training';
+
+        return view('pages.training.show', $this->buildJclPageData(
+            title: $program->title,
+            description: $program->short_description ?? $program->title,
             breadcrumbs: [
                 ['label' => 'Home', 'url' => url('/')],
-                ['label' => 'Trainings'],
+                ['label' => $listingLabel, 'url' => route($listingRoute)],
+                ['label' => $program->title],
             ],
+            extra: ['program' => $program],
+        ));
+    }
+
+    private function renderTrainingListing(Request $request, string $type)
+    {
+        $isApprenticeship = $type === 'apprenticeship';
+
+        $query = \App\Models\TrainingProgram::active()->ofType($type);
+        if ($request->filled('category')) {
+            $query->where('category', $request->input('category'));
+        }
+        $programs = $query
+            ->orderByDesc('is_featured')
+            ->orderBy('sort_order')
+            ->orderByDesc('id')
+            ->paginate(12)
+            ->withQueryString();
+
+        $categories = \App\Models\TrainingProgram::active()->ofType($type)
+            ->whereNotNull('category')
+            ->select('category')->distinct()->orderBy('category')->pluck('category')->all();
+
+        $title = $isApprenticeship ? 'Apprenticeships' : 'Training';
+        $crumbs = $isApprenticeship
+            ? [['label' => 'Home', 'url' => url('/')], ['label' => 'Career', 'url' => route('career.index')], ['label' => 'Apprenticeship']]
+            : [['label' => 'Home', 'url' => url('/')], ['label' => 'Training']];
+
+        return view('pages.training.index', $this->buildJclPageData(
+            title: $title,
+            description: $isApprenticeship
+                ? 'Earn while you learn — paid maritime apprenticeship programmes.'
+                : 'Internationally recognised training programmes built around STCW, BOSIET and industry frameworks.',
+            breadcrumbs: $crumbs,
             extra: [
-                'profile' => $profile,
-                'programs' => $profile['training_programs'],
-                'events' => $profile['events'],
-                'industry_events' => $profile['industry_events'],
+                'programs' => $programs,
+                'categories' => $categories,
+                'filterType' => $type,
             ],
         ));
     }
@@ -219,32 +266,60 @@ class PublicPageController extends BasePageController
 
     public function candidatesIndex()
     {
-        $candidates = [
-            [
-                'slug' => 'john-anderson',
-                'name' => 'John Anderson',
-                'role' => 'Chief Engineer',
-                'location' => 'Oslo, Norway',
-                'experience' => '11 years',
-                'availability' => 'Immediate',
-            ],
-            [
-                'slug' => 'elena-petrova',
-                'name' => 'Elena Petrova',
-                'role' => 'Navigation Officer',
-                'location' => 'Rotterdam, Netherlands',
-                'experience' => '8 years',
-                'availability' => '2 weeks',
-            ],
-            [
-                'slug' => 'marcus-thorne',
-                'name' => 'Marcus Thorne',
-                'role' => 'Safety Superintendent',
-                'location' => 'Aberdeen, UK',
-                'experience' => '13 years',
-                'availability' => 'Immediate',
-            ],
+        $fallback = [
+            ['slug' => 'john-anderson', 'name' => 'John Anderson', 'role' => 'Chief Engineer', 'location' => 'Oslo, Norway', 'experience' => '11 years', 'availability' => 'Immediate', 'is_featured' => false],
+            ['slug' => 'elena-petrova', 'name' => 'Elena Petrova', 'role' => 'Navigation Officer', 'location' => 'Rotterdam, Netherlands', 'experience' => '8 years', 'availability' => '2 weeks', 'is_featured' => false],
+            ['slug' => 'marcus-thorne', 'name' => 'Marcus Thorne', 'role' => 'Safety Superintendent', 'location' => 'Aberdeen, UK', 'experience' => '13 years', 'availability' => 'Immediate', 'is_featured' => false],
         ];
+
+        $candidates = $fallback;
+
+        if (Schema::hasTable('candidates')) {
+            // Featured (boosted or premium) come first via featured_until DESC NULLS LAST.
+            $now = now()->toDateTimeString();
+            $today = now()->toDateString();
+
+            // Pull active premium subscriber user ids (always-featured benefit).
+            $premiumUserIds = [];
+            if (Schema::hasTable('subscriptions') && Schema::hasTable('plans')) {
+                $premiumUserIds = \App\Models\Subscription::query()
+                    ->join('plans', 'plans.id', '=', 'subscriptions.plan_id')
+                    ->where('subscriptions.status', 'active')
+                    ->where(function ($q) use ($today) {
+                        $q->whereNull('subscriptions.ends_at')->orWhere('subscriptions.ends_at', '>=', $today);
+                    })
+                    ->whereRaw("plans.benefits LIKE '%\"always_featured\":true%'")
+                    ->pluck('subscriptions.user_id')
+                    ->all();
+            }
+
+            $rows = \App\Models\Candidate::with(['user:id,name', 'location:id,name'])
+                ->where('allow_search', true)
+                ->orderByRaw('CASE WHEN featured_until > ? OR user_id IN (' . (empty($premiumUserIds) ? 'NULL' : implode(',', $premiumUserIds)) . ') THEN 0 ELSE 1 END', [$now])
+                ->orderByDesc('featured_until')
+                ->orderByDesc('created_at')
+                ->take(24)
+                ->get();
+
+            // Mark premium-only candidates as featured for view purposes.
+            foreach ($rows as $c) {
+                if (in_array($c->user_id, $premiumUserIds, true) && ! $c->isFeatured()) {
+                    $c->setAttribute('_premium_featured', true);
+                }
+            }
+
+            if ($rows->isNotEmpty()) {
+                $candidates = $rows->map(fn ($c) => [
+                    'slug' => $c->slug,
+                    'name' => $c->user?->name ?? 'Candidate',
+                    'role' => $c->title ?? 'Maritime Professional',
+                    'location' => $c->location?->name ?? $c->address ?? '—',
+                    'experience' => $c->experience_years ? $c->experience_years . ' years' : 'Experience varies',
+                    'availability' => $c->is_available ? 'Available' : '—',
+                    'is_featured' => $c->isFeatured() || $c->getAttribute('_premium_featured') === true,
+                ])->all();
+            }
+        }
 
         return view('pages.candidates.index', [
             'pageTitle' => 'Candidate Directory',
@@ -581,6 +656,17 @@ class PublicPageController extends BasePageController
     {
         $profile = JclProfileContent::company();
 
+        $dbPrograms = collect();
+        if (Schema::hasTable('training_programs')) {
+            $dbPrograms = TrainingProgram::active()
+                ->ofType(TrainingProgram::TYPE_TRAINING)
+                ->orderByDesc('is_featured')
+                ->orderBy('sort_order')
+                ->orderByDesc('id')
+                ->take(12)
+                ->get();
+        }
+
         return view('pages.services.training', $this->buildJclPageData(
             title: 'Training',
             description: 'Professional training programs aligned to international maritime and energy standards.',
@@ -592,6 +678,7 @@ class PublicPageController extends BasePageController
             extra: [
                 'profile' => $profile,
                 'programs' => $profile['training_programs'],
+                'dbPrograms' => $dbPrograms,
             ],
         ));
     }
@@ -714,17 +801,9 @@ class PublicPageController extends BasePageController
         ));
     }
 
-    public function careerApprenticeship()
+    public function careerApprenticeship(Request $request)
     {
-        return view('pages.career.apprenticeship', $this->buildJclPageData(
-            title: 'Apprenticeship',
-            description: 'Structured apprenticeship pathways into the maritime and energy sectors.',
-            breadcrumbs: [
-                ['label' => 'Home', 'url' => url('/')],
-                ['label' => 'Career', 'url' => route('career.index')],
-                ['label' => 'Apprenticeship'],
-            ],
-        ));
+        return $this->renderTrainingListing($request, 'apprenticeship');
     }
 
     public function careerInternship()
@@ -784,6 +863,7 @@ class PublicPageController extends BasePageController
     private function eventForView(Event $event): array
     {
         return [
+            'id' => $event->id,
             'title' => $event->title,
             'type' => $event->type,
             'date' => $event->display_date,
@@ -794,6 +874,15 @@ class PublicPageController extends BasePageController
             'is_featured' => (bool) $event->is_featured,
             'image_url' => $event->image_url,
             'register_url' => $event->register_url,
+            // Internal-ticketing fields
+            'price' => $event->price,
+            'currency' => $event->currency,
+            'capacity' => $event->capacity,
+            'seats_remaining' => $event->seatsRemaining(),
+            'is_paid' => $event->isPaid(),
+            'is_free_internal' => $event->isFreeInternal(),
+            'is_sold_out' => $event->isSoldOut(),
+            'register_show_url' => route('events.register.show', $event),
         ];
     }
 

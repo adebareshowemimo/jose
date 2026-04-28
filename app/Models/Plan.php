@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Plan extends Model
@@ -14,6 +15,7 @@ class Plan extends Model
     protected $fillable = [
         'name', 'description', 'monthly_price', 'annual_price',
         'max_job_posts', 'max_featured_jobs', 'resume_access',
+        'benefits',
         'role_id', 'is_recommended', 'is_active', 'sort_order',
     ];
 
@@ -25,6 +27,7 @@ class Plan extends Model
             'resume_access' => 'boolean',
             'is_recommended' => 'boolean',
             'is_active' => 'boolean',
+            'benefits' => 'array',
         ];
     }
 
@@ -36,5 +39,15 @@ class Plan extends Model
     public function subscriptions(): HasMany
     {
         return $this->hasMany(Subscription::class);
+    }
+
+    public function orderItems(): MorphMany
+    {
+        return $this->morphMany(OrderItem::class, 'orderable');
+    }
+
+    public function hasBenefit(string $key): bool
+    {
+        return ! empty($this->benefits[$key]);
     }
 }

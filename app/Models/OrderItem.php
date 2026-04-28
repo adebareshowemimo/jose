@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class OrderItem extends Model
 {
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_FULFILLED = 'fulfilled';
+    public const STATUS_FAILED = 'failed';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_REFUNDED = 'refunded';
+
     protected $fillable = [
         'order_id', 'orderable_type', 'orderable_id',
         'price', 'quantity', 'subtotal', 'status', 'meta',

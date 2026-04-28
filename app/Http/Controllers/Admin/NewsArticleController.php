@@ -48,11 +48,16 @@ class NewsArticleController extends Controller
         return view('admin.news.index', compact('articles', 'categories'));
     }
 
+    public function create()
+    {
+        return view('admin.news.create');
+    }
+
     public function store(Request $request)
     {
         NewsArticle::create($this->validatedData($request));
 
-        return back()->with('success', 'News article created.');
+        return redirect()->route('admin.news.index')->with('success', 'News article created.');
     }
 
     public function update(Request $request, NewsArticle $article)
@@ -97,11 +102,11 @@ class NewsArticleController extends Controller
         $validated['slug'] = filled($validated['slug'] ?? null)
             ? Str::slug($validated['slug'])
             : Str::slug($validated['title']);
-        $validated['content'] = collect(preg_split('/\R{2,}/', trim($validated['content'])))
-            ->map(fn ($paragraph) => trim($paragraph))
-            ->filter()
-            ->values()
-            ->all();
+        // Quill editor produces HTML. Store as a single-element JSON array so
+        // the existing `content => 'array'` cast keeps working and legacy
+        // multi-paragraph rows still render correctly through the detail view.
+        $html = trim((string) $validated['content']);
+        $validated['content'] = $html === '' ? [] : [$html];
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
 

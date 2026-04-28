@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             RecruitmentEmailTemplateSeeder::class,
             PaymentEmailTemplateSeeder::class,
             NewsletterEmailTemplateSeeder::class,
+            MonetizationEmailTemplateSeeder::class,
+            CandidatePlanSeeder::class,
+            TrainingProgramSeeder::class,
         ]);
     }
 }

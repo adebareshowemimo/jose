@@ -39,6 +39,10 @@ Route::get('/about', [PublicPageController::class, 'about'])->name('about.index'
 Route::get('/leadership', [PublicPageController::class, 'leadership'])->name('leadership.index');
 Route::get('/partnerships', [PublicPageController::class, 'partnerships'])->name('partnerships.index');
 Route::get('/training', [PublicPageController::class, 'training'])->name('training.index');
+Route::get('/training/{slug}', [PublicPageController::class, 'trainingShow'])->name('training.show');
+Route::post('/training/{program}/enrol', [\App\Http\Controllers\Frontend\TrainingEnrolmentController::class, 'enrol'])
+    ->middleware('auth')
+    ->name('training.enrol');
 
 // Services (Training becomes a sub-service; old /training URL preserved for compat)
 Route::get('/services', [PublicPageController::class, 'services'])->name('services.index');
@@ -68,6 +72,11 @@ Route::get('/companies', [PublicPageController::class, 'companiesIndex'])->name(
 Route::get('/companies/{slug}', [PublicPageController::class, 'companyDetail'])->name('companies.detail');
 Route::get('/news', [PublicPageController::class, 'newsIndex'])->name('news.index');
 Route::get('/news/{slug}', [PublicPageController::class, 'newsDetail'])->name('news.detail');
+
+// Event registration (Phase C)
+Route::get('/events/{event}/register', [\App\Http\Controllers\Frontend\EventRegistrationController::class, 'showForm'])->name('events.register.show');
+Route::post('/events/{event}/register', [\App\Http\Controllers\Frontend\EventRegistrationController::class, 'submit'])->name('events.register.submit');
+Route::get('/events/{event}/registered', [\App\Http\Controllers\Frontend\EventRegistrationController::class, 'thanks'])->name('events.register.thanks');
 
 // Newsletter
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\Frontend\NewsletterController::class, 'subscribe'])
@@ -144,7 +153,15 @@ Route::prefix('user')->middleware(['auth', 'role.selected'])->group(function () 
     Route::post('/candidate/profile/skills', [ProfileController::class, 'updateSkills'])->name('user.profile.skills.update');
     
     Route::get('/applied-jobs', [CandidateDashboardController::class, 'appliedJobs'])->name('user.applied-jobs');
-    
+
+    // Candidate visibility boost (Phase D)
+    Route::get('/boost', [\App\Http\Controllers\Frontend\CandidateBoostController::class, 'index'])->name('candidate.boost.index');
+    Route::post('/boost', [\App\Http\Controllers\Frontend\CandidateBoostController::class, 'purchase'])->name('candidate.boost.purchase');
+
+    // Candidate Premium membership (Phase E)
+    Route::get('/upgrade', [\App\Http\Controllers\Frontend\CandidateUpgradeController::class, 'show'])->name('candidate.upgrade.show');
+    Route::post('/upgrade/{plan}', [\App\Http\Controllers\Frontend\CandidateUpgradeController::class, 'subscribe'])->name('candidate.upgrade.subscribe');
+
     // CV Manager routes
     Route::get('/cv-manager', [CVManagerController::class, 'index'])->name('user.cv-manager');
     Route::post('/cv-manager/upload', [CVManagerController::class, 'upload'])->name('user.cv.upload');
@@ -300,12 +317,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Events
     Route::get('/events', [AdminEventController::class, 'index'])->name('admin.events.index');
+    Route::get('/events/create', [AdminEventController::class, 'create'])->name('admin.events.create');
     Route::post('/events', [AdminEventController::class, 'store'])->name('admin.events.store');
     Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('admin.events.update');
     Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('admin.events.destroy');
 
     // News
     Route::get('/news', [AdminNewsArticleController::class, 'index'])->name('admin.news.index');
+    Route::get('/news/create', [AdminNewsArticleController::class, 'create'])->name('admin.news.create');
     Route::post('/news', [AdminNewsArticleController::class, 'store'])->name('admin.news.store');
     Route::put('/news/{article}', [AdminNewsArticleController::class, 'update'])->name('admin.news.update');
     Route::delete('/news/{article}', [AdminNewsArticleController::class, 'destroy'])->name('admin.news.destroy');
@@ -334,6 +353,19 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Bulk application notifications
     Route::post('/applications/send-notification', [ApplicationNotificationController::class, 'send'])->name('admin.applications.send-notification');
+
+    // Event Registrations (Phase C)
+    Route::get('/events/{event}/registrations', [\App\Http\Controllers\Admin\EventRegistrationController::class, 'index'])->name('admin.events.registrations');
+    Route::get('/events/{event}/registrations/export', [\App\Http\Controllers\Admin\EventRegistrationController::class, 'export'])->name('admin.events.registrations.export');
+
+    // Training Programs (Phase B)
+    Route::prefix('training')->name('admin.training.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'store'])->name('store');
+        Route::put('/{program}', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'update'])->name('update');
+        Route::delete('/{program}', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'destroy'])->name('destroy');
+    });
 
     // Newsletter Subscribers
     Route::prefix('newsletter')->name('admin.newsletter.')->group(function () {

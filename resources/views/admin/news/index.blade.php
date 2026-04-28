@@ -10,11 +10,15 @@
             <h1 class="text-2xl font-bold text-[#0A1929]">News & Articles</h1>
             <p class="text-sm text-gray-500 mt-1">Publish editorial content, industry insights and company announcements.</p>
         </div>
-        <div class="flex items-center gap-3 text-xs text-gray-500">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-200">
+        <div class="flex items-center gap-3">
+            <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border border-gray-200 text-xs text-gray-500">
                 <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                 <span class="font-semibold text-gray-700">{{ $articles->total() }}</span> total
             </span>
+            <a href="{{ route('admin.news.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-lg shadow transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                Add Article
+            </a>
         </div>
     </div>
 
@@ -25,27 +29,7 @@
         </div>
     @endif
 
-    <div class="grid gap-6 xl:grid-cols-[440px_1fr]">
-        {{-- Create form --}}
-        <div class="space-y-6">
-            <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-                <div class="px-5 py-4 border-b border-gray-100 bg-gradient-to-br from-[#073057] to-[#0a4275] text-white">
-                    <h2 class="text-base font-bold flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                        Add New Article
-                    </h2>
-                    <p class="text-xs text-white/70 mt-0.5">Cover image, title, excerpt and content.</p>
-                </div>
-                <form method="POST" action="{{ route('admin.news.store') }}" enctype="multipart/form-data" class="p-5 space-y-4">
-                    @csrf
-                    @include('admin.news.partials.form', ['article' => null])
-                    <button type="submit" class="w-full px-4 py-3 bg-[#1AAD94] text-white text-sm font-bold uppercase tracking-widest rounded-lg hover:brightness-110 shadow transition">
-                        Create Article
-                    </button>
-                </form>
-            </div>
-        </div>
-
+    <div>
         {{-- List + filters --}}
         <div class="space-y-5">
             @if($errors->any())
@@ -187,7 +171,11 @@
                 @empty
                     <div class="bg-white rounded-xl border border-dashed border-gray-300 p-12 text-center">
                         <svg class="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2M5 8h4m-4 4h4"/></svg>
-                        <p class="text-sm text-gray-500">No articles yet. Use the form on the left to create your first one.</p>
+                        <p class="text-sm text-gray-500 mb-4">No articles yet.</p>
+                        <a href="{{ route('admin.news.create') }}" class="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-lg shadow transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                            Create your first article
+                        </a>
                     </div>
                 @endforelse
             </div>

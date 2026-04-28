@@ -1,12 +1,27 @@
 @php
     $statusOptions = ['published', 'draft', 'archived'];
-    $contentValue = old('content');
 
+    // Build the initial Quill HTML.
+    // - old() is used on validation rebound and is already HTML.
+    // - Existing rows store an array of paragraphs (legacy plain text) OR a
+    //   single-element array containing HTML. Detect HTML vs plain text and
+    //   normalise accordingly so Quill receives valid HTML either way.
+    $contentValue = old('content');
     if ($contentValue === null && $article) {
-        $contentValue = implode("\n\n", $article->content ?? []);
+        $existing = $article->content ?? [];
+        if (count($existing) === 1 && str_contains($existing[0] ?? '', '<')) {
+            $contentValue = $existing[0];
+        } else {
+            $contentValue = collect($existing)
+                ->map(fn ($p) => '<p>' . e($p) . '</p>')
+                ->implode("\n");
+        }
     }
     $existingImageUrl = $article?->image_url;
+    $editorId = 'news-content-' . ($article?->id ?? 'new');
 @endphp
+
+@include('admin.partials.quill-editor')
 
 {{-- Cover image --}}
 <div x-data="{
@@ -90,11 +105,24 @@
         class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">{{ old('excerpt', $article?->excerpt) }}</textarea>
 </div>
 
-<div>
-    <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block">Content</label>
-    <textarea name="content" rows="9" required placeholder="Separate paragraphs with a blank line."
-        class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm leading-relaxed focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">{{ $contentValue }}</textarea>
-    <p class="mt-1 text-xs text-gray-400">Tip: leave a blank line between paragraphs.</p>
+<div x-data="quillEditor({ id: @js($editorId), initial: @js($contentValue) })">
+    <div class="flex items-center justify-between mb-2">
+        <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Content</label>
+        <div class="inline-flex bg-gray-100 rounded-md p-0.5 text-[11px] font-semibold">
+            <button type="button" @click="setMode('rich')" :class="mode === 'rich' ? 'bg-[#1AAD94] text-white' : 'text-gray-600 hover:bg-gray-200'" class="px-2.5 py-1 rounded transition">Rich text</button>
+            <button type="button" @click="setMode('html')" :class="mode === 'html' ? 'bg-[#1AAD94] text-white' : 'text-gray-600 hover:bg-gray-200'" class="px-2.5 py-1 rounded transition">HTML</button>
+        </div>
+    </div>
+
+    <div x-show="mode === 'rich'">
+        <div :id="id" class="bg-white"></div>
+    </div>
+    <div x-show="mode === 'html'" x-cloak>
+        <textarea x-model="html" rows="14" class="w-full px-3 py-2.5 border border-gray-300 rounded-b-lg font-mono text-xs focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" placeholder="<p>...</p>"></textarea>
+    </div>
+
+    <input type="hidden" name="content" :value="html" required>
+    <p class="mt-1.5 text-xs text-gray-400">Format with the toolbar — headings, lists, links, quotes. Rendered as HTML on the article page.</p>
 </div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
