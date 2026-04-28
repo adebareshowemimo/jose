@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\PaystackService;
+use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +65,7 @@ class PaymentController extends Controller
      * Paystack returns the user here after the checkout page (or the webhook hits).
      * Verifies the reference, then marks the order completed if successful.
      */
-    public function paystackCallback(Request $request, PaystackService $paystack)
+    public function paystackCallback(Request $request, PaystackService $paystack, EmailDispatcher $dispatcher)
     {
         $reference = $request->query('reference') ?? $request->input('reference');
         if (! $reference) {
@@ -125,6 +126,8 @@ class PaymentController extends Controller
             ]);
         });
 
+        $this->sendPaymentConfirmedEmail($order->fresh('user'), $dispatcher);
+
         return redirect()->route('order.detail', $order->id)
             ->with('success', 'Payment confirmed. Thank you!');
     }
@@ -133,7 +136,7 @@ class PaymentController extends Controller
      * Submit a manual bank-transfer claim. Marks the order as 'processing'
      * pending admin verification.
      */
-    public function manualSubmit(Request $request, Order $order)
+    public function manualSubmit(Request $request, Order $order, EmailDispatcher $dispatcher)
     {
         $this->authorizeOrder($request, $order);
 
@@ -175,6 +178,8 @@ class PaymentController extends Controller
 
         $order->update(['status' => 'processing', 'gateway' => 'manual']);
 
+        $this->sendBankTransferReceivedEmails($order->fresh('user'), $data['transaction_id'], $dispatcher);
+
         return redirect()->route('order.detail', $order->id)
             ->with('success', 'Your transfer details have been submitted. Our team will verify and confirm shortly.');
     }
@@ -187,6 +192,48 @@ class PaymentController extends Controller
         // Owner of the order, OR an admin.
         if ($order->user_id !== $request->user()->id && $request->user()->role?->name !== 'admin') {
             abort(403);
+        }
+    }
+
+    protected function sendPaymentConfirmedEmail(Order $order, EmailDispatcher $dispatcher): void
+    {
+        if (! $order->user) {
+            return;
+        }
+
+        $dispatcher->send('payment.confirmed', $order->user, [
+            'order_number' => $order->order_number,
+            'amount' => number_format((float) $order->total, 2),
+            'currency' => $order->currency ?? 'USD',
+            'gateway' => ucfirst($order->gateway ?? 'manual'),
+            'paid_at' => optional($order->paid_at)->format('M d, Y \a\t g:i A') ?? now()->format('M d, Y \a\t g:i A'),
+            'order_url' => route('order.detail', $order->id),
+        ]);
+    }
+
+    protected function sendBankTransferReceivedEmails(Order $order, string $transactionId, EmailDispatcher $dispatcher): void
+    {
+        if ($order->user) {
+            $dispatcher->send('payment.received', $order->user, [
+                'order_number' => $order->order_number,
+                'amount' => number_format((float) $order->total, 2),
+                'currency' => $order->currency ?? 'USD',
+                'transaction_id' => $transactionId,
+                'order_url' => route('order.detail', $order->id),
+            ]);
+        }
+
+        $adminEmail = config('mail.from.address');
+        if ($adminEmail) {
+            $dispatcher->send('payment.admin_received', $adminEmail, [
+                'order_number' => $order->order_number,
+                'customer_name' => $order->user?->name ?? '—',
+                'customer_email' => $order->user?->email ?? '—',
+                'amount' => number_format((float) $order->total, 2),
+                'currency' => $order->currency ?? 'USD',
+                'transaction_id' => $transactionId,
+                'admin_url' => route('admin.orders.show', $order->id),
+            ]);
         }
     }
 }

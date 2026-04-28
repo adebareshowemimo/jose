@@ -64,7 +64,7 @@ class ChatController extends Controller
     {
         $query = trim((string) $request->input('q', ''));
 
-        $candidates = Candidate::with('user:id,name,email,avatar')
+        $candidates = Candidate::with(['user:id,name,email,avatar', 'resumes:id,candidate_id,file_path'])
             ->whereHas('user', function ($q) use ($query) {
                 if ($query !== '') {
                     $q->where(function ($inner) use ($query) {
@@ -83,6 +83,8 @@ class ChatController extends Controller
                 'name' => $c->user?->name ?? 'Candidate',
                 'email' => $c->user?->email,
                 'avatar' => $c->user?->avatar,
+                'profile_url' => $c->slug ? route('candidate.detail', $c->slug) : null,
+                'has_cv' => $c->resumes->contains(fn ($r) => ! empty($r->file_path)),
             ])->values(),
         ]);
     }

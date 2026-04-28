@@ -68,6 +68,15 @@ Route::get('/companies', [PublicPageController::class, 'companiesIndex'])->name(
 Route::get('/companies/{slug}', [PublicPageController::class, 'companyDetail'])->name('companies.detail');
 Route::get('/news', [PublicPageController::class, 'newsIndex'])->name('news.index');
 Route::get('/news/{slug}', [PublicPageController::class, 'newsDetail'])->name('news.detail');
+
+// Newsletter
+Route::post('/newsletter/subscribe', [\App\Http\Controllers\Frontend\NewsletterController::class, 'subscribe'])
+    ->middleware('throttle:10,1')
+    ->name('newsletter.subscribe');
+Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\Frontend\NewsletterController::class, 'unsubscribe'])
+    ->name('newsletter.unsubscribe');
+Route::post('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\Frontend\NewsletterController::class, 'unsubscribeConfirm'])
+    ->name('newsletter.unsubscribe.confirm');
 Route::get('/contact', [PublicPageController::class, 'contact'])->name('contact.index');
 Route::post('/contact', [ContactSubmissionController::class, 'store'])->name('contact.store');
 Route::get('/contact/thread/{token}', [ContactSubmissionController::class, 'thread'])->name('contact.thread');
@@ -325,6 +334,19 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Bulk application notifications
     Route::post('/applications/send-notification', [ApplicationNotificationController::class, 'send'])->name('admin.applications.send-notification');
+
+    // Newsletter Subscribers
+    Route::prefix('newsletter')->name('admin.newsletter.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'index'])->name('index');
+        Route::get('/export', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'export'])->name('export');
+        Route::patch('/{subscriber}/unsubscribe', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'unsubscribe'])->name('unsubscribe');
+        Route::patch('/{subscriber}/reactivate', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'reactivate'])->name('reactivate');
+        Route::delete('/{subscriber}', [\App\Http\Controllers\Admin\NewsletterSubscriberController::class, 'destroy'])->name('destroy');
+    });
+
+    // Social Media Settings
+    Route::get('/social', [\App\Http\Controllers\Admin\SocialSettingsController::class, 'index'])->name('admin.social.index');
+    Route::put('/social', [\App\Http\Controllers\Admin\SocialSettingsController::class, 'update'])->name('admin.social.update');
 
     // Recruitment Requests
     Route::prefix('recruitment-requests')->name('admin.recruitment-requests.')->group(function () {

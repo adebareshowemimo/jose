@@ -22,6 +22,10 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,      // depends on roles
             EventSeeder::class,
             NewsArticleSeeder::class,
+            EmailTemplateSeeder::class,
+            RecruitmentEmailTemplateSeeder::class,
+            PaymentEmailTemplateSeeder::class,
+            NewsletterEmailTemplateSeeder::class,
         ]);
     }
 }

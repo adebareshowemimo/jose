@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class EventController extends Controller
 {
@@ -48,19 +49,22 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event)
     {
-        $event->update($this->validatedData($request));
+        $event->update($this->validatedData($request, $event));
 
         return back()->with('success', 'Event updated.');
     }
 
     public function destroy(Event $event)
     {
+        if ($event->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+        }
         $event->delete();
 
         return redirect()->route('admin.events.index')->with('success', 'Event deleted.');
     }
 
-    private function validatedData(Request $request): array
+    private function validatedData(Request $request, ?Event $event = null): array
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
@@ -71,6 +75,9 @@ class EventController extends Controller
             'ends_at' => ['nullable', 'date', 'after_or_equal:starts_at'],
             'location' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:1000'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:4096'],
+            'remove_image' => ['nullable', 'boolean'],
+            'register_url' => ['nullable', 'url', 'max:512'],
             'status' => ['required', 'in:upcoming,active,completed,draft,cancelled'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'is_featured' => ['nullable', 'boolean'],
@@ -78,6 +85,19 @@ class EventController extends Controller
 
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
+
+        // Image handling: replace, remove, or leave as-is.
+        if ($request->hasFile('image')) {
+            if ($event?->image_path) {
+                Storage::disk('public')->delete($event->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('events', 'public');
+        } elseif ($request->boolean('remove_image') && $event?->image_path) {
+            Storage::disk('public')->delete($event->image_path);
+            $validated['image_path'] = null;
+        }
+
+        unset($validated['image'], $validated['remove_image']);
 
         return $validated;
     }

@@ -5,6 +5,7 @@
 @section('content')
 @php
     $hasBankDetails = ! empty($bank['bank.account_number'] ?? null) && ! empty($bank['bank.bank_name'] ?? null);
+    $bankTransferEnabled = true; // bank-transfer option is always offered; details may be on file or arranged via support
     $statusBadge = match ($order->status) {
         'pending' => 'bg-yellow-100 text-yellow-700',
         'processing' => 'bg-blue-100 text-blue-700',
@@ -90,7 +91,7 @@
                     <div class="bg-white rounded-2xl border border-[#E5E7EB] p-6" x-data="{ method: '{{ $paystackEnabled ? 'paystack' : 'manual' }}' }">
                         <h2 class="text-lg font-bold text-[#073057] mb-4">Choose how to pay</h2>
 
-                        <div class="grid {{ $paystackEnabled && $hasBankDetails ? 'sm:grid-cols-2' : '' }} gap-3 mb-6">
+                        <div class="grid {{ $paystackEnabled && $bankTransferEnabled ? 'sm:grid-cols-2' : '' }} gap-3 mb-6">
                             @if ($paystackEnabled)
                                 <label class="cursor-pointer block">
                                     <input type="radio" name="method" value="paystack" x-model="method" class="sr-only" />
@@ -107,7 +108,7 @@
                                 </label>
                             @endif
 
-                            @if ($hasBankDetails)
+                            @if ($bankTransferEnabled)
                                 <label class="cursor-pointer block">
                                     <input type="radio" name="method" value="manual" x-model="method" class="sr-only" />
                                     <div :class="method === 'manual' ? 'border-[#1AAD94] bg-[#1AAD94]/5 ring-2 ring-[#1AAD94]/30' : 'border-[#E5E7EB]'"
@@ -124,12 +125,6 @@
                             @endif
                         </div>
 
-                        @if (! $paystackEnabled && ! $hasBankDetails)
-                            <div class="rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 text-sm">
-                                Online payment is not available right now. Please contact <a href="mailto:info@joseoceanjobs.com" class="font-semibold underline">info@joseoceanjobs.com</a> to settle this invoice.
-                            </div>
-                        @endif
-
                         @if ($paystackEnabled)
                             <div x-show="method === 'paystack'" x-cloak>
                                 <p class="text-sm text-[#4B5563] mb-4">You'll be securely redirected to Paystack to complete payment. Once paid, you'll be brought back here automatically.</p>
@@ -142,23 +137,30 @@
                             </div>
                         @endif
 
-                        @if ($hasBankDetails)
+                        @if ($bankTransferEnabled)
                             <div x-show="method === 'manual'" x-cloak>
-                                <div class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 mb-5">
-                                    <p class="text-xs uppercase tracking-widest text-gray-400 mb-2 font-semibold">Transfer to:</p>
-                                    <dl class="grid sm:grid-cols-2 gap-3 text-sm">
-                                        <div><dt class="text-gray-500">Bank</dt><dd class="font-semibold text-[#073057]">{{ $bank['bank.bank_name'] }}</dd></div>
-                                        <div><dt class="text-gray-500">Account name</dt><dd class="font-semibold text-[#073057]">{{ $bank['bank.account_name'] }}</dd></div>
-                                        <div><dt class="text-gray-500">Account number</dt><dd class="font-semibold text-[#073057] font-mono">{{ $bank['bank.account_number'] }}</dd></div>
-                                        @if (! empty($bank['bank.swift_code']))
-                                            <div><dt class="text-gray-500">SWIFT / BIC</dt><dd class="font-semibold text-[#073057] font-mono">{{ $bank['bank.swift_code'] }}</dd></div>
+                                @if ($hasBankDetails)
+                                    <div class="bg-[#F9FAFB] border border-[#E5E7EB] rounded-xl p-4 mb-5">
+                                        <p class="text-xs uppercase tracking-widest text-gray-400 mb-2 font-semibold">Transfer to:</p>
+                                        <dl class="grid sm:grid-cols-2 gap-3 text-sm">
+                                            <div><dt class="text-gray-500">Bank</dt><dd class="font-semibold text-[#073057]">{{ $bank['bank.bank_name'] }}</dd></div>
+                                            <div><dt class="text-gray-500">Account name</dt><dd class="font-semibold text-[#073057]">{{ $bank['bank.account_name'] }}</dd></div>
+                                            <div><dt class="text-gray-500">Account number</dt><dd class="font-semibold text-[#073057] font-mono">{{ $bank['bank.account_number'] }}</dd></div>
+                                            @if (! empty($bank['bank.swift_code']))
+                                                <div><dt class="text-gray-500">SWIFT / BIC</dt><dd class="font-semibold text-[#073057] font-mono">{{ $bank['bank.swift_code'] }}</dd></div>
+                                            @endif
+                                            <div class="sm:col-span-2"><dt class="text-gray-500">Reference</dt><dd class="font-semibold text-[#073057] font-mono">{{ $order->order_number }}</dd></div>
+                                        </dl>
+                                        @if (! empty($bank['bank.instructions']))
+                                            <p class="mt-3 pt-3 border-t border-gray-200 text-xs text-[#4B5563] whitespace-pre-line">{{ $bank['bank.instructions'] }}</p>
                                         @endif
-                                        <div class="sm:col-span-2"><dt class="text-gray-500">Reference</dt><dd class="font-semibold text-[#073057] font-mono">{{ $order->order_number }}</dd></div>
-                                    </dl>
-                                    @if (! empty($bank['bank.instructions']))
-                                        <p class="mt-3 pt-3 border-t border-gray-200 text-xs text-[#4B5563] whitespace-pre-line">{{ $bank['bank.instructions'] }}</p>
-                                    @endif
-                                </div>
+                                    </div>
+                                @else
+                                    <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-5 text-sm text-yellow-900">
+                                        <p class="font-semibold mb-1">Request bank details</p>
+                                        <p>Please email <a href="mailto:info@joseoceanjobs.com" class="underline font-semibold">info@joseoceanjobs.com</a> with your order reference <span class="font-mono font-semibold">{{ $order->order_number }}</span> to receive our bank account details. Then return here to submit your transaction reference below.</p>
+                                    </div>
+                                @endif
 
                                 <form method="POST" action="{{ route('payment.manual.submit', $order) }}" enctype="multipart/form-data" class="space-y-4">
                                     @csrf

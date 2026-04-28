@@ -112,17 +112,27 @@ class RecruitmentRequestController extends Controller
             ]);
         });
 
+        $vars = [
+            'job_title' => $recruitment->job_title,
+            'quoted_amount' => number_format((float) $data['quoted_amount'], 2),
+            'currency' => $data['currency'],
+            'quote_note' => $data['quote_note'] ?? '',
+            'order_url' => route('order.detail', $recruitment->order_id),
+        ];
+
+        $sentTo = [];
+
         if ($recruitment->requester) {
-            $dispatcher->send('recruitment.quote_sent', $recruitment->requester, [
-                'job_title' => $recruitment->job_title,
-                'quoted_amount' => number_format((float) $data['quoted_amount'], 2),
-                'currency' => $data['currency'],
-                'quote_note' => $data['quote_note'] ?? '',
-                'order_url' => route('order.detail', $recruitment->order_id),
-            ]);
+            $dispatcher->send('recruitment.quote_sent', $recruitment->requester, $vars);
+            $sentTo[] = strtolower($recruitment->requester->email);
         }
 
-        return back()->with('success', 'Quote issued and email sent.');
+        $companyEmail = $recruitment->company?->email;
+        if ($companyEmail && ! in_array(strtolower($companyEmail), $sentTo, true)) {
+            $dispatcher->send('recruitment.quote_sent', [$companyEmail, null, $recruitment->company->name], $vars);
+        }
+
+        return back()->with('success', 'Quote issued and email sent to requester' . ($companyEmail ? ' and company' : '') . '.');
     }
 
     public function attachCandidate(Request $request, RecruitmentRequest $recruitment, EmailDispatcher $dispatcher)
@@ -132,7 +142,14 @@ class RecruitmentRequestController extends Controller
             'summary' => 'nullable|string|max:2000',
         ]);
 
-        $candidate = Candidate::find($data['candidate_id']);
+        $candidate = Candidate::with('resumes')->find($data['candidate_id']);
+
+        $hasCv = $candidate->resumes->contains(fn ($r) => ! empty($r->file_path));
+        if (! $hasCv) {
+            return back()
+                ->withInput()
+                ->with('error', 'Cannot attach this candidate: no CV on file. The candidate must upload a CV (or use "Upload external CV" instead).');
+        }
 
         $delivery = RecruitmentRequestCandidate::create([
             'recruitment_request_id' => $recruitment->id,

@@ -231,6 +231,22 @@
                 Email Templates
             </a>
 
+            {{-- Newsletter --}}
+            <a href="{{ route('admin.newsletter.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition
+               {{ str_starts_with($current, 'admin.newsletter') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                Newsletter
+            </a>
+
+            {{-- Social Media --}}
+            <a href="{{ route('admin.social.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition
+               {{ str_starts_with($current, 'admin.social') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 010-2.684m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm-9.032-4.026a9.001 9.001 0 000 2.684m0 0a3 3 0 11-5.368 2.684 3 3 0 015.368-2.684z"/></svg>
+                Social Media
+            </a>
+
             {{-- Settings --}}
             <a href="{{ route('admin.settings.index') }}"
                class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition

@@ -220,23 +220,134 @@
     </div>
 
     {{-- Attach Platform Candidate Modal --}}
-    <div x-show="attachOpen" x-cloak class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" @click.self="attachOpen = false">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl">
+    <div x-show="attachOpen"
+         x-cloak
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+         @click.self="attachOpen = false">
+        <div class="bg-white rounded-xl max-w-2xl w-full p-6 shadow-2xl"
+             x-data="{
+                 query: '',
+                 results: [],
+                 loading: false,
+                 hasSearched: false,
+                 selected: null,
+                 timer: null,
+                 showResults: false,
+                 onInput() {
+                     clearTimeout(this.timer);
+                     this.timer = setTimeout(() => this.fetch(), 250);
+                 },
+                 async fetch() {
+                     this.loading = true;
+                     this.showResults = true;
+                     try {
+                         const url = new URL('{{ route('admin.chat.candidates.search') }}', window.location.origin);
+                         if (this.query) url.searchParams.set('q', this.query);
+                         const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                         const data = await res.json();
+                         this.results = data.results || [];
+                     } catch (e) {
+                         this.results = [];
+                     } finally {
+                         this.loading = false;
+                         this.hasSearched = true;
+                     }
+                 },
+                 pick(r) {
+                     if (!r.has_cv) {
+                         alert('This candidate has no CV on file and cannot be attached. Ask the candidate to upload a CV, or use \'Upload external CV\' to attach a CV manually.');
+                         return;
+                     }
+                     this.selected = r;
+                     this.query = r.name;
+                     this.showResults = false;
+                 },
+                 clearSelection() {
+                     this.selected = null;
+                     this.query = '';
+                     this.results = [];
+                     this.hasSearched = false;
+                 }
+             }">
             <h3 class="text-lg font-bold text-[#0A1929] mb-4">Attach a platform candidate</h3>
             <form method="POST" action="{{ route('admin.recruitment-requests.attach-candidate', $recruitment) }}" class="space-y-4">
                 @csrf
+                <input type="hidden" name="candidate_id" :value="selected ? selected.id : ''" required />
+
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Candidate ID</label>
-                    <input type="number" name="candidate_id" required min="1" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none" />
-                    <p class="mt-1 text-xs text-gray-400">Find IDs at <a href="{{ route('admin.users') }}" class="text-[#1AAD94]">admin/users</a> (look up the candidate, then their associated candidate record).</p>
+                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Search candidate</label>
+                    <div class="relative" @click.outside="showResults = false">
+                        <div class="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-[#1AAD94] focus-within:border-[#1AAD94]">
+                            <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"/></svg>
+                            <input type="text"
+                                   x-model="query"
+                                   @input="onInput(); selected = null"
+                                   @focus="showResults = true; if (!hasSearched) fetch()"
+                                   placeholder="Type a name or email..."
+                                   autocomplete="off"
+                                   class="flex-1 outline-none text-sm bg-transparent" />
+                            <span x-show="loading" class="text-xs text-gray-400">…</span>
+                        </div>
+
+                        <div x-show="showResults && hasSearched"
+                             x-cloak
+                             class="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto">
+                            <template x-if="!loading && results.length === 0">
+                                <div class="px-4 py-3 text-sm text-gray-400" x-text="query ? 'No matches for &quot;' + query + '&quot;.' : 'No candidates found.'"></div>
+                            </template>
+                            <template x-for="r in results" :key="r.id">
+                                <button type="button"
+                                        @click="pick(r)"
+                                        :title="r.has_cv ? '' : 'No CV on file — cannot be attached'"
+                                        :class="r.has_cv ? 'hover:bg-gray-50' : 'opacity-60 hover:bg-red-50 cursor-not-allowed'"
+                                        class="w-full text-left px-4 py-2.5 border-b border-gray-100 last:border-0 flex items-start justify-between gap-2">
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-[#0A1929] text-sm" x-text="r.name"></div>
+                                        <div class="text-xs text-gray-500" x-text="r.email"></div>
+                                    </div>
+                                    <span x-show="!r.has_cv" class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-red-100 text-red-700">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        No CV
+                                    </span>
+                                    <span x-show="r.has_cv" class="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-green-100 text-green-700">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                        CV
+                                    </span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
+                    <template x-if="selected">
+                        <div class="mt-3 flex items-center justify-between gap-3 bg-[#1AAD94]/10 border border-[#1AAD94]/30 rounded-lg px-3 py-2">
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-[#073057] truncate" x-text="selected.name"></p>
+                                <p class="text-xs text-gray-600 truncate flex items-center gap-1.5 flex-wrap">
+                                    <span x-text="selected.email || '—'"></span>
+                                    <span class="text-gray-400">·</span>
+                                    <template x-if="selected.profile_url">
+                                        <a :href="selected.profile_url" target="_blank" rel="noopener" class="inline-flex items-center gap-1 text-[#1AAD94] hover:text-[#0F8B75] font-semibold">
+                                            <span x-text="'View candidate #' + selected.id"></span>
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3h7m0 0v7m0-7L10 14M5 5h4M5 12v7h14v-4"/></svg>
+                                        </a>
+                                    </template>
+                                    <template x-if="!selected.profile_url">
+                                        <span x-text="'Candidate ID ' + selected.id"></span>
+                                    </template>
+                                </p>
+                            </div>
+                            <button type="button" @click="clearSelection()" class="text-xs font-semibold text-red-600 hover:text-red-700 shrink-0">Remove</button>
+                        </div>
+                    </template>
                 </div>
+
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Why this candidate (optional)</label>
                     <textarea name="summary" rows="3" placeholder="STCW certified, 8 years container vessel experience..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none"></textarea>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" @click="attachOpen = false" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-600">Cancel</button>
-                    <button type="submit" class="px-5 py-2 bg-[#073057] text-white rounded-lg text-sm font-semibold hover:brightness-110">Attach</button>
+                    <button type="button" @click="attachOpen = false; clearSelection()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-semibold text-gray-600">Cancel</button>
+                    <button type="submit" :disabled="!selected" :class="selected ? 'bg-[#073057] hover:brightness-110' : 'bg-gray-300 cursor-not-allowed'" class="px-5 py-2 text-white rounded-lg text-sm font-semibold">Attach</button>
                 </div>
             </form>
         </div>

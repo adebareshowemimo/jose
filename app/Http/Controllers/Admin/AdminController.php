@@ -13,6 +13,7 @@ use App\Models\Plan;
 use App\Models\Role;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
@@ -321,7 +322,7 @@ class AdminController extends Controller
         return view('admin.orders.show', compact('order'));
     }
 
-    public function verifyPayment(Request $request, Order $order, Payment $payment)
+    public function verifyPayment(Request $request, Order $order, Payment $payment, EmailDispatcher $dispatcher)
     {
         if ($payment->order_id !== $order->id) {
             abort(404);
@@ -342,7 +343,19 @@ class AdminController extends Controller
             'paid_at' => now(),
         ]);
 
-        return back()->with('success', 'Payment verified. Order marked as completed.');
+        $order->load('user');
+        if ($order->user) {
+            $dispatcher->send('payment.confirmed', $order->user, [
+                'order_number' => $order->order_number,
+                'amount' => number_format((float) $order->total, 2),
+                'currency' => $order->currency ?? 'USD',
+                'gateway' => ucfirst($order->gateway ?? 'manual'),
+                'paid_at' => optional($order->paid_at)->format('M d, Y \a\t g:i A') ?? now()->format('M d, Y \a\t g:i A'),
+                'order_url' => route('order.detail', $order->id),
+            ]);
+        }
+
+        return back()->with('success', 'Payment verified. Order marked as completed. Customer notified by email.');
     }
 
     public function rejectPayment(Request $request, Order $order, Payment $payment)

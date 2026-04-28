@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Event extends Model
 {
@@ -18,6 +19,8 @@ class Event extends Model
         'ends_at',
         'location',
         'description',
+        'image_path',
+        'register_url',
         'status',
         'is_featured',
         'sort_order',
@@ -43,5 +46,12 @@ class Event extends Model
     public function scopeIndustry($query)
     {
         return $query->where('category', 'industry');
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path
+            ? Storage::disk('public')->url($this->image_path)
+            : null;
     }
 }

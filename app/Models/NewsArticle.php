@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class NewsArticle extends Model
@@ -15,6 +16,7 @@ class NewsArticle extends Model
         'slug',
         'excerpt',
         'content',
+        'image_path',
         'author',
         'category',
         'published_at',
@@ -42,5 +44,12 @@ class NewsArticle extends Model
     public function scopePublished($query)
     {
         return $query->where('status', 'published');
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image_path
+            ? Storage::disk('public')->url($this->image_path)
+            : null;
     }
 }

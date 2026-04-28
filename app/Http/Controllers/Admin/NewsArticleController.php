@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsArticle;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -63,6 +64,9 @@ class NewsArticleController extends Controller
 
     public function destroy(NewsArticle $article)
     {
+        if ($article->image_path) {
+            Storage::disk('public')->delete($article->image_path);
+        }
         $article->delete();
 
         return redirect()->route('admin.news.index')->with('success', 'News article deleted.');
@@ -80,6 +84,8 @@ class NewsArticleController extends Controller
             ],
             'excerpt' => ['required', 'string', 'max:500'],
             'content' => ['required', 'string'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp,gif', 'max:4096'],
+            'remove_image' => ['nullable', 'boolean'],
             'author' => ['required', 'string', 'max:255'],
             'category' => ['required', 'string', 'max:100'],
             'published_at' => ['nullable', 'date'],
@@ -98,6 +104,20 @@ class NewsArticleController extends Controller
             ->all();
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['sort_order'] = $validated['sort_order'] ?? 0;
+
+        // Image handling: replace, remove, or leave as-is.
+        if ($request->hasFile('image')) {
+            if ($article?->image_path) {
+                Storage::disk('public')->delete($article->image_path);
+            }
+            $validated['image_path'] = $request->file('image')->store('news', 'public');
+        } elseif ($request->boolean('remove_image') && $article?->image_path) {
+            Storage::disk('public')->delete($article->image_path);
+            $validated['image_path'] = null;
+        }
+
+        // Don't overwrite image_path with these helper keys.
+        unset($validated['image'], $validated['remove_image']);
 
         return $validated;
     }

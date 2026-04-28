@@ -356,18 +356,29 @@ class PublicPageController extends BasePageController
     public function newsDetail(string $slug)
     {
         $article = null;
+        $related = [];
 
         if (Schema::hasTable('news_articles')) {
             $storedArticle = NewsArticle::published()->where('slug', $slug)->first();
 
             if ($storedArticle) {
                 $article = $this->newsArticleForDetail($storedArticle);
+                $related = $this->relatedNewsArticles($storedArticle);
             }
         }
 
         $article ??= collect($this->fallbackNewsArticles())
             ->firstWhere('slug', $slug)
             ?? $this->generatedNewsArticle($slug);
+
+        // Fallback related articles when DB lookup yielded nothing
+        if (empty($related)) {
+            $related = collect($this->fallbackNewsArticles())
+                ->where('slug', '!=', $article['slug'] ?? null)
+                ->take(3)
+                ->values()
+                ->all();
+        }
 
         return view('pages.news.detail', [
             'pageTitle' => 'News Detail',
@@ -378,6 +389,8 @@ class PublicPageController extends BasePageController
                 ['label' => $article['title']],
             ],
             'article' => $article,
+            'related' => $related,
+            'social' => app(\App\Support\Settings::class)->group('social'),
         ]);
     }
 
@@ -391,6 +404,7 @@ class PublicPageController extends BasePageController
                 'author' => 'JCL Editorial',
                 'date' => 'Mar 20, 2026',
                 'category' => 'Safety',
+                'image_url' => 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1200&q=80',
                 'content' => [
                     'Offshore safety requirements continue to evolve as operators respond to tighter compliance expectations, higher client scrutiny, and more complex deployment environments.',
                     'Crews should expect stronger emphasis on documented risk assessment, incident reporting, permit-to-work discipline, and recurring emergency response drills.',
@@ -404,6 +418,7 @@ class PublicPageController extends BasePageController
                 'author' => 'Market Insights Team',
                 'date' => 'Mar 12, 2026',
                 'category' => 'Hiring',
+                'image_url' => 'https://images.unsplash.com/photo-1494412519320-aa613dfb7738?w=1200&q=80',
                 'content' => [
                     'Global maritime hiring remains active, with employers prioritizing qualified deck officers, marine engineers, offshore support crews, and dynamic positioning specialists.',
                     'Verified documents and current competency records are increasingly important because employers are shortening recruitment windows for urgent placements.',
@@ -417,6 +432,7 @@ class PublicPageController extends BasePageController
                 'author' => 'Training Desk',
                 'date' => 'Mar 03, 2026',
                 'category' => 'Training',
+                'image_url' => 'https://images.unsplash.com/photo-1473221326025-9183b464bb7e?w=1200&q=80',
                 'content' => [
                     'STCW certification provides the foundation for safe and compliant seafaring work, starting with basic safety training and progressing into role-specific endorsements.',
                     'Professionals should understand renewal timelines, refresher requirements, and the supporting medical and identity documentation needed for deployment.',
@@ -451,14 +467,46 @@ class PublicPageController extends BasePageController
             'author' => $article->author,
             'date' => $article->published_at?->format('M d, Y') ?? 'Draft',
             'category' => $article->category,
+            'image_url' => $article->image_url,
         ];
     }
 
     private function newsArticleForDetail(NewsArticle $article): array
     {
+        $paragraphs = $article->content ?? [];
+        $wordCount = str_word_count(strip_tags(implode(' ', $paragraphs)));
+        $readMinutes = max(1, (int) ceil($wordCount / 200));
+
         return array_merge($this->newsArticleForCard($article), [
-            'content' => $article->content ?? [],
+            'content' => $paragraphs,
+            'read_minutes' => $readMinutes,
+            'word_count' => $wordCount,
         ]);
+    }
+
+    private function relatedNewsArticles(NewsArticle $current, int $limit = 3): array
+    {
+        // Prefer same-category matches; if there aren't enough, top up with the latest from any category.
+        $sameCategory = NewsArticle::published()
+            ->where('id', '!=', $current->id)
+            ->where('category', $current->category)
+            ->orderByDesc('published_at')
+            ->take($limit)
+            ->get();
+
+        if ($sameCategory->count() < $limit) {
+            $excludeIds = $sameCategory->pluck('id')->push($current->id)->all();
+            $topUp = NewsArticle::published()
+                ->whereNotIn('id', $excludeIds)
+                ->orderByDesc('published_at')
+                ->take($limit - $sameCategory->count())
+                ->get();
+            $sameCategory = $sameCategory->concat($topUp);
+        }
+
+        return $sameCategory
+            ->map(fn (NewsArticle $a) => $this->newsArticleForCard($a))
+            ->all();
     }
 
     public function contact()
@@ -739,9 +787,13 @@ class PublicPageController extends BasePageController
             'title' => $event->title,
             'type' => $event->type,
             'date' => $event->display_date,
+            'starts_at' => $event->starts_at,
             'location' => $event->location,
             'description' => $event->description,
             'status' => $event->status,
+            'is_featured' => (bool) $event->is_featured,
+            'image_url' => $event->image_url,
+            'register_url' => $event->register_url,
         ];
     }
 
