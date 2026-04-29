@@ -58,11 +58,13 @@
                         </div>
 
                         <div class="grid grid-cols-2 gap-6">
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white px-4 py-4 text-center shadow-sm">
-                                <div class="text-sm font-extrabold text-[#073057]">Maritime/Logistics</div>
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-5 text-center shadow-sm">
+                                <div class="text-[11px] font-bold uppercase tracking-widest text-[#1AAD94] mb-2">Maritime/Logistics</div>
+                                <p class="text-xs leading-relaxed text-gray-600">Recruitment, crew management, ship chandelling, and logistics workforce development.</p>
                             </div>
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white px-4 py-4 text-center shadow-sm">
-                                <div class="text-sm font-extrabold text-[#073057]">Energy Workforce Development</div>
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-5 text-center shadow-sm">
+                                <div class="text-[11px] font-bold uppercase tracking-widest text-[#1AAD94] mb-2">Energy Workforce Development</div>
+                                <p class="text-xs leading-relaxed text-gray-600">Training, consulting, and career pathways for the energy sector.</p>
                             </div>
                         </div>
                     </div>
