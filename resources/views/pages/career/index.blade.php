@@ -5,6 +5,8 @@
 
 @section('content')
 
+@php($img = $jclImages ?? [])
+
 {{-- HERO --}}
 <section class="relative overflow-hidden bg-[#073057] py-24 lg:py-32">
     <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(26,173,148,0.18),transparent_35%),radial-gradient(circle_at_bottom_left,rgba(26,173,148,0.12),transparent_30%)]"></div>
@@ -36,6 +38,13 @@
             </nav>
         </div>
     </div>
+</section>
+
+{{-- BANNER --}}
+<section class="relative">
+    <img src="{{ $img['career_banner'] ?? '' }}"
+         alt="Professional in command of their career journey"
+         class="w-full h-[280px] md:h-[420px] object-cover" loading="lazy" />
 </section>
 
 {{-- PROGRAMMES --}}

@@ -45,14 +45,39 @@ HTML,
             ],
             [
                 'key' => 'auth.verify_email',
-                'name' => 'Email Verification',
+                'name' => 'Candidate Email Verification',
                 'category' => 'Authentication',
-                'subject' => 'Confirm your email for {{app_name}}',
+                'subject' => 'Confirm your email to start applying on {{app_name}}',
                 'variables' => ['name', 'verify_url', 'app_name', 'app_url'],
                 'body_html' => <<<'HTML'
-<h2>Hi {{name}}, welcome aboard!</h2>
-<p>Thanks for signing up to <strong>{{app_name}}</strong>. To finish setting up your account, please confirm your email address by clicking the button below:</p>
+<h2>Hi {{name}}, let's get you ready to apply.</h2>
+<p>Thanks for signing up to <strong>{{app_name}}</strong>. Confirm your email to activate your candidate account and unlock:</p>
+<ul>
+  <li>One-click applications across maritime, logistics, and energy roles</li>
+  <li>A searchable profile employers can match against</li>
+  <li>CV uploads, training enrolments, and application tracking</li>
+</ul>
 <div class="btn-wrap"><a href="{{verify_url}}" class="btn">Verify my email</a></div>
+<p style="color:#6B7280; font-size:13px;">If the button doesn't work, copy and paste this link into your browser:<br><a href="{{verify_url}}">{{verify_url}}</a></p>
+<p style="color:#6B7280; font-size:13px;">This link will expire in 60 minutes for your security.</p>
+HTML,
+            ],
+            [
+                'key' => 'auth.verify_email_employer',
+                'name' => 'Employer Email Verification',
+                'category' => 'Authentication',
+                'subject' => 'Confirm your email to start hiring on {{app_name}}',
+                'variables' => ['name', 'company_name', 'verify_url', 'app_name', 'app_url'],
+                'body_html' => <<<'HTML'
+<h2>Hi {{name}}, let's get {{company_name}} ready to hire.</h2>
+<p>Thanks for registering <strong>{{company_name}}</strong> on <strong>{{app_name}}</strong>. Confirm your email to activate your employer account and unlock:</p>
+<ul>
+  <li>Posting jobs and managing applications from your dashboard</li>
+  <li>Hiring Services — let our team source and deliver matched candidates</li>
+  <li>Direct chat with shortlisted seafarers and professionals</li>
+  <li>A managed company profile candidates can discover</li>
+</ul>
+<div class="btn-wrap"><a href="{{verify_url}}" class="btn">Verify employer email</a></div>
 <p style="color:#6B7280; font-size:13px;">If the button doesn't work, copy and paste this link into your browser:<br><a href="{{verify_url}}">{{verify_url}}</a></p>
 <p style="color:#6B7280; font-size:13px;">This link will expire in 60 minutes for your security.</p>
 HTML,

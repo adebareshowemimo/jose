@@ -17,7 +17,8 @@
                     <li><a href="{{ route('about.index') }}" class="hover:text-white transition-colors">About JCL</a></li>
                     <li><a href="{{ route('leadership.index') }}" class="hover:text-white transition-colors">Leadership & Experts</a></li>
                     <li><a href="{{ route('partnerships.index') }}" class="hover:text-white transition-colors">Partnerships & Expertise</a></li>
-                    <li><a href="{{ route('training.index') }}" class="hover:text-white transition-colors">Training & Events</a></li>
+                    <li><a href="{{ route('training.index') }}" class="hover:text-white transition-colors">Training</a></li>
+                    <li><a href="{{ route('events.index') }}" class="hover:text-white transition-colors">Events</a></li>
                     <li><a href="{{ route('contact.index') }}" class="hover:text-white transition-colors">Contact JCL</a></li>
                 </ul>
             </div>
@@ -26,6 +27,8 @@
                 <h4 class="mb-6 text-[13px] font-bold uppercase tracking-[0.18em] text-[#1AAD94]">Platform</h4>
                 <ul class="space-y-3 text-white/65">
                     <li><a href="{{ route('job.index') }}" class="hover:text-white transition-colors">Browse Jobs</a></li>
+                    <li><a href="{{ route('career.index') }}" class="hover:text-white transition-colors">Browse Career</a></li>
+                    <li><a href="{{ route('services.index') }}" class="hover:text-white transition-colors">Browse Services</a></li>
                     <li><a href="{{ route('news.index') }}" class="hover:text-white transition-colors">News & Insights</a></li>
                     <li><a href="{{ route('companies.index') }}" class="hover:text-white transition-colors">Industry Directory</a></li>
                     <li><a href="{{ route('auth.register') }}" class="hover:text-white transition-colors">Start Your Pathway</a></li>

@@ -44,7 +44,7 @@ $navItems = [
             ]],
             ['label' => 'Crew Management',               'route' => 'services.crew-management',   'children' => []],
             ['label' => 'Ship Chandelling',               'route' => 'services.ship-chandelling',  'children' => []],
-            ['label' => 'Solution to Crew Abandonment',   'route' => 'services.crew-abandonment',  'children' => []],
+            ['label' => 'Crew Abandonment Support',   'route' => 'services.crew-abandonment',  'children' => []],
             ['label' => 'Marine Procurement',             'route' => 'services.marine-procurement','children' => []],
             ['label' => 'Marine Insurance',               'route' => 'services.marine-insurance',  'children' => []],
             ['label' => 'Travel Management Service',      'route' => 'services.travel-management', 'children' => []],

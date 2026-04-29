@@ -170,6 +170,27 @@
                 </div>
             @endif
 
+            @if (! empty($recruitment->certificates))
+                <div class="mt-5 pt-5 border-t border-gray-100">
+                    <p class="text-xs uppercase tracking-widest text-gray-400 mb-2">Certificates</p>
+                    <ul class="space-y-2">
+                        @foreach ($recruitment->certificates as $cert)
+                            <li class="flex items-start gap-3 text-sm">
+                                <svg class="w-4 h-4 mt-0.5 text-[#1AAD94] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-[#073057]">{{ $cert['name'] ?: '—' }}</div>
+                                    <div class="text-xs text-[#6B7280]">
+                                        @if (!empty($cert['vendor'])) Issued by {{ $cert['vendor'] }} @endif
+                                        @if (!empty($cert['issued_at'])) · Received {{ \Carbon\Carbon::parse($cert['issued_at'])->format('M Y') }} @endif
+                                        @if (!empty($cert['expires_at'])) · Expires {{ \Carbon\Carbon::parse($cert['expires_at'])->format('M Y') }} @endif
+                                    </div>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="mt-5 pt-5 border-t border-gray-100">
                 <p class="text-xs uppercase tracking-widest text-gray-400 mb-2">Description</p>
                 <p class="text-sm text-[#4B5563] whitespace-pre-line">{{ $recruitment->description }}</p>

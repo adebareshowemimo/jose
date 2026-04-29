@@ -9,12 +9,12 @@
 {{-- Hero --}}
 <section class="relative h-[400px] flex items-center overflow-hidden bg-[#073057]">
     <img src="{{ $img['offshore_vessel'] ?? '' }}"
-         alt="Solution to Crew Abandonment"
+         alt="Crew Abandonment Support"
          class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/80 to-transparent"></div>
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
-        <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Solution to Crew Abandonment</h1>
+        <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Crew Abandonment Support</h1>
         <p class="mt-4 max-w-xl text-lg text-white/70">Protecting seafarers' rights and ensuring safe repatriation when vessels fail their crew.</p>
     </div>
 </section>
@@ -44,7 +44,7 @@
             </div>
             <div class="rounded-[32px] overflow-hidden shadow-xl">
                 <img src="{{ $img['offshore_vessel'] ?? '' }}"
-                     alt="Solution to Crew Abandonment"
+                     alt="Crew Abandonment Support"
                      class="w-full h-[480px] object-cover" />
             </div>
         </div>

@@ -41,13 +41,30 @@
                          alt="About Jose Consulting Limited"
                          class="w-full h-[400px] object-cover rounded-[24px] mb-12 shadow-lg" loading="lazy" />
 
-                    <div class="grid grid-cols-2 gap-6">
-                        @foreach(($profile['stats'] ?? []) as $stat)
-                            <a href="{{ route('job.index') }}" class="group bg-[#F9FAFB] border border-gray-100 rounded-[20px] p-6 text-center hover:border-[#1AAD94] hover:shadow-lg transition-all block">
-                                <div class="text-4xl font-extrabold text-[#073057] mb-1 group-hover:text-[#1AAD94] transition-colors">{{ $stat['value'] }}</div>
-                                <div class="text-[10px] font-bold uppercase tracking-widest text-[#1AAD94]">{{ $stat['label'] }}</div>
-                            </a>
-                        @endforeach
+                    <div class="bg-[#F9FAFB] border border-gray-100 rounded-[20px] p-6 lg:p-8">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-[#1AAD94] text-center mb-6">Our Sectors</div>
+                        <span class="sr-only">Jose Consulting operates two sectors: Maritime/Logistics and Energy Workforce Development.</span>
+
+                        <div class="flex justify-center">
+                            <div class="rounded-xl bg-[#073057] text-white px-8 py-3 text-sm font-extrabold shadow-md">Jose Consulting</div>
+                        </div>
+
+                        <div class="relative h-10" aria-hidden="true">
+                            <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] h-5 bg-[#1AAD94]"></div>
+                            <div class="absolute top-[14px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#7DE1D1]"></div>
+                            <div class="absolute top-5 left-1/4 right-1/4 h-[2px] bg-[#1AAD94]"></div>
+                            <div class="absolute top-5 left-1/4 -translate-x-1/2 w-[2px] h-5 bg-[#1AAD94]"></div>
+                            <div class="absolute top-5 right-1/4 translate-x-1/2 w-[2px] h-5 bg-[#1AAD94]"></div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white px-4 py-4 text-center shadow-sm">
+                                <div class="text-sm font-extrabold text-[#073057]">Maritime/Logistics</div>
+                            </div>
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white px-4 py-4 text-center shadow-sm">
+                                <div class="text-sm font-extrabold text-[#073057]">Energy Workforce Development</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

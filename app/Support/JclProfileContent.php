@@ -363,33 +363,31 @@ class JclProfileContent
 
     /**
      * Curated image URLs for brochure pages.
-     * Source: Unsplash (free/Unsplash+ licensed for embedding).
      */
     public static function images(): array
     {
         return [
             // Hero & banner backgrounds
-            'hero_officer'       => 'https://plus.unsplash.com/premium_photo-1664908275323-347df090da38?auto=format&fit=crop&q=80&w=1200',
-            'hero_aerial_cargo'  => 'https://plus.unsplash.com/premium_photo-1677535536120-bb73a938956a?auto=format&fit=crop&q=80&w=1800',
+            'hero_aerial_cargo'  => asset('images/premium/harbor-aerial.jpg'),
 
             // Maritime operations
-            'safety_officer'     => 'https://plus.unsplash.com/premium_photo-1664910274597-1ade6b93d1f9?auto=format&fit=crop&q=80&w=1200',
-            'deck_officer'       => 'https://plus.unsplash.com/premium_photo-1664910776806-cad446f8a911?auto=format&fit=crop&q=80&w=1200',
-            'sailor_repairs'     => 'https://plus.unsplash.com/premium_photo-1667520087776-ed55ab3ec406?auto=format&fit=crop&q=80&w=1200',
+            'safety_officer'     => asset('images/premium/safety-officer.jpg'),
+            'deck_officer'       => asset('images/premium/deck-officer.jpg'),
+            'sailor_repairs'     => asset('images/premium/sailor-repairs.jpg'),
 
             // Container / logistics
-            'container_port'     => 'https://plus.unsplash.com/premium_photo-1661881089108-50d39a86a1a6?auto=format&fit=crop&q=80&w=1200',
-            'cargo_colorful'     => 'https://images.unsplash.com/photo-1769144256207-bc4bb75b29db?auto=format&fit=crop&q=80&w=1200',
-            'aerial_container'   => 'https://plus.unsplash.com/premium_photo-1661912188428-bb0d2f67669b?auto=format&fit=crop&q=80&w=1200',
+            'container_port'     => asset('images/premium/container-port.jpg'),
+            'cargo_colorful'     => asset('images/premium/ship-chandelling.jpg'),
+            'aerial_container'   => asset('images/premium/harbor-aerial.jpg'),
 
             // Offshore vessels & rigs
-            'offshore_vessel'    => 'https://plus.unsplash.com/premium_photo-1754211694853-cab881338a62?auto=format&fit=crop&q=80&w=1200',
+            'offshore_vessel'    => asset('images/premium/offshore-vessel.jpg'),
 
             // Professional / Consulting
-            'business_meeting'   => 'https://images.unsplash.com/photo-1758518729706-b1810dd39cc6?auto=format&fit=crop&q=80&w=1200',
+            'business_meeting'   => asset('images/premium/site-officer.jpg'),
 
             // Training & workforce
-            'maritime_training'  => 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&q=80&w=1200',
+            'maritime_training'  => asset('images/premium/safety-officer.jpg'),
 
             // Local hero images
             'home_1'             => asset('images/home 1.jpg'),
@@ -398,9 +396,12 @@ class JclProfileContent
 
             // Page-specific local images
             'about_page'         => asset('images/About page image.jpeg'),
-            'crew_management'    => asset('images/crew management.jpg'),
-            'ship_chandelling'   => asset('images/dhip chandeling.jpg'),
-            'marine_procurement' => asset('images/marine procurement.jpg'),
+            'crew_management'    => asset('images/premium/crew-management.jpg'),
+            'ship_chandelling'   => asset('images/premium/ship-chandelling.jpg'),
+            'marine_procurement' => asset('images/premium/marine-procurement.jpg'),
+            'events_hero'        => asset('images/premium/events-hero.jpg'),
+            'contact_hero'       => asset('images/premium/contact-hero.jpg'),
+            'career_banner'      => asset('images/premium/career-banner.jpg'),
             'news_marine'        => asset('images/news marine.jpg'),
             'auth_bg'            => asset('images/sing in or register.jpg'),
         ];

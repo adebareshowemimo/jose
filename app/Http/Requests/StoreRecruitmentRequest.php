@@ -28,7 +28,13 @@ class StoreRecruitmentRequest extends FormRequest
             'salary_currency' => 'nullable|string|size:3',
 
             'description' => 'required|string|max:5000',
-            'skills_input' => 'nullable|string|max:500',
+            'skills' => 'nullable|array|max:50',
+            'skills.*' => 'nullable|string|max:120',
+            'certificates' => 'nullable|array|max:50',
+            'certificates.*.name' => 'nullable|string|max:200',
+            'certificates.*.vendor' => 'nullable|string|max:200',
+            'certificates.*.issued_at' => 'nullable|date',
+            'certificates.*.expires_at' => 'nullable|date|after_or_equal:certificates.*.issued_at',
             'needed_by' => 'nullable|date|after_or_equal:today',
 
             'jd_file' => 'nullable|file|mimes:pdf,doc,docx|max:5120',
@@ -46,6 +52,7 @@ class StoreRecruitmentRequest extends FormRequest
             'salary_max.gte' => 'Maximum salary must be greater than or equal to minimum.',
             'jd_file.mimes' => 'Job description must be a PDF, DOC, or DOCX file.',
             'jd_file.max' => 'Job description file must be 5 MB or smaller.',
+            'certificates.*.expires_at.after_or_equal' => 'Certificate expiry must be on or after the date received.',
         ];
     }
 }

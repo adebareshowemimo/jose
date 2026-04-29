@@ -30,7 +30,7 @@ class RecruitmentRequest extends Model
         'service_type', 'cv_count',
         'job_title', 'category_id', 'job_type_id', 'location_id',
         'experience_level', 'salary_min', 'salary_max', 'salary_currency',
-        'description', 'skills_list', 'needed_by', 'jd_file_path',
+        'description', 'skills_list', 'certificates', 'needed_by', 'jd_file_path',
         'status', 'admin_notes', 'assigned_to_admin_user_id',
         'quoted_amount', 'quoted_at', 'order_id',
     ];
@@ -42,6 +42,7 @@ class RecruitmentRequest extends Model
             'salary_min' => 'decimal:2',
             'salary_max' => 'decimal:2',
             'skills_list' => 'array',
+            'certificates' => 'array',
             'needed_by' => 'date',
             'quoted_amount' => 'decimal:2',
             'quoted_at' => 'datetime',

@@ -56,9 +56,20 @@ class RecruitmentRequestController extends Controller
         $user = $request->user();
         $company = $user->company;
 
-        $skills = collect(explode(',', $request->input('skills_input', '')))
-            ->map(fn ($s) => trim($s))
+        $skills = collect($request->input('skills', []))
+            ->map(fn ($s) => trim((string) $s))
             ->filter()
+            ->values()
+            ->all();
+
+        $certificates = collect($request->input('certificates', []))
+            ->map(fn ($row) => [
+                'name' => trim((string) ($row['name'] ?? '')),
+                'vendor' => trim((string) ($row['vendor'] ?? '')),
+                'issued_at' => $row['issued_at'] ?? null,
+                'expires_at' => $row['expires_at'] ?? null,
+            ])
+            ->filter(fn ($row) => $row['name'] !== '' || $row['vendor'] !== '' || $row['issued_at'] || $row['expires_at'])
             ->values()
             ->all();
 
@@ -77,6 +88,7 @@ class RecruitmentRequestController extends Controller
             'salary_currency' => $request->input('salary_currency') ?: 'USD',
             'description' => $request->input('description'),
             'skills_list' => $skills ?: null,
+            'certificates' => $certificates ?: null,
             'needed_by' => $request->input('needed_by'),
             'status' => 'pending',
         ]);

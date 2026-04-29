@@ -11,8 +11,8 @@
 {{-- Hero --}}
 <section class="relative h-[400px] flex items-center overflow-hidden bg-[#073057]">
     <div class="absolute inset-0 z-0">
-        <img src="{{ $img['hero_officer'] ?? '' }}"
-             alt="Maritime professional representing JCL workforce"
+        <img src="{{ $img['contact_hero'] ?? '' }}"
+             alt="Professional reaching out to the JCL team"
              class="h-full w-full object-cover opacity-40" loading="eager" />
         <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/80 to-transparent"></div>
     </div>

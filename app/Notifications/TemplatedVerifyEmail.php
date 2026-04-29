@@ -16,7 +16,14 @@ class TemplatedVerifyEmail extends VerifyEmail
     {
         $verifyUrl = $this->verificationUrl($notifiable);
 
-        $template = EmailTemplate::findByKey('auth.verify_email');
+        $isEmployer = $notifiable->role?->name === 'employer';
+        $templateKey = $isEmployer ? 'auth.verify_email_employer' : 'auth.verify_email';
+
+        $template = EmailTemplate::findByKey($templateKey);
+        if (! $template && $isEmployer) {
+            $templateKey = 'auth.verify_email';
+            $template = EmailTemplate::findByKey($templateKey);
+        }
         if (! $template) {
             // Fallback to Laravel default if template missing.
             return parent::toMail($notifiable);
@@ -32,13 +39,18 @@ class TemplatedVerifyEmail extends VerifyEmail
             'support_email' => 'info@joseoceanjobs.com',
             'year' => date('Y'),
         ];
+
+        if ($isEmployer) {
+            $vars['company_name'] = $notifiable->company?->name ?? $notifiable->name;
+        }
+
         $subject = $dispatcher->substitute($template->subject, $vars);
         $body = $dispatcher->substitute($template->body_html, $vars);
 
         EmailLog::create([
             'user_id' => $notifiable->id,
             'to_email' => $notifiable->email,
-            'template_key' => 'auth.verify_email',
+            'template_key' => $templateKey,
             'subject' => $subject,
             'context' => $vars,
             'status' => 'sent',

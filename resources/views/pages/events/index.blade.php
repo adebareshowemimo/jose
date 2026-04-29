@@ -50,7 +50,7 @@
 
 {{-- ─── Hero ──────────────────────────────────────────────────── --}}
 <section class="relative h-[480px] flex items-center overflow-hidden bg-[#073057]">
-    <img src="{{ $img['aerial_container'] ?? '' }}"
+    <img src="{{ $img['events_hero'] ?? '' }}"
          alt="Events"
          class="absolute inset-0 w-full h-full object-cover opacity-30" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/90 to-[#073057]/40"></div>

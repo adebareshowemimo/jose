@@ -479,7 +479,7 @@ class PublicPageController extends BasePageController
                 'author' => 'JCL Editorial',
                 'date' => 'Mar 20, 2026',
                 'category' => 'Safety',
-                'image_url' => 'https://images.unsplash.com/photo-1605281317010-fe5ffe798166?w=1200&q=80',
+                'image_url' => asset('images/premium/safety-officer.jpg'),
                 'content' => [
                     'Offshore safety requirements continue to evolve as operators respond to tighter compliance expectations, higher client scrutiny, and more complex deployment environments.',
                     'Crews should expect stronger emphasis on documented risk assessment, incident reporting, permit-to-work discipline, and recurring emergency response drills.',
@@ -493,7 +493,7 @@ class PublicPageController extends BasePageController
                 'author' => 'Market Insights Team',
                 'date' => 'Mar 12, 2026',
                 'category' => 'Hiring',
-                'image_url' => 'https://images.unsplash.com/photo-1494412519320-aa613dfb7738?w=1200&q=80',
+                'image_url' => asset('images/premium/container-port.jpg'),
                 'content' => [
                     'Global maritime hiring remains active, with employers prioritizing qualified deck officers, marine engineers, offshore support crews, and dynamic positioning specialists.',
                     'Verified documents and current competency records are increasingly important because employers are shortening recruitment windows for urgent placements.',
@@ -507,7 +507,7 @@ class PublicPageController extends BasePageController
                 'author' => 'Training Desk',
                 'date' => 'Mar 03, 2026',
                 'category' => 'Training',
-                'image_url' => 'https://images.unsplash.com/photo-1473221326025-9183b464bb7e?w=1200&q=80',
+                'image_url' => asset('images/premium/deck-officer.jpg'),
                 'content' => [
                     'STCW certification provides the foundation for safe and compliant seafaring work, starting with basic safety training and progressing into role-specific endorsements.',
                     'Professionals should understand renewal timelines, refresher requirements, and the supporting medical and identity documentation needed for deployment.',
@@ -740,12 +740,12 @@ class PublicPageController extends BasePageController
     public function servicesCrewAbandonment()
     {
         return view('pages.services.crew-abandonment', $this->buildJclPageData(
-            title: 'Solution to Crew Abandonment',
+            title: 'Crew Abandonment Support',
             description: 'Specialist support and resolution services for crew abandonment situations.',
             breadcrumbs: [
                 ['label' => 'Home', 'url' => url('/')],
                 ['label' => 'Services', 'url' => route('services.index')],
-                ['label' => 'Solution to Crew Abandonment'],
+                ['label' => 'Crew Abandonment Support'],
             ],
         ));
     }

@@ -131,10 +131,92 @@
             </div>
         </div>
 
-        <div>
-            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Skills (comma-separated)</label>
-            <input type="text" name="skills_input" value="{{ old('skills_input') }}" placeholder="STCW Basic, Bridge Watchkeeping, GMDSS"
-                   class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+        {{-- Skills (repeatable rows) --}}
+        <div x-data="{
+                rows: {{ \Illuminate\Support\Js::from(
+                    old('skills')
+                        ? array_values(array_filter(old('skills'), fn($s) => trim((string) $s) !== ''))
+                        : ['']
+                ) }},
+                add() { this.rows.push(''); },
+                remove(i) { this.rows.splice(i, 1); if (this.rows.length === 0) this.rows.push(''); },
+            }">
+            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Skills</label>
+            <div class="space-y-2">
+                <template x-for="(row, i) in rows" :key="i">
+                    <div class="flex items-center gap-2">
+                        <input type="text" :name="`skills[${i}]`" x-model="rows[i]" placeholder="e.g. STCW Basic"
+                               class="flex-1 px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                        <button type="button" @click="remove(i)"
+                                class="shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-lg border border-[#E5E7EB] text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition cursor-pointer"
+                                :title="'Remove skill'">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+                </template>
+            </div>
+            <button type="button" @click="add()"
+                    class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#1AAD94] hover:text-[#073057] cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                Add skill
+            </button>
+        </div>
+
+        {{-- Certificates (repeatable rows) --}}
+        <div x-data="{
+                rows: {{ \Illuminate\Support\Js::from(
+                    old('certificates')
+                        ? array_values(array_filter(old('certificates'), fn($r) =>
+                            ($r['name'] ?? '') !== '' || ($r['vendor'] ?? '') !== ''
+                            || ($r['issued_at'] ?? '') !== '' || ($r['expires_at'] ?? '') !== ''))
+                        : [['name' => '', 'vendor' => '', 'issued_at' => '', 'expires_at' => '']]
+                ) }},
+                add() { this.rows.push({ name: '', vendor: '', issued_at: '', expires_at: '' }); },
+                remove(i) {
+                    this.rows.splice(i, 1);
+                    if (this.rows.length === 0) this.rows.push({ name: '', vendor: '', issued_at: '', expires_at: '' });
+                },
+            }">
+            <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Certificates</label>
+            <p class="text-xs text-gray-400 mb-3">List the certifications candidates must hold — name, issuing organisation, date received, and expiry.</p>
+            <div class="space-y-3">
+                <template x-for="(row, i) in rows" :key="i">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-2 items-start p-3 rounded-lg border border-[#E5E7EB] bg-gray-50/50">
+                        <div class="md:col-span-4">
+                            <label class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Name</label>
+                            <input type="text" :name="`certificates[${i}][name]`" x-model="rows[i].name" placeholder="e.g. STCW Basic Safety Training"
+                                   class="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none bg-white" />
+                        </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Issuing organisation</label>
+                            <input type="text" :name="`certificates[${i}][vendor]`" x-model="rows[i].vendor" placeholder="e.g. MCA, IMO, Lloyd's"
+                                   class="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none bg-white" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Date received</label>
+                            <input type="date" :name="`certificates[${i}][issued_at]`" x-model="rows[i].issued_at"
+                                   class="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none bg-white" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-semibold uppercase tracking-wider text-gray-400 mb-1">Expiry date</label>
+                            <input type="date" :name="`certificates[${i}][expires_at]`" x-model="rows[i].expires_at"
+                                   class="w-full px-3 py-2 border border-[#E5E7EB] rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none bg-white" />
+                        </div>
+                        <div class="md:col-span-1 flex md:items-end md:justify-end md:h-full">
+                            <button type="button" @click="remove(i)"
+                                    class="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-[#E5E7EB] text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition cursor-pointer bg-white"
+                                    title="Remove certificate">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            <button type="button" @click="add()"
+                    class="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#1AAD94] hover:text-[#073057] cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                Add certificate
+            </button>
         </div>
 
         <div>
