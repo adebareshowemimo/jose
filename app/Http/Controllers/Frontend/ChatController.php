@@ -61,7 +61,11 @@ class ChatController extends Controller
     public function contactAdmin(Request $request)
     {
         $company = $request->user()->company;
-        abort_unless($company, 403);
+
+        if (! $company) {
+            return redirect()->route('employer.company.profile')
+                ->with('error', 'Please set up your company profile before contacting admin support.');
+        }
 
         $conversation = ChatConversation::firstOrCreate(
             [
