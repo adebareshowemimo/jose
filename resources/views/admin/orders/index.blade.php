@@ -93,7 +93,7 @@
                                 <p class="text-xs text-gray-500">{{ $order->user?->email ?? '' }}</p>
                             </td>
                             <td class="px-5 py-3 text-gray-600">{{ ucfirst($order->gateway ?? '—') }}</td>
-                            <td class="px-5 py-3 text-right font-semibold text-gray-900">{{ $order->currency ?? 'USD' }} {{ number_format($order->total, 2) }}</td>
+                            <td class="px-5 py-3 text-right font-semibold text-gray-900">{{ money($order->total, $order->currency ?? 'USD') }}</td>
                             <td class="px-5 py-3">
                                 <span class="text-xs px-2 py-1 rounded-full
                                     {{ $order->status === 'completed' ? 'bg-green-100 text-green-700' : ($order->status === 'pending' ? 'bg-yellow-100 text-yellow-700' : ($order->status === 'cancelled' || $order->status === 'refunded' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700')) }}">

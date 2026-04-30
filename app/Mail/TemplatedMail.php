@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -12,9 +13,13 @@ class TemplatedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * @param  array<int, array{name: string, data: string, mime?: string}>  $pdfAttachments
+     */
     public function __construct(
         public string $renderedSubject,
         public string $renderedBody,
+        public array $pdfAttachments = [],
     ) {
     }
 
@@ -33,5 +38,20 @@ class TemplatedMail extends Mailable
                 'appName' => config('app.name', 'JOSEOCEANJOBS'),
             ],
         );
+    }
+
+    /**
+     * @return array<int, Attachment>
+     */
+    public function attachments(): array
+    {
+        $items = [];
+        foreach ($this->pdfAttachments as $a) {
+            $name = $a['name'] ?? 'attachment.pdf';
+            $data = $a['data'] ?? '';
+            $mime = $a['mime'] ?? 'application/pdf';
+            $items[] = Attachment::fromData(fn () => $data, $name)->withMime($mime);
+        }
+        return $items;
     }
 }

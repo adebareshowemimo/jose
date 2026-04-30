@@ -13,6 +13,7 @@ use App\Models\Plan;
 use App\Models\Role;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Support\Currency;
 use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -29,7 +30,9 @@ class AdminController extends Controller
         $totalJobs       = JobListing::count();
         $totalCandidates = Candidate::count();
         $totalOrders     = Order::count();
-        $totalRevenue    = Payment::where('status', 'completed')->sum('amount');
+        $totalRevenue    = $this->sumPaymentsInDefault(
+            Payment::where('status', 'completed')
+        );
 
         $activeJobs      = JobListing::where('status', 'active')->count();
         $pendingJobs     = JobListing::where('status', 'pending')->count();
@@ -38,16 +41,17 @@ class AdminController extends Controller
         $recentUsers = User::with('role')->latest()->take(10)->get();
         $recentOrders = Order::with('user')->latest()->take(10)->get();
 
-        // Revenue chart — last 6 months
+        // Revenue chart — last 6 months (converted to default currency per row)
         $revenueChart = [];
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
             $revenueChart[] = [
                 'month' => $date->format('M Y'),
-                'total' => Payment::where('status', 'completed')
-                    ->whereYear('created_at', $date->year)
-                    ->whereMonth('created_at', $date->month)
-                    ->sum('amount'),
+                'total' => $this->sumPaymentsInDefault(
+                    Payment::where('status', 'completed')
+                        ->whereYear('created_at', $date->year)
+                        ->whereMonth('created_at', $date->month)
+                ),
             ];
         }
 
@@ -347,6 +351,7 @@ class AdminController extends Controller
 
         $payment->update([
             'status' => 'completed',
+            'exchange_rate' => Currency::rate($payment->currency ?? 'USD', Currency::default()),
             'gateway_response' => array_merge($payment->gateway_response ?? [], [
                 'verified_by_admin_id' => auth()->id(),
                 'verified_at' => now()->toIso8601String(),
@@ -402,10 +407,39 @@ class AdminController extends Controller
         }
 
         $payments = $query->latest()->paginate(20)->withQueryString();
-        $totalRevenue   = Payment::where('status', 'completed')->sum('amount');
-        $pendingPayments = Payment::where('status', 'pending')->sum('amount');
+        $totalRevenue    = $this->sumPaymentsInDefault(Payment::where('status', 'completed'));
+        $pendingPayments = $this->sumPaymentsInDefault(Payment::where('status', 'pending'));
 
         return view('admin.payments.index', compact('payments', 'totalRevenue', 'pendingPayments'));
+    }
+
+    /**
+     * Sum a Payment query in the site's default currency.
+     * Prefers the per-row stamped exchange_rate (when present and not the default 1.0
+     * placeholder for cross-currency rows); otherwise falls back to the current rate.
+     */
+    protected function sumPaymentsInDefault($query): float
+    {
+        $default = Currency::default();
+        $total = 0.0;
+
+        $query->select('amount', 'currency', 'exchange_rate')
+            ->cursor()
+            ->each(function ($row) use (&$total, $default) {
+                $amount = (float) $row->amount;
+                $currency = strtoupper((string) ($row->currency ?? $default));
+                if ($currency === $default) {
+                    $total += $amount;
+                    return;
+                }
+                $stamped = (float) ($row->exchange_rate ?? 0);
+                $rate = $stamped > 0 && $stamped !== 1.0
+                    ? $stamped
+                    : Currency::rate($currency, $default);
+                $total += $amount * $rate;
+            });
+
+        return round($total, 2);
     }
 
     // ─── Applications ────────────────────────────────────────────

@@ -143,7 +143,7 @@
                             <a href="{{ $featured['register_show_url'] ?? '#' }}"
                                class="inline-flex items-center gap-2 px-6 py-3 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
                                 <iconify-icon icon="lucide:ticket"></iconify-icon>
-                                Register & pay · {{ $featured['currency'] }} {{ number_format((float) $featured['price'], 2) }}
+                                Register & pay · {{ money($featured['price'], $featured['currency'] ?? 'USD') }}
                             </a>
                         @elseif (! empty($featured['is_free_internal']))
                             <a href="{{ $featured['register_show_url'] ?? '#' }}"
@@ -245,7 +245,7 @@
                                     @elseif (! empty($event['is_sold_out']))
                                         <span class="inline-flex px-2.5 py-1 rounded-full bg-gray-200 text-gray-500 text-xs font-bold uppercase tracking-wider">Sold out</span>
                                     @elseif (! empty($event['is_paid']))
-                                        <span class="text-sm font-extrabold text-[#073057]">{{ $event['currency'] }} {{ number_format((float) $event['price'], 2) }}</span>
+                                        <span class="text-sm font-extrabold text-[#073057]">{{ money($event['price'], $event['currency'] ?? 'USD') }}</span>
                                         <a href="{{ $event['register_show_url'] ?? '#' }}" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1AAD94] hover:brightness-110 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition">
                                             Register
                                             <iconify-icon icon="lucide:arrow-right"></iconify-icon>

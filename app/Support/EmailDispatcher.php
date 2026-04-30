@@ -17,8 +17,10 @@ class EmailDispatcher
      * @param  string  $key   Template key (e.g. 'auth.welcome')
      * @param  string|User|array{0:string,1:?int}  $to  Email string, User model, or [email, user_id]
      * @param  array<string,mixed>  $vars  Variables for substitution
+     * @param  string|null  $replyTo  Optional Reply-To address applied to the outgoing message
+     * @param  array<int, array{name: string, data: string, mime?: string}>  $attachments  Optional binary attachments
      */
-    public function send(string $key, string|User|array $to, array $vars = []): bool
+    public function send(string $key, string|User|array $to, array $vars = [], ?string $replyTo = null, array $attachments = []): bool
     {
         $template = EmailTemplate::findByKey($key);
 
@@ -35,7 +37,11 @@ class EmailDispatcher
         $body = $this->substitute($template->body_html, $vars);
 
         try {
-            Mail::to($email)->send(new TemplatedMail($subject, $body));
+            $pending = Mail::to($email);
+            if ($replyTo && filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+                $pending->replyTo($replyTo);
+            }
+            $pending->send(new TemplatedMail($subject, $body, $attachments));
 
             EmailLog::create([
                 'user_id' => $userId,

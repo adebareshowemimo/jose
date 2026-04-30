@@ -7,7 +7,7 @@
 
 {{-- HERO --}}
 <section class="relative h-[420px] flex items-center overflow-hidden bg-[#073057]">
-    <img src="{{ ($jclImages ?? [])['safety_officer'] ?? '' }}"
+    <img src="{{ ($jclImages ?? [])['training_hero'] ?? '' }}"
          alt="Training"
          class="absolute inset-0 w-full h-full object-cover opacity-30" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/85 to-transparent"></div>
@@ -124,7 +124,7 @@
                                     @if ($program->isFree())
                                         <span class="text-[#1AAD94]">Free</span>
                                     @else
-                                        {{ $program->currency }} {{ number_format((float) $program->price, 2) }}
+                                        {{ money($program->price, $program->currency ?? 'USD') }}
                                     @endif
                                 </span>
                                 <div class="flex items-center gap-2">

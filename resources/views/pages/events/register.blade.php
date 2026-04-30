@@ -35,9 +35,15 @@
         <div class="grid lg:grid-cols-[minmax(0,1fr)_320px] gap-6">
 
             {{-- Form --}}
+            @php
+                $eventCurrency  = strtoupper($event->currency ?? 'USD');
+                $defaultCurrency = \App\Support\Currency::default();
+                $unitInDefault  = \App\Support\Currency::convertToDefault((float) ($event->price ?? 0), $eventCurrency);
+                $defaultSymbol  = \App\Support\Currency::symbol($defaultCurrency);
+            @endphp
             <form method="POST" action="{{ route('events.register.submit', $event) }}"
                   class="bg-white rounded-2xl border border-[#E0E0E0] shadow-sm p-6 md:p-8 space-y-5"
-                  x-data="{ tickets: {{ (int) old('ticket_count', 1) }}, unit: {{ (float) ($event->price ?? 0) }} }">
+                  x-data="{ tickets: {{ (int) old('ticket_count', 1) }}, unit: {{ $unitInDefault }} }">
                 @csrf
 
                 <div>
@@ -109,7 +115,7 @@
                     <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#1AAD94] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow-lg">
                         @if ($isPaid)
                             <iconify-icon icon="lucide:credit-card"></iconify-icon>
-                            Continue to payment · <span x-text="(unit * tickets).toFixed(2)"></span> {{ $event->currency ?? 'USD' }}
+                            Continue to payment · {{ $defaultSymbol }}<span x-text="(unit * tickets).toFixed(2)"></span>
                         @else
                             <iconify-icon icon="lucide:check"></iconify-icon>
                             Reserve my spot
@@ -125,7 +131,7 @@
             <aside>
                 <div class="sticky top-24 space-y-4">
                     <div class="bg-white rounded-2xl border border-[#E0E0E0] shadow-sm overflow-hidden"
-                         x-data="{ tickets: {{ (int) old('ticket_count', 1) }}, unit: {{ (float) ($event->price ?? 0) }} }">
+                         x-data="{ tickets: {{ (int) old('ticket_count', 1) }}, unit: {{ $unitInDefault }} }">
                         @if ($event->image_url)
                             <img src="{{ $event->image_url }}" alt="" class="w-full h-32 object-cover">
                         @else
@@ -141,12 +147,12 @@
                             @if ($isPaid)
                                 <div class="pt-3 border-t border-gray-100 space-y-1.5 text-sm">
                                     <div class="flex justify-between text-[#6B7280]">
-                                        <span><span x-text="tickets"></span> × {{ $event->currency }} {{ number_format((float) $event->price, 2) }}</span>
-                                        <span class="font-medium text-[#073057]" x-text="(unit * tickets).toFixed(2)"></span>
+                                        <span><span x-text="tickets"></span> × {{ money($event->price, $eventCurrency) }}</span>
+                                        <span class="font-medium text-[#073057]">{{ $defaultSymbol }}<span x-text="(unit * tickets).toFixed(2)"></span></span>
                                     </div>
                                     <div class="flex justify-between font-extrabold text-[#073057] pt-2 border-t border-gray-100">
                                         <span>Total</span>
-                                        <span>{{ $event->currency }} <span x-text="(unit * tickets).toFixed(2)"></span></span>
+                                        <span>{{ $defaultSymbol }}<span x-text="(unit * tickets).toFixed(2)"></span></span>
                                     </div>
                                 </div>
                             @else

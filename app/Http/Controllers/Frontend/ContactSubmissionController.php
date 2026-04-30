@@ -4,12 +4,13 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\ContactSubmission;
+use App\Support\ContactRoutes;
 use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 
 class ContactSubmissionController extends Controller
 {
-    public function store(Request $request, EmailDispatcher $emails)
+    public function store(Request $request, EmailDispatcher $emails, ContactRoutes $routes)
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -37,9 +38,10 @@ class ContactSubmissionController extends Controller
         ]);
 
         $vars = $this->templateVars($submission);
+        $teamEmail = $routes->routeFor($submission->subject);
 
-        $emails->send('contact.auto_response', $submission->email, $vars);
-        $emails->send('contact.admin_notification', $this->adminEmail(), $vars);
+        $emails->send('contact.auto_response', $submission->email, $vars, $teamEmail);
+        $emails->send('contact.admin_notification', $teamEmail, $vars, $submission->email);
 
         return back()->with('success', 'Thanks for contacting us. Your message has been received and our team will respond shortly.');
     }
@@ -62,7 +64,7 @@ class ContactSubmissionController extends Controller
         ]);
     }
 
-    public function reply(Request $request, string $token, EmailDispatcher $emails)
+    public function reply(Request $request, string $token, EmailDispatcher $emails, ContactRoutes $routes)
     {
         $submission = ContactSubmission::where('reply_token', $token)->firstOrFail();
 
@@ -82,9 +84,16 @@ class ContactSubmissionController extends Controller
             'closed_at' => null,
         ]);
 
-        $emails->send('contact.user_reply_notification', $this->adminEmail(), array_merge($this->templateVars($submission), [
+        $vars = array_merge($this->templateVars($submission), [
             'reply_message' => $data['message'],
-        ]));
+        ]);
+
+        $emails->send(
+            'contact.user_reply_notification',
+            $routes->routeFor($submission->subject),
+            $vars,
+            $submission->email,
+        );
 
         return back()->with('success', 'Your reply has been sent to our team.');
     }
@@ -104,10 +113,4 @@ class ContactSubmissionController extends Controller
         ];
     }
 
-    private function adminEmail(): string
-    {
-        return config('mail.admin_address')
-            ?? config('mail.from.address')
-            ?? 'info@joseoceanjobs.com';
-    }
 }

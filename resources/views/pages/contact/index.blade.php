@@ -82,7 +82,7 @@
                     <div class="space-y-2 md:col-span-2">
                         <label class="text-[11px] font-bold uppercase tracking-widest text-[#073057]/60">Subject</label>
                         <select name="subject" class="w-full rounded-xl border border-[#E0E0E0] bg-[#F9FAFB] px-5 py-4 focus:border-[#1AAD94] focus:outline-none focus:ring-1 focus:ring-[#1AAD94] transition-all">
-                            @foreach(['General Inquiry', 'Training & Certification', 'Job Placement Services', 'Partnership Proposal'] as $subject)
+                            @foreach($contactSubjects ?? [] as $subject)
                                 <option value="{{ $subject }}" {{ old('subject') === $subject ? 'selected' : '' }}>{{ $subject }}</option>
                             @endforeach
                         </select>

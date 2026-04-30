@@ -402,6 +402,9 @@ class JclProfileContent
             'events_hero'        => asset('images/premium/events-hero.jpg'),
             'contact_hero'       => asset('images/premium/contact-hero.jpg'),
             'career_banner'      => asset('images/premium/career-banner.jpg'),
+            'training_hero'      => asset('images/premium/training-hero.jpg'),
+            'soft_skills_hero'   => asset('images/premium/soft-skills-hero.jpg'),
+            'travel_management_hero' => asset('images/premium/travel-management-hero.jpg'),
             'news_marine'        => asset('images/news marine.jpg'),
             'auth_bg'            => asset('images/sing in or register.jpg'),
         ];

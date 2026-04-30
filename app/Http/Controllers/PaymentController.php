@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Services\PaystackService;
+use App\Support\Currency;
 use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -117,6 +118,7 @@ class PaymentController extends Controller
         DB::transaction(function () use ($payment, $order, $data) {
             $payment->update([
                 'status' => 'completed',
+                'exchange_rate' => Currency::rate($payment->currency ?? 'USD', Currency::default()),
                 'gateway_response' => array_merge($payment->gateway_response ?? [], ['verified' => $data]),
             ]);
             $order->update([

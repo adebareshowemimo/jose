@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Setting;
+use App\Support\ContactRoutes;
 use Illuminate\Database\Seeder;
 
 class SettingsSeeder extends Seeder
@@ -51,6 +52,10 @@ class SettingsSeeder extends Seeder
             ['key' => 'reminders.repeat_every_days', 'value' => 7, 'group' => 'reminders', 'is_encrypted' => false],
             ['key' => 'reminders.max_count',         'value' => 3, 'group' => 'reminders', 'is_encrypted' => false],
             ['key' => 'reminders.profile_threshold_percent', 'value' => 70, 'group' => 'reminders', 'is_encrypted' => false],
+
+            // Contact form subject -> recipient routing
+            ['key' => 'contact.subject_routes', 'value' => ContactRoutes::DEFAULT_ROUTES,           'group' => 'contact_routing', 'is_encrypted' => false],
+            ['key' => 'contact.default_email',  'value' => ContactRoutes::DEFAULT_FALLBACK_EMAIL,   'group' => 'contact_routing', 'is_encrypted' => false],
         ];
 
         foreach ($defaults as $row) {

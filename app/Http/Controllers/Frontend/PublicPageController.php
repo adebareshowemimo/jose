@@ -598,6 +598,7 @@ class PublicPageController extends BasePageController
             'profile' => $profile,
             'contactPathways' => $profile['contact_pathways'],
             'jclImages' => JclProfileContent::images(),
+            'contactSubjects' => app(\App\Support\ContactRoutes::class)->subjectLabels(),
         ]);
     }
 

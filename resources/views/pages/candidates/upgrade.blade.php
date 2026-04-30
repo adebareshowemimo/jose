@@ -78,17 +78,19 @@
                     <button type="button" @click="cycle = 'annual'" :class="cycle === 'annual' ? 'bg-white text-[#073057]' : 'text-white/70'" class="px-3 py-1.5 rounded-md text-xs font-bold uppercase tracking-widest transition">Annual</button>
                 </div>
 
+                @php
+                    $monthlyDisplay = money($plan->monthly_price, 'USD');
+                    $annualDisplay  = money($plan->annual_price, 'USD');
+                    $monthlyEquivDisplay = money(($plan->annual_price ?? 0) / 12, 'USD');
+                    $savingsDisplay = money(max(0, ($plan->monthly_price * 12) - $plan->annual_price), 'USD');
+                @endphp
                 <div x-show="cycle === 'monthly'">
-                    <p class="text-5xl font-extrabold">${{ number_format((float) $plan->monthly_price, 0) }}<span class="text-lg font-normal text-white/60">/mo</span></p>
+                    <p class="text-5xl font-extrabold">{{ $monthlyDisplay }}<span class="text-lg font-normal text-white/60">/mo</span></p>
                     <p class="text-xs text-white/60 mt-1">Billed monthly · cancel anytime</p>
                 </div>
                 <div x-show="cycle === 'annual'" x-cloak>
-                    <p class="text-5xl font-extrabold">${{ number_format((float) $plan->annual_price, 0) }}<span class="text-lg font-normal text-white/60">/yr</span></p>
-                    @php
-                        $monthlyEquiv = ($plan->annual_price ?? 0) / 12;
-                        $savings = max(0, ($plan->monthly_price * 12) - $plan->annual_price);
-                    @endphp
-                    <p class="text-xs text-white/60 mt-1">${{ number_format($monthlyEquiv, 2) }}/mo equivalent · <span class="text-[#7DE1D1] font-semibold">save ${{ number_format($savings, 0) }}</span></p>
+                    <p class="text-5xl font-extrabold">{{ $annualDisplay }}<span class="text-lg font-normal text-white/60">/yr</span></p>
+                    <p class="text-xs text-white/60 mt-1">{{ $monthlyEquivDisplay }}/mo equivalent · <span class="text-[#7DE1D1] font-semibold">save {{ $savingsDisplay }}</span></p>
                 </div>
 
                 <div class="flex-1"></div>

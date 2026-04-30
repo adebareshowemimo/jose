@@ -43,10 +43,6 @@
                         Enquire Now
                         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
                     </a>
-                    <a href="{{ route('services.training') }}" class="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-[#073057] text-[#073057] hover:bg-[#073057] hover:text-white font-bold rounded-xl transition-all">
-                        <iconify-icon icon="lucide:graduation-cap"></iconify-icon>
-                        View All Trainings
-                    </a>
                 </div>
             </div>
             <div class="rounded-[32px] overflow-hidden shadow-xl">

@@ -10,6 +10,7 @@ class ChatConversation extends Model
 {
     public const TYPE_EMPLOYER_CANDIDATE = 'employer_candidate';
     public const TYPE_ADMIN_CANDIDATE = 'admin_candidate';
+    public const TYPE_ADMIN_EMPLOYER = 'admin_employer';
 
     protected $fillable = [
         'type',
@@ -59,7 +60,7 @@ class ChatConversation extends Model
 
     public function contextLabel(): string
     {
-        if ($this->type === self::TYPE_ADMIN_CANDIDATE) {
+        if (in_array($this->type, [self::TYPE_ADMIN_CANDIDATE, self::TYPE_ADMIN_EMPLOYER], true)) {
             return 'Admin conversation';
         }
 

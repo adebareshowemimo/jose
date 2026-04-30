@@ -49,7 +49,7 @@
     {{-- Left: details --}}
     <div class="lg:col-span-2 space-y-6">
         {{-- Quote / pay CTA --}}
-        @if ($recruitment->status === 'quote_sent' && $recruitment->order)
+        @if ($recruitment->status === 'quote_sent' && $recruitment->order && $recruitment->order->status !== 'completed')
             <div class="bg-gradient-to-br from-[#073057] to-[#0a4275] text-white rounded-xl p-6 shadow-lg">
                 <div class="text-xs font-bold uppercase tracking-widest text-white/60 mb-2">Quote Ready</div>
                 <div class="text-3xl font-extrabold mb-1">{{ $recruitment->salary_currency }} {{ number_format($recruitment->quoted_amount, 2) }}</div>

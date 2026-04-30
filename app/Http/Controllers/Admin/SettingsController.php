@@ -7,6 +7,7 @@ use App\Models\Setting;
 use App\Support\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
@@ -20,6 +21,7 @@ class SettingsController extends Controller
             'reminders' => $settings->group('reminders'),
             'paystack' => $settings->group('paystack'),
             'bank' => $settings->group('bank'),
+            'receipt' => $settings->group('receipt'),
         ]);
     }
 
@@ -60,7 +62,31 @@ class SettingsController extends Controller
             'bank_bank_name'      => 'nullable|string|max:255',
             'bank_swift_code'     => 'nullable|string|max:50',
             'bank_instructions'   => 'nullable|string|max:2000',
+
+            'receipt_business_name'    => 'nullable|string|max:255',
+            'receipt_business_address' => 'nullable|string|max:1000',
+            'receipt_business_phone'   => 'nullable|string|max:50',
+            'receipt_business_email'   => 'nullable|email|max:255',
+            'receipt_tax_id'           => 'nullable|string|max:100',
+            'receipt_logo'             => 'nullable|image|mimes:png,jpg,jpeg,svg|max:2048',
+            'receipt_remove_logo'      => 'sometimes|boolean',
+            'receipt_header_note'      => 'nullable|string|max:1000',
+            'receipt_footer_text'      => 'nullable|string|max:2000',
+            'receipt_signature_label'  => 'nullable|string|max:100',
+            'receipt_number_prefix'    => 'nullable|string|max:20',
         ]);
+
+        $logoPath = $settings->get('receipt.logo_path');
+        if ($request->boolean('receipt_remove_logo') && $logoPath) {
+            Storage::disk('public')->delete($logoPath);
+            $logoPath = null;
+        }
+        if ($request->hasFile('receipt_logo')) {
+            if ($logoPath) {
+                Storage::disk('public')->delete($logoPath);
+            }
+            $logoPath = $request->file('receipt_logo')->store('receipts/branding', 'public');
+        }
 
         $map = [
             'auth.require_email_verification' => ['auth', false, $request->boolean('auth_require_email_verification')],
@@ -97,6 +123,17 @@ class SettingsController extends Controller
             'bank.bank_name'      => ['bank', false, $data['bank_bank_name'] ?? null],
             'bank.swift_code'     => ['bank', false, $data['bank_swift_code'] ?? null],
             'bank.instructions'   => ['bank', false, $data['bank_instructions'] ?? null],
+
+            'receipt.business_name'    => ['receipt', false, $data['receipt_business_name'] ?? null],
+            'receipt.business_address' => ['receipt', false, $data['receipt_business_address'] ?? null],
+            'receipt.business_phone'   => ['receipt', false, $data['receipt_business_phone'] ?? null],
+            'receipt.business_email'   => ['receipt', false, $data['receipt_business_email'] ?? null],
+            'receipt.tax_id'           => ['receipt', false, $data['receipt_tax_id'] ?? null],
+            'receipt.logo_path'        => ['receipt', false, $logoPath],
+            'receipt.header_note'      => ['receipt', false, $data['receipt_header_note'] ?? null],
+            'receipt.footer_text'      => ['receipt', false, $data['receipt_footer_text'] ?? null],
+            'receipt.signature_label'  => ['receipt', false, $data['receipt_signature_label'] ?? null],
+            'receipt.number_prefix'    => ['receipt', false, $data['receipt_number_prefix'] ?? 'RCP-'],
         ];
 
         foreach ($map as $key => [$group, $encrypted, $value]) {

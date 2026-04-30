@@ -57,6 +57,20 @@ HTML,
 HTML,
             ],
             [
+                'key' => 'recruitment.payment_confirmed',
+                'name' => 'Recruitment Payment Confirmed',
+                'category' => 'Recruitment',
+                'subject' => 'Payment received — we\'re sourcing candidates for {{job_title}}',
+                'variables' => ['name', 'job_title', 'amount', 'currency', 'paid_at', 'request_url'],
+                'body_html' => <<<'HTML'
+<h2>Payment confirmed — we're on it</h2>
+<p>Hi {{name}}, we've received your payment of <strong>{{currency}} {{amount}}</strong> on {{paid_at}} for the <strong>{{job_title}}</strong> recruitment request.</p>
+<p>Our team is now sourcing and screening candidates for the role. You'll get an email as soon as they're ready for you to review.</p>
+<div class="btn-wrap"><a href="{{request_url}}" class="btn">View request</a></div>
+<p style="color:#6B7280; font-size:13px;">Questions? Just reply to this email.</p>
+HTML,
+            ],
+            [
                 'key' => 'recruitment.candidates_delivered',
                 'name' => 'Candidates Delivered',
                 'category' => 'Recruitment',

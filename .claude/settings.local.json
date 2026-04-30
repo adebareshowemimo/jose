@@ -42,7 +42,17 @@
       "Bash(netstat -ano)",
       "Bash(tasklist /FI \"PID eq 31440\")",
       "PowerShell(Get-Process | Where-Object {$_.Id -eq 31440} | Format-Table -AutoSize; Get-Process php -ErrorAction SilentlyContinue | Format-Table Name, Id, StartTime -AutoSize)",
-      "Bash(php test_chat.php)"
+      "Bash(php test_chat.php)",
+      "Bash(git commit -m ' *)",
+      "Bash(xargs head *)",
+      "Bash(php -r \"echo json_encode\\(json_decode\\(file_get_contents\\('/c/xampp/htdocs/jose/composer.lock'\\), true\\)['packages'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES\\);\")",
+      "Bash(php c:/xampp/htdocs/jose/artisan route:list --columns=method,uri,name)",
+      "Bash(composer dump-autoload *)",
+      "Bash(php -l app/Services/ReceiptPdfService.php)",
+      "Bash(php -l app/Support/EmailDispatcher.php)",
+      "Bash(php -l app/Mail/TemplatedMail.php)",
+      "Bash(php -l app/Support/PaymentTypeLabel.php)",
+      "Bash(php -l database/migrations/2026_04_30_173248_align_order_items_status_with_model.php)"
     ]
   }
 }

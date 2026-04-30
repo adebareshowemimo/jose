@@ -19,7 +19,7 @@
 
 {{-- Hero --}}
 <section class="relative h-[460px] flex items-center overflow-hidden bg-[#073057]">
-    <img src="{{ $img['aerial_container'] ?? '' }}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-25" loading="eager">
+    <img src="{{ $img['training_hero'] ?? '' }}" alt="" class="absolute inset-0 w-full h-full object-cover opacity-25" loading="eager">
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/90 to-[#073057]/40"></div>
     <div class="absolute inset-0 opacity-[0.04]" style="background-image: radial-gradient(circle, white 1px, transparent 1px); background-size: 28px 28px;"></div>
 
@@ -110,7 +110,7 @@
                                     @if ($program->isFree())
                                         <span class="text-[#1AAD94]">Free</span>
                                     @else
-                                        {{ $program->currency }} {{ number_format((float) $program->price, 2) }}
+                                        {{ money($program->price, $program->currency ?? 'USD') }}
                                     @endif
                                 </span>
                                 <a href="{{ route('training.show', $program->slug) }}"

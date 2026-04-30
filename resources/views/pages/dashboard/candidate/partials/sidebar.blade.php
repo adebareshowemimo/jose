@@ -58,6 +58,7 @@ $navItems = [
     ['route' => 'user.bookmark', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>', 'label' => 'Saved Jobs', 'badge' => $savedJobsCount],
     ['route' => 'user.cv-manager', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>', 'label' => 'CV Manager', 'badge' => $cvCount],
     ['route' => 'user.chat', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>', 'label' => 'Messages', 'badge' => $chatUnreadCount],
+    ['route' => 'user.payments', 'active_prefix' => 'user.payments', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h2m4 0h4M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z"/>', 'label' => 'My Payments'],
     ['route' => 'candidate.boost.index', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>', 'label' => 'Boost Profile'],
     ['route' => 'candidate.upgrade.show', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l3.057 6.196L15 10.31l-5 4.873 1.18 6.879L5 18.866 -1.18 22.062 0 15.183 -5 10.31l6.943-1.114L5 3z" transform="translate(7 0)"/>', 'label' => 'Premium'],
 ];
@@ -65,9 +66,10 @@ $navItems = [
 
 {{-- Navigation Links --}}
 @foreach($navItems as $item)
-<a href="{{ route($item['route']) }}" 
+@php $isActive = $currentRoute === $item['route'] || (! empty($item['active_prefix']) && str_starts_with((string) $currentRoute, $item['active_prefix'] . '.')); @endphp
+<a href="{{ route($item['route']) }}"
    class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition
-          {{ $currentRoute === $item['route'] ? 'bg-[#1AAD94]/10 text-[#1AAD94]' : 'text-[#4B5563] hover:bg-[#F3F4F6]' }}">
+          {{ $isActive ? 'bg-[#1AAD94]/10 text-[#1AAD94]' : 'text-[#4B5563] hover:bg-[#F3F4F6]' }}">
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">{!! $item['icon'] !!}</svg>
     {{ $item['label'] }}
     @if(!empty($item['badge']))

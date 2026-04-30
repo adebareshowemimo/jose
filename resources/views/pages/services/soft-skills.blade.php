@@ -8,7 +8,7 @@
 
 {{-- Hero --}}
 <section class="relative h-[400px] flex items-center overflow-hidden bg-[#073057]">
-    <img src="{{ $img['maritime_training'] ?? '' }}"
+    <img src="{{ $img['soft_skills_hero'] ?? '' }}"
          alt="Soft Skills Training"
          class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/80 to-transparent"></div>
@@ -43,14 +43,10 @@
                         Enquire Now
                         <iconify-icon icon="lucide:arrow-right"></iconify-icon>
                     </a>
-                    <a href="{{ route('services.training') }}" class="inline-flex items-center gap-2 px-7 py-3.5 border-2 border-[#073057] text-[#073057] hover:bg-[#073057] hover:text-white font-bold rounded-xl transition-all">
-                        <iconify-icon icon="lucide:graduation-cap"></iconify-icon>
-                        View All Trainings
-                    </a>
                 </div>
             </div>
             <div class="rounded-[32px] overflow-hidden shadow-xl">
-                <img src="{{ $img['maritime_training'] ?? '' }}"
+                <img src="{{ $img['soft_skills_hero'] ?? '' }}"
                      alt="Soft Skills Training"
                      class="w-full h-[480px] object-cover" />
             </div>

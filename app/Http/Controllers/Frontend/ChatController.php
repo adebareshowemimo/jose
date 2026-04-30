@@ -20,6 +20,7 @@ class ChatController extends Controller
             return view('pages.dashboard.employer.messages', [
                 'dashboardType' => 'employer',
                 'conversations' => collect(),
+                'adminConversation' => null,
                 'selectedConversation' => null,
                 'messages' => collect(),
             ]);
@@ -38,12 +39,44 @@ class ChatController extends Controller
             ->orderByDesc('created_at')
             ->get();
 
-        $selectedConversation = $this->selectedConversation($request, $conversations);
+        $adminConversation = ChatConversation::with(['latestMessage.sender'])
+            ->where('type', ChatConversation::TYPE_ADMIN_EMPLOYER)
+            ->where('company_id', $company->id)
+            ->orderByDesc('last_message_at')
+            ->orderByDesc('created_at')
+            ->first();
+
+        $selectableConversations = $adminConversation
+            ? $conversations->concat([$adminConversation])
+            : $conversations;
+
+        $selectedConversation = $this->selectedConversation($request, $selectableConversations);
         $messages = $selectedConversation ? $this->openConversation($selectedConversation, $request->user()->id) : collect();
 
-        return view('pages.dashboard.employer.messages', compact('conversations', 'selectedConversation', 'messages') + [
+        return view('pages.dashboard.employer.messages', compact('conversations', 'adminConversation', 'selectedConversation', 'messages') + [
             'dashboardType' => 'employer',
         ]);
+    }
+
+    public function contactAdmin(Request $request)
+    {
+        $company = $request->user()->company;
+        abort_unless($company, 403);
+
+        $conversation = ChatConversation::firstOrCreate(
+            [
+                'type' => ChatConversation::TYPE_ADMIN_EMPLOYER,
+                'company_id' => $company->id,
+                'candidate_id' => null,
+                'recruitment_request_candidate_id' => null,
+            ],
+            [
+                'started_by_user_id' => $request->user()->id,
+                'last_message_at' => now(),
+            ]
+        );
+
+        return redirect()->route('employer.chat', ['conversation' => $conversation->id]);
     }
 
     public function candidate(Request $request)
@@ -83,7 +116,7 @@ class ChatController extends Controller
 
     public function sendEmployerMessage(Request $request, ChatConversation $conversation)
     {
-        $this->authorizeEmployer($request, $conversation);
+        $this->authorizeEmployer($request, $conversation, allowAdmin: true);
 
         $data = $request->validate([
             'body' => 'required|string|max:5000',
@@ -237,10 +270,14 @@ class ChatController extends Controller
         return $conversation->messages()->with('sender')->oldest()->get();
     }
 
-    private function authorizeEmployer(Request $request, ChatConversation $conversation): void
+    private function authorizeEmployer(Request $request, ChatConversation $conversation, bool $allowAdmin = false): void
     {
+        $allowedTypes = $allowAdmin
+            ? [ChatConversation::TYPE_EMPLOYER_CANDIDATE, ChatConversation::TYPE_ADMIN_EMPLOYER]
+            : [ChatConversation::TYPE_EMPLOYER_CANDIDATE];
+
         abort_unless(
-            $conversation->type === ChatConversation::TYPE_EMPLOYER_CANDIDATE
+            in_array($conversation->type, $allowedTypes, true)
             && $request->user()->role?->name === 'employer'
             && (int) $request->user()->company?->id === (int) $conversation->company_id,
             403

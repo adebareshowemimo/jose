@@ -37,8 +37,8 @@
                                     <tr>
                                         <td class="px-4 py-3 text-gray-900">{{ $item->name ?? $item->object_model ?? 'Item' }}</td>
                                         <td class="px-4 py-3 text-right text-gray-600">{{ $item->qty ?? 1 }}</td>
-                                        <td class="px-4 py-3 text-right text-gray-600">${{ number_format($item->price ?? 0, 2) }}</td>
-                                        <td class="px-4 py-3 text-right font-medium">${{ number_format(($item->price ?? 0) * ($item->qty ?? 1), 2) }}</td>
+                                        <td class="px-4 py-3 text-right text-gray-600">{{ money($item->price ?? 0, $order->currency ?? 'USD') }}</td>
+                                        <td class="px-4 py-3 text-right font-medium">{{ money(($item->price ?? 0) * ($item->qty ?? 1), $order->currency ?? 'USD') }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
@@ -50,9 +50,9 @@
 
                 {{-- Totals --}}
                 <div class="border-t border-gray-200 pt-4 space-y-2 text-sm">
-                    <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span class="text-gray-900">${{ number_format($order->subtotal, 2) }}</span></div>
-                    <div class="flex justify-between"><span class="text-gray-500">Tax</span><span class="text-gray-900">${{ number_format($order->tax, 2) }}</span></div>
-                    <div class="flex justify-between text-base font-bold pt-2 border-t border-gray-200"><span>Total</span><span>${{ number_format($order->total, 2) }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Subtotal</span><span class="text-gray-900">{{ money($order->subtotal, $order->currency ?? 'USD') }}</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Tax</span><span class="text-gray-900">{{ money($order->tax, $order->currency ?? 'USD') }}</span></div>
+                    <div class="flex justify-between text-base font-bold pt-2 border-t border-gray-200"><span>Total</span><span>{{ money($order->total, $order->currency ?? 'USD') }}</span></div>
                 </div>
             </div>
 
@@ -70,7 +70,7 @@
                                         <p class="text-xs text-gray-500">{{ $payment->created_at?->format('M d, Y g:i A') }}</p>
                                     </div>
                                     <div class="text-right">
-                                        <p class="text-sm font-semibold text-gray-900">{{ $payment->currency ?? 'USD' }} {{ number_format($payment->amount, 2) }}</p>
+                                        <p class="text-sm font-semibold text-gray-900">{{ money($payment->amount, $payment->currency ?? 'USD') }}</p>
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold
                                             {{ $payment->status === 'completed' ? 'bg-green-100 text-green-700' : ($payment->status === 'failed' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700') }}">
                                             {{ ucfirst($payment->status ?? 'N/A') }}
@@ -80,18 +80,7 @@
 
                                 {{-- Manual transfer details --}}
                                 @if ($payment->gateway === 'manual')
-                                    <dl class="grid sm:grid-cols-2 gap-2 text-xs mt-3 pt-3 border-t border-gray-100">
-                                        @if (! empty($meta['paid_at']))<div><dt class="text-gray-500">Date paid</dt><dd class="text-gray-900">{{ $meta['paid_at'] }}</dd></div>@endif
-                                        @if (! empty($meta['sender_bank']))<div><dt class="text-gray-500">Sender bank</dt><dd class="text-gray-900">{{ $meta['sender_bank'] }}</dd></div>@endif
-                                        @if (! empty($meta['sender_account']))<div><dt class="text-gray-500">Sender account</dt><dd class="text-gray-900">{{ $meta['sender_account'] }}</dd></div>@endif
-                                        @if (! empty($meta['note']))<div class="sm:col-span-2"><dt class="text-gray-500">Note</dt><dd class="text-gray-900">{{ $meta['note'] }}</dd></div>@endif
-                                        @if (! empty($meta['proof_path']))
-                                            <div class="sm:col-span-2"><dt class="text-gray-500">Proof of payment</dt>
-                                                <dd><a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($meta['proof_path']) }}" target="_blank" class="text-[#1AAD94] font-semibold">Download &rarr;</a></dd>
-                                            </div>
-                                        @endif
-                                        @if (! empty($meta['rejection_reason']))<div class="sm:col-span-2"><dt class="text-gray-500">Rejection reason</dt><dd class="text-red-600">{{ $meta['rejection_reason'] }}</dd></div>@endif
-                                    </dl>
+                                    @include('admin.payments._partials.manual-details', ['payment' => $payment])
 
                                     @if ($payment->status === 'pending')
                                         <div class="flex gap-2 mt-4 pt-3 border-t border-gray-100">

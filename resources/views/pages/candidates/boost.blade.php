@@ -49,7 +49,7 @@
                 <p class="text-xs text-[#6B7280] mb-5">{{ $pkg['tagline'] }}</p>
 
                 <div class="my-5 py-4 border-y border-gray-100">
-                    <p class="text-3xl font-extrabold text-[#073057]">{{ $currency }} {{ number_format($pkg['price'], 2) }}</p>
+                    <p class="text-3xl font-extrabold text-[#073057]">{{ money($pkg['price'], $currency ?? 'USD') }}</p>
                     <p class="text-xs text-[#6B7280] mt-1">One-time payment</p>
                 </div>
 

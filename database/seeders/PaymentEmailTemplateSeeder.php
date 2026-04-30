@@ -63,6 +63,24 @@ HTML,
 <div class="btn-wrap"><a href="{{admin_url}}" class="btn">Open in admin</a></div>
 HTML,
             ],
+            [
+                'key' => 'receipt.sent',
+                'name' => 'Receipt Issued',
+                'category' => 'Payment',
+                'subject' => 'Your receipt for order {{order_number}} ({{receipt_number}})',
+                'variables' => ['name', 'order_number', 'receipt_number', 'amount', 'currency', 'issued_at', 'download_url'],
+                'body_html' => <<<'HTML'
+<h2>Your receipt is ready</h2>
+<p>Hi {{name}}, please find attached the receipt for your payment on order <strong>{{order_number}}</strong>.</p>
+<ul>
+  <li><strong>Receipt number:</strong> {{receipt_number}}</li>
+  <li><strong>Amount:</strong> {{currency}} {{amount}}</li>
+  <li><strong>Issued:</strong> {{issued_at}}</li>
+</ul>
+<div class="btn-wrap"><a href="{{download_url}}" class="btn">Download receipt</a></div>
+<p style="color:#6B7280; font-size:13px;">You can also download this receipt anytime from your dashboard. If anything looks off, just reply to this email.</p>
+HTML,
+            ],
         ];
 
         foreach ($templates as $row) {

@@ -103,7 +103,7 @@
 
                                 <div class="mt-3 pt-3 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
                                     <div class="flex items-center gap-3 flex-wrap">
-                                        <span class="font-bold text-[#073057] text-sm">{{ $program->currency }} {{ number_format((float) $program->price, 2) }}</span>
+                                        <span class="font-bold text-[#073057] text-sm">{{ money($program->price, $program->currency ?? 'USD') }}</span>
                                         @if ($program->duration)
                                             <span class="inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ $program->duration }}</span>
                                         @endif

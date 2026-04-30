@@ -118,9 +118,10 @@
             </div>
             <div>
                 <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Currency</label>
+                @php $defaultCurrency = \App\Support\Currency::default(); @endphp
                 <select name="salary_currency" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none">
-                    @foreach (['USD', 'EUR', 'GBP', 'NGN', 'AED'] as $cur)
-                        <option value="{{ $cur }}" {{ old('salary_currency', 'USD') === $cur ? 'selected' : '' }}>{{ $cur }}</option>
+                    @foreach (\App\Support\Currency::ALLOWED as $cur)
+                        <option value="{{ $cur }}" {{ old('salary_currency', $defaultCurrency) === $cur ? 'selected' : '' }}>{{ $cur }}</option>
                     @endforeach
                 </select>
             </div>
@@ -145,7 +146,7 @@
             <div class="space-y-2">
                 <template x-for="(row, i) in rows" :key="i">
                     <div class="flex items-center gap-2">
-                        <input type="text" :name="`skills[${i}]`" x-model="rows[i]" placeholder="e.g. STCW Basic"
+                        <input type="text" :name="`skills[${i}]`" x-model="rows[i]" placeholder="e.g. Leadership, Teamwork"
                                class="flex-1 px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
                         <button type="button" @click="remove(i)"
                                 class="shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-lg border border-[#E5E7EB] text-gray-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition cursor-pointer"

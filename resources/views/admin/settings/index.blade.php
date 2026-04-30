@@ -27,9 +27,10 @@
             <button type="button" @click="tab = 'reminders'" :class="tab === 'reminders' ? 'bg-[#1AAD94] text-white' : 'text-gray-600 hover:bg-gray-100'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Reminders</button>
             <button type="button" @click="tab = 'paystack'" :class="tab === 'paystack' ? 'bg-[#1AAD94] text-white' : 'text-gray-600 hover:bg-gray-100'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Paystack</button>
             <button type="button" @click="tab = 'bank'" :class="tab === 'bank' ? 'bg-[#1AAD94] text-white' : 'text-gray-600 hover:bg-gray-100'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Bank Transfer</button>
+            <button type="button" @click="tab = 'receipt'" :class="tab === 'receipt' ? 'bg-[#1AAD94] text-white' : 'text-gray-600 hover:bg-gray-100'" class="px-4 py-2 rounded-lg text-sm font-semibold transition">Receipt Template</button>
         </div>
 
-        <form method="POST" action="{{ route('admin.settings.update') }}" class="p-6">
+        <form method="POST" action="{{ route('admin.settings.update') }}" enctype="multipart/form-data" class="p-6">
             @csrf
             @method('PUT')
 
@@ -301,6 +302,80 @@
                     <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Additional Instructions</label>
                     <textarea name="bank_instructions" rows="3" placeholder="Please include the order number as the transfer reference..."
                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none">{{ $bank['bank.instructions'] ?? '' }}</textarea>
+                </div>
+            </div>
+
+            {{-- Receipt template tab --}}
+            <div x-show="tab === 'receipt'" x-cloak class="space-y-5">
+                <p class="text-sm text-gray-600">These details appear on PDF receipts issued from <span class="font-mono">/admin/payments</span>. The layout is fixed; only the values below change.</p>
+
+                <div class="grid md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Business Name</label>
+                        <input type="text" name="receipt_business_name" value="{{ $receipt['receipt.business_name'] ?? config('app.name') }}" placeholder="Jose Consulting Limited"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Tax / VAT ID (optional)</label>
+                        <input type="text" name="receipt_tax_id" value="{{ $receipt['receipt.tax_id'] ?? '' }}" placeholder="RC 123456 / VAT 123-456-789"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Business Address</label>
+                        <textarea name="receipt_business_address" rows="2" placeholder="Street, City, State, Postcode, Country"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none">{{ $receipt['receipt.business_address'] ?? '' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Phone</label>
+                        <input type="text" name="receipt_business_phone" value="{{ $receipt['receipt.business_phone'] ?? '' }}" placeholder="+234 ..."
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Email</label>
+                        <input type="email" name="receipt_business_email" value="{{ $receipt['receipt.business_email'] ?? '' }}" placeholder="billing@yourdomain.com"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-100">
+                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Logo</label>
+                    @if (! empty($receipt['receipt.logo_path']))
+                        <div class="flex items-center gap-4 mb-3">
+                            <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($receipt['receipt.logo_path']) }}" alt="Receipt logo" class="h-16 w-auto rounded border border-gray-200 bg-gray-50 p-2" />
+                            <label class="flex items-center gap-2 text-sm text-red-600 cursor-pointer">
+                                <input type="hidden" name="receipt_remove_logo" value="0">
+                                <input type="checkbox" name="receipt_remove_logo" value="1" class="w-4 h-4 rounded border-gray-300 text-red-600">
+                                Remove this logo
+                            </label>
+                        </div>
+                    @endif
+                    <input type="file" name="receipt_logo" accept="image/png,image/jpeg,image/svg+xml"
+                           class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#073057] file:text-white hover:file:bg-[#0a4275]" />
+                    <p class="mt-1 text-xs text-gray-500">PNG, JPG or SVG. Max 2MB. Will display at the top-left of every receipt PDF.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-5 pt-4 border-t border-gray-100">
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Header Note (optional)</label>
+                        <textarea name="receipt_header_note" rows="2" placeholder="A short message to show under the title."
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none">{{ $receipt['receipt.header_note'] ?? '' }}</textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Footer / Terms</label>
+                        <textarea name="receipt_footer_text" rows="3" placeholder="Thank you for your business. This is a computer-generated receipt and does not require a signature."
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none">{{ $receipt['receipt.footer_text'] ?? '' }}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Signature Label</label>
+                        <input type="text" name="receipt_signature_label" value="{{ $receipt['receipt.signature_label'] ?? 'Authorised Signature' }}"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Receipt Number Prefix</label>
+                        <input type="text" name="receipt_number_prefix" value="{{ $receipt['receipt.number_prefix'] ?? 'RCP-' }}"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
+                        <p class="mt-1 text-xs text-gray-500">Receipt numbers will look like <span class="font-mono">{{ ($receipt['receipt.number_prefix'] ?? 'RCP-') }}000123</span>.</p>
+                    </div>
                 </div>
             </div>
 

@@ -16,8 +16,12 @@ use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\CompleteSignupController;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ReceiptController as AdminReceiptController;
+use App\Http\Controllers\Frontend\UserPaymentController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\CurrencySettingsController as AdminCurrencySettingsController;
 use App\Http\Controllers\Admin\EmailTemplateController as AdminEmailTemplateController;
 use App\Http\Controllers\Admin\ApplicationNotificationController;
 use App\Http\Controllers\Admin\RecruitmentRequestController as AdminRecruitmentRequestController;
@@ -191,6 +195,11 @@ Route::prefix('user')->middleware(['auth', 'role.selected'])->group(function () 
     Route::get('/my-plan', [CandidateDashboardController::class, 'plans'])->name('user.my-plan');
     Route::get('/wallet', [CandidateDashboardController::class, 'wallet'])->name('user.wallet');
     Route::get('/payout', [CandidateDashboardController::class, 'payout'])->name('user.payout');
+
+    // My Payments
+    Route::get('/payments', [UserPaymentController::class, 'index'])->name('user.payments');
+    Route::get('/payments/{payment}', [UserPaymentController::class, 'show'])->name('user.payments.show');
+    Route::get('/payments/{payment}/receipt', [UserPaymentController::class, 'downloadReceipt'])->name('user.payments.receipt');
 });
 
 // Employer dashboard pages
@@ -210,6 +219,7 @@ Route::prefix('employer')->middleware(['auth', 'role.selected'])->group(function
     Route::get('/resumes', [EmployerDashboardController::class, 'browseResumes'])->name('employer.resumes');
     Route::get('/resume-alerts', [EmployerDashboardController::class, 'resumeAlerts'])->name('employer.resume-alerts');
     Route::get('/chat', [ChatController::class, 'employer'])->name('employer.chat');
+    Route::post('/chat/contact-admin', [ChatController::class, 'contactAdmin'])->name('employer.chat.contact-admin');
     Route::post('/chat/{conversation}/messages', [ChatController::class, 'sendEmployerMessage'])->name('employer.chat.messages.store');
     Route::post('/chat/{conversation}/schedule-interview', [ChatController::class, 'scheduleInterview'])->name('employer.chat.schedule-interview');
     Route::post('/chat/{conversation}/request-documents', [ChatController::class, 'requestDocuments'])->name('employer.chat.request-documents');
@@ -228,6 +238,11 @@ Route::prefix('employer')->middleware(['auth', 'role.selected'])->group(function
         Route::post('/{recruitment}/cancel', [RecruitmentRequestController::class, 'cancel'])->name('cancel');
         Route::post('/{recruitment}/candidates/{candidate}/decision', [RecruitmentRequestController::class, 'decide'])->name('candidate.decide');
     });
+
+    // Payments & Receipts
+    Route::get('/payments', [UserPaymentController::class, 'index'])->name('employer.payments');
+    Route::get('/payments/{payment}', [UserPaymentController::class, 'show'])->name('employer.payments.show');
+    Route::get('/payments/{payment}/receipt', [UserPaymentController::class, 'downloadReceipt'])->name('employer.payments.receipt');
 });
 
 // Transactional pages — all require login.
@@ -301,11 +316,23 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Orders
     Route::get('/orders', [AdminController::class, 'orders'])->name('admin.orders');
     Route::get('/orders/{order}', [AdminController::class, 'showOrder'])->name('admin.orders.show');
-    Route::post('/orders/{order}/payments/{payment}/verify', [AdminController::class, 'verifyPayment'])->name('admin.orders.payments.verify');
-    Route::post('/orders/{order}/payments/{payment}/reject', [AdminController::class, 'rejectPayment'])->name('admin.orders.payments.reject');
+    Route::post('/orders/{order}/payments/{payment}/verify', [AdminPaymentController::class, 'verify'])->name('admin.orders.payments.verify');
+    Route::post('/orders/{order}/payments/{payment}/reject', [AdminPaymentController::class, 'reject'])->name('admin.orders.payments.reject');
 
-    // Payments
-    Route::get('/payments', [AdminController::class, 'payments'])->name('admin.payments');
+    // Payments — full CRUD (admin.payments stays the index name for backwards compat with the sidebar)
+    Route::get('/payments', [AdminPaymentController::class, 'index'])->name('admin.payments');
+    Route::get('/payments/{payment}', [AdminPaymentController::class, 'show'])->name('admin.payments.show');
+    Route::get('/payments/{payment}/edit', [AdminPaymentController::class, 'edit'])->name('admin.payments.edit');
+    Route::put('/payments/{payment}', [AdminPaymentController::class, 'update'])->name('admin.payments.update');
+    Route::delete('/payments/{payment}', [AdminPaymentController::class, 'destroy'])->name('admin.payments.destroy');
+
+    // Receipts (one-to-one with Payment) — issue + manage
+    Route::post('/payments/{payment}/receipt', [AdminReceiptController::class, 'store'])->name('admin.receipts.store');
+    Route::get('/receipts/{receipt}', [AdminReceiptController::class, 'show'])->name('admin.receipts.show');
+    Route::get('/receipts/{receipt}/download', [AdminReceiptController::class, 'download'])->name('admin.receipts.download');
+    Route::put('/receipts/{receipt}', [AdminReceiptController::class, 'update'])->name('admin.receipts.update');
+    Route::delete('/receipts/{receipt}', [AdminReceiptController::class, 'destroy'])->name('admin.receipts.destroy');
+    Route::post('/receipts/{receipt}/email', [AdminReceiptController::class, 'email'])->name('admin.receipts.email');
 
     // Applications
     Route::get('/applications', [AdminController::class, 'applications'])->name('admin.applications');
@@ -313,6 +340,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Chat
     Route::get('/chat', [AdminChatController::class, 'index'])->name('admin.chat.index');
     Route::get('/chat/candidates/search', [AdminChatController::class, 'searchCandidates'])->name('admin.chat.candidates.search');
+    Route::get('/chat/employers/search', [AdminChatController::class, 'searchEmployers'])->name('admin.chat.employers.search');
     Route::post('/chat/{conversation}/messages', [AdminChatController::class, 'send'])->name('admin.chat.messages.store');
 
     // Events
@@ -343,6 +371,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('admin.settings.index');
     Route::put('/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
     Route::post('/settings/mail/test', [AdminSettingsController::class, 'testMail'])->name('admin.settings.mail.test');
+
+    // Currency settings
+    Route::get('/settings/currency', [AdminCurrencySettingsController::class, 'index'])->name('admin.currency.index');
+    Route::put('/settings/currency', [AdminCurrencySettingsController::class, 'update'])->name('admin.currency.update');
 
     // Email Templates
     Route::get('/email-templates', [AdminEmailTemplateController::class, 'index'])->name('admin.email-templates.index');
@@ -379,6 +411,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Social Media Settings
     Route::get('/social', [\App\Http\Controllers\Admin\SocialSettingsController::class, 'index'])->name('admin.social.index');
     Route::put('/social', [\App\Http\Controllers\Admin\SocialSettingsController::class, 'update'])->name('admin.social.update');
+
+    // Contact Routing Settings
+    Route::get('/contact-routing', [\App\Http\Controllers\Admin\ContactRoutingController::class, 'index'])->name('admin.contact-routing.index');
+    Route::put('/contact-routing', [\App\Http\Controllers\Admin\ContactRoutingController::class, 'update'])->name('admin.contact-routing.update');
 
     // Recruitment Requests
     Route::prefix('recruitment-requests')->name('admin.recruitment-requests.')->group(function () {

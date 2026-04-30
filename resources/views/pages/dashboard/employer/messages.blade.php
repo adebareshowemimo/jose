@@ -10,6 +10,8 @@
 @section('content')
 @php
     $selectedId = $selectedConversation?->id;
+    $isAdminChat = $selectedConversation && $selectedConversation->type === \App\Models\ChatConversation::TYPE_ADMIN_EMPLOYER;
+    $adminConversation = $adminConversation ?? null;
 @endphp
 
 @if($selectedConversation)
@@ -19,6 +21,36 @@
 <div x-data="{ actionModal: null }" class="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
     <div class="flex h-[calc(100vh-200px)] min-h-[560px]">
         <div class="w-full md:w-80 lg:w-96 border-r border-[#E5E7EB] flex flex-col">
+            <div class="p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
+                <h2 class="font-bold text-[#073057] text-sm">Admin Support</h2>
+                @if($adminConversation)
+                    @php
+                        $adminUnread = $adminConversation->messages()->where('sender_user_id', '!=', auth()->id())->whereNull('read_at')->count();
+                    @endphp
+                    <a href="{{ route('employer.chat', ['conversation' => $adminConversation->id]) }}"
+                       class="mt-2 w-full p-3 flex items-start gap-3 rounded-lg text-left transition border border-[#E5E7EB] {{ $selectedId === $adminConversation->id ? 'bg-[#1AAD94]/5 border-[#1AAD94]' : 'bg-white hover:bg-[#F3F4F6]' }}">
+                        <div class="w-10 h-10 bg-[#073057] rounded-full flex items-center justify-center text-white font-semibold shrink-0 text-xs">JCL</div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="font-semibold text-[#073057] truncate text-sm">JCL Admin</h4>
+                                @if($adminUnread > 0)
+                                    <span class="w-5 h-5 bg-[#1AAD94] text-white text-xs font-medium rounded-full flex items-center justify-center shrink-0">{{ $adminUnread }}</span>
+                                @endif
+                            </div>
+                            <p class="text-xs text-[#6B7280] truncate">{{ $adminConversation->latestMessage?->body ?? 'No messages yet.' }}</p>
+                        </div>
+                    </a>
+                @else
+                    <form method="POST" action="{{ route('employer.chat.contact-admin') }}" class="mt-2">
+                        @csrf
+                        <button class="w-full px-3 py-2 bg-[#073057] hover:bg-[#0a3f6b] text-white text-sm font-semibold rounded-lg transition">
+                            Contact Admin
+                        </button>
+                    </form>
+                    <p class="text-xs text-[#6B7280] mt-2">Need help? Reach out to the JCL admin team.</p>
+                @endif
+            </div>
+
             <div class="p-4 border-b border-[#E5E7EB]">
                 <h2 class="font-bold text-[#073057]">Assigned Candidates</h2>
                 <p class="text-xs text-[#6B7280] mt-1">Only candidates delivered by admin are available here.</p>
@@ -61,14 +93,19 @@
         <div class="hidden md:flex flex-1 flex-col">
             @if($selectedConversation)
                 @php
-                    $candidateName = $selectedConversation->candidate?->user?->name ?? 'Candidate';
-                    $initials = collect(explode(' ', $candidateName))->map(fn($w) => strtoupper(mb_substr($w, 0, 1)))->take(2)->join('');
+                    if ($isAdminChat) {
+                        $headerName = 'JCL Admin';
+                        $headerInitials = 'JCL';
+                    } else {
+                        $headerName = $selectedConversation->candidate?->user?->name ?? 'Candidate';
+                        $headerInitials = collect(explode(' ', $headerName))->map(fn($w) => strtoupper(mb_substr($w, 0, 1)))->take(2)->join('') ?: 'C';
+                    }
                 @endphp
                 <div class="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-[#073057]/10 rounded-full flex items-center justify-center text-[#073057] font-semibold text-sm">{{ $initials ?: 'C' }}</div>
+                        <div class="w-10 h-10 {{ $isAdminChat ? 'bg-[#073057] text-white' : 'bg-[#073057]/10 text-[#073057]' }} rounded-full flex items-center justify-center font-semibold text-xs">{{ $headerInitials }}</div>
                         <div>
-                            <h4 class="font-semibold text-[#073057]">{{ $candidateName }}</h4>
+                            <h4 class="font-semibold text-[#073057]">{{ $headerName }}</h4>
                             <p class="text-xs text-[#1AAD94]">{{ $selectedConversation->contextLabel() }}</p>
                         </div>
                     </div>
@@ -96,11 +133,13 @@
                     @endforelse
                 </div>
 
-                <div class="px-4 py-2 border-t border-[#E5E7EB] flex gap-2 overflow-x-auto">
-                    <button type="button" @click="actionModal = 'interview'" class="px-3 py-1.5 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-sm text-[#4B5563] rounded-lg whitespace-nowrap transition">Schedule Interview</button>
-                    <button type="button" @click="actionModal = 'documents'" class="px-3 py-1.5 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-sm text-[#4B5563] rounded-lg whitespace-nowrap transition">Request Documents</button>
-                    <button type="button" @click="actionModal = 'offer'" class="px-3 py-1.5 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-sm text-[#4B5563] rounded-lg whitespace-nowrap transition">Send Offer</button>
-                </div>
+                @unless($isAdminChat)
+                    <div class="px-4 py-2 border-t border-[#E5E7EB] flex gap-2 overflow-x-auto">
+                        <button type="button" @click="actionModal = 'interview'" class="px-3 py-1.5 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-sm text-[#4B5563] rounded-lg whitespace-nowrap transition">Schedule Interview</button>
+                        <button type="button" @click="actionModal = 'documents'" class="px-3 py-1.5 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-sm text-[#4B5563] rounded-lg whitespace-nowrap transition">Request Documents</button>
+                        <button type="button" @click="actionModal = 'offer'" class="px-3 py-1.5 bg-[#F3F4F6] hover:bg-[#E5E7EB] text-sm text-[#4B5563] rounded-lg whitespace-nowrap transition">Send Offer</button>
+                    </div>
+                @endunless
 
                 <form method="POST" action="{{ route('employer.chat.messages.store', $selectedConversation) }}" class="p-4 border-t border-[#E5E7EB]">
                     @csrf

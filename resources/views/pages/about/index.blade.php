@@ -41,30 +41,29 @@
                          alt="About Jose Consulting Limited"
                          class="w-full h-[400px] object-cover rounded-[24px] mb-12 shadow-lg" loading="lazy" />
 
-                    <div class="bg-[#F9FAFB] border border-gray-100 rounded-[20px] p-6 lg:p-8">
-                        <div class="text-[10px] font-bold uppercase tracking-widest text-[#1AAD94] text-center mb-6">Our Sectors</div>
+                    <div class="bg-[#F9FAFB] border border-gray-100 rounded-[24px] p-10 lg:p-14">
                         <span class="sr-only">Jose Consulting operates two sectors: Maritime/Logistics and Energy Workforce Development.</span>
 
                         <div class="flex justify-center">
-                            <div class="rounded-xl bg-[#073057] text-white px-8 py-3 text-sm font-extrabold shadow-md">Jose Consulting</div>
+                            <div class="rounded-xl bg-[#073057] text-white px-10 py-4 text-base font-extrabold shadow-md tracking-wide">2 SECTORS</div>
                         </div>
 
-                        <div class="relative h-10" aria-hidden="true">
-                            <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] h-5 bg-[#1AAD94]"></div>
-                            <div class="absolute top-[14px] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-[#7DE1D1]"></div>
-                            <div class="absolute top-5 left-1/4 right-1/4 h-[2px] bg-[#1AAD94]"></div>
-                            <div class="absolute top-5 left-1/4 -translate-x-1/2 w-[2px] h-5 bg-[#1AAD94]"></div>
-                            <div class="absolute top-5 right-1/4 translate-x-1/2 w-[2px] h-5 bg-[#1AAD94]"></div>
+                        <div class="relative h-12" aria-hidden="true">
+                            <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] h-6 bg-[#1AAD94]"></div>
+                            <div class="absolute top-[18px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#7DE1D1]"></div>
+                            <div class="absolute top-6 left-1/4 right-1/4 h-[2px] bg-[#1AAD94]"></div>
+                            <div class="absolute top-6 left-1/4 -translate-x-1/2 w-[2px] h-6 bg-[#1AAD94]"></div>
+                            <div class="absolute top-6 right-1/4 translate-x-1/2 w-[2px] h-6 bg-[#1AAD94]"></div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-5 text-center shadow-sm">
-                                <div class="text-[11px] font-bold uppercase tracking-widest text-[#1AAD94] mb-2">Maritime/Logistics</div>
-                                <p class="text-xs leading-relaxed text-gray-600">Recruitment, crew management, ship chandelling, and logistics workforce development.</p>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm">
+                                <div class="text-[12px] font-bold uppercase tracking-widest text-[#1AAD94] mb-3">Maritime/Logistics</div>
+                                <p class="text-sm leading-relaxed text-gray-600">Recruitment, crew management, ship chandelling, and logistics workforce development.</p>
                             </div>
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-5 text-center shadow-sm">
-                                <div class="text-[11px] font-bold uppercase tracking-widest text-[#1AAD94] mb-2">Energy Workforce Development</div>
-                                <p class="text-xs leading-relaxed text-gray-600">Training, consulting, and career pathways for the energy sector.</p>
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm">
+                                <div class="text-[12px] font-bold uppercase tracking-widest text-[#1AAD94] mb-3">Energy Workforce Development</div>
+                                <p class="text-sm leading-relaxed text-gray-600">Training, consulting, and career pathways for the energy sector.</p>
                             </div>
                         </div>
                     </div>

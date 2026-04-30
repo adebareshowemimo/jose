@@ -8,7 +8,7 @@
 
 {{-- Hero --}}
 <section class="relative h-[400px] flex items-center overflow-hidden bg-[#073057]">
-    <img src="{{ $img['business_meeting'] ?? '' }}"
+    <img src="{{ $img['travel_management_hero'] ?? '' }}"
          alt="Travel Management Service"
          class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/80 to-transparent"></div>
@@ -43,7 +43,7 @@
                 </a>
             </div>
             <div class="rounded-[32px] overflow-hidden shadow-xl">
-                <img src="{{ $img['business_meeting'] ?? '' }}"
+                <img src="{{ $img['travel_management_hero'] ?? '' }}"
                      alt="Travel Management Service"
                      class="w-full h-[480px] object-cover" />
             </div>
