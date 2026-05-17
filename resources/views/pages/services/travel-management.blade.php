@@ -9,12 +9,12 @@
 {{-- Hero --}}
 <section class="relative h-[400px] flex items-center overflow-hidden bg-[#073057]">
     <img src="{{ $img['travel_management_hero'] ?? '' }}"
-         alt="Travel Management Service"
+         alt="Marine Travel"
          class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/80 to-transparent"></div>
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
-        <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Travel Management Service</h1>
+        <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Marine Travel</h1>
         <p class="mt-4 max-w-xl text-lg text-white/70">Seamless travel logistics for maritime and offshore personnel.</p>
     </div>
 </section>
@@ -26,7 +26,7 @@
             <div>
                 <div class="inline-flex items-center gap-2 rounded-full bg-[#1AAD94]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.15em] text-[#1AAD94] mb-6">
                     <iconify-icon icon="lucide:anchor"></iconify-icon>
-                    Travel Management
+                    Marine Travel
                 </div>
                 <h2 class="text-3xl font-extrabold text-[#073057] leading-tight mb-6">Getting your crew there — efficiently, safely, on time.</h2>
                 <p class="text-[#4B5563] leading-relaxed mb-8">Crew change travel demands speed, precision, and maritime expertise. Jose Ocean Jobs coordinates travel arrangements for maritime and offshore personnel — from first-leg flights to final port drop-off — ensuring crew arrive on time, every time.</p>
@@ -44,7 +44,7 @@
             </div>
             <div class="rounded-[32px] overflow-hidden shadow-xl">
                 <img src="{{ $img['travel_management_hero'] ?? '' }}"
-                     alt="Travel Management Service"
+                     alt="Marine Travel"
                      class="w-full h-[480px] object-cover" />
             </div>
         </div>

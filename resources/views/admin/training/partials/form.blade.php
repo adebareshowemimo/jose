@@ -68,6 +68,21 @@
     </div>
 </div>
 
+@php $categoryVal = old('training_category_id', $program?->training_category_id); @endphp
+<div>
+    <div class="flex items-center justify-between mb-2">
+        <label class="text-xs font-semibold uppercase tracking-wider text-gray-500">Page Routing (Category) <span class="text-red-500">*</span></label>
+        <a href="{{ route('admin.training-categories.index') }}" target="_blank" class="text-[11px] font-semibold text-[#1AAD94] hover:underline">Manage categories &rarr;</a>
+    </div>
+    <select name="training_category_id" required class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
+        <option value="">— Select category —</option>
+        @foreach (($trainingCategories ?? collect()) as $cat)
+            <option value="{{ $cat->id }}" {{ (int) $categoryVal === (int) $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+        @endforeach
+    </select>
+    <p class="mt-1.5 text-xs text-gray-400">Controls which public page this course appears on. Add new categories via Manage categories.</p>
+</div>
+
 <div>
     <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block">Slug</label>
     <input type="text" name="slug" value="{{ old('slug', $program?->slug) }}" placeholder="Auto-generated from title" class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
@@ -147,8 +162,9 @@
 </div>
 
 <div>
-    <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block">Category</label>
-    <input type="text" name="category" value="{{ old('category', $program?->category) }}" placeholder="STCW, Soft Skills, Technical..." class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
+    <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block">Category Tag <span class="text-gray-400 normal-case font-normal">(descriptive, e.g. STCW)</span></label>
+    <input type="text" name="category" value="{{ old('category', $program?->category) }}" placeholder="STCW, BOSIET, NEBOSH..." class="w-full px-3.5 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
+    <p class="mt-1.5 text-xs text-gray-400">Optional chip shown on the program card.</p>
 </div>
 
 <div class="flex flex-wrap gap-4 pt-2">

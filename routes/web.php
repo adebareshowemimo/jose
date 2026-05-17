@@ -51,14 +51,28 @@ Route::post('/training/{program}/enrol', [\App\Http\Controllers\Frontend\Trainin
 // Services (Training becomes a sub-service; old /training URL preserved for compat)
 Route::get('/services', [PublicPageController::class, 'services'])->name('services.index');
 Route::get('/services/training', [PublicPageController::class, 'servicesTraining'])->name('services.training');
-Route::get('/services/training/soft-skills', [PublicPageController::class, 'servicesTrainingSoft'])->name('services.training.soft');
-Route::get('/services/training/technical', [PublicPageController::class, 'servicesTrainingTechnical'])->name('services.training.technical');
+// Legacy aliases — kept so existing nav links (route('services.training.soft') / .technical) continue to work.
+// Both resolve to the dynamic category handler with the matching seeded slug.
+Route::get('/services/training/soft-skills', fn () => app(PublicPageController::class)->servicesTrainingCategory('soft-skills'))->name('services.training.soft');
+Route::get('/services/training/technical', fn () => app(PublicPageController::class)->servicesTrainingCategory('technical'))->name('services.training.technical');
+// Dynamic route for any category — use this for new categories: route('services.training.category', $category->slug).
+Route::get('/services/training/{slug}', [PublicPageController::class, 'servicesTrainingCategory'])
+    ->where('slug', '[a-z0-9-]+')
+    ->name('services.training.category');
 Route::get('/services/crew-management', [PublicPageController::class, 'servicesCrewManagement'])->name('services.crew-management');
 Route::get('/services/ship-chandelling', [PublicPageController::class, 'servicesShipChandelling'])->name('services.ship-chandelling');
 Route::get('/services/crew-abandonment', [PublicPageController::class, 'servicesCrewAbandonment'])->name('services.crew-abandonment');
 Route::get('/services/marine-procurement', [PublicPageController::class, 'servicesMarineProcurement'])->name('services.marine-procurement');
 Route::get('/services/marine-insurance', [PublicPageController::class, 'servicesMarineInsurance'])->name('services.marine-insurance');
 Route::get('/services/travel-management', [PublicPageController::class, 'servicesTravelManagement'])->name('services.travel-management');
+Route::get('/services/contract-staffing', [PublicPageController::class, 'servicesContractStaffing'])->name('services.contract-staffing');
+Route::get('/services/contract-staffing/jobs', [PublicPageController::class, 'contractStaffingJobs'])->name('services.contract-staffing.jobs');
+Route::get('/services/contract-staffing/jobs/{slug}', [PublicPageController::class, 'contractStaffingJobShow'])->name('services.contract-staffing.detail');
+Route::get('/services/self-employment-setup', [PublicPageController::class, 'servicesSelfEmploymentSetup'])->name('services.self-employment-setup');
+Route::get('/services/global-opportunity', [PublicPageController::class, 'servicesGlobalOpportunity'])->name('services.global-opportunity');
+Route::get('/services/academic-partnerships', [PublicPageController::class, 'servicesAcademicPartnerships'])->name('services.academic-partnerships');
+Route::get('/services/business-partnership', [PublicPageController::class, 'servicesBusinessPartnership'])->name('services.business-partnership');
+Route::get('/services/mobilization', [PublicPageController::class, 'servicesMobilization'])->name('services.mobilization');
 
 // Career
 Route::get('/career', [PublicPageController::class, 'career'])->name('career.index');
@@ -70,6 +84,9 @@ Route::get('/events', [PublicPageController::class, 'events'])->name('events.ind
 Route::get('/job', [PublicPageController::class, 'jobsIndex'])->name('job.index');
 Route::get('/job/{slug}', [PublicPageController::class, 'jobDetail'])->name('job.detail');
 Route::get('/job/category/{slug}', [PublicPageController::class, 'jobCategory'])->name('job.category');
+Route::post('/job/{jobListing}/apply', [\App\Http\Controllers\Frontend\JobApplicationController::class, 'store'])
+    ->middleware(['auth', 'throttle:6,1'])
+    ->name('job.apply');
 Route::get('/candidate', [PublicPageController::class, 'candidatesIndex'])->name('candidate.index');
 Route::get('/candidate/{slug}', [PublicPageController::class, 'candidateDetail'])->name('candidate.detail');
 Route::get('/companies', [PublicPageController::class, 'companiesIndex'])->name('companies.index');
@@ -397,6 +414,25 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::post('/', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'store'])->name('store');
         Route::put('/{program}', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'update'])->name('update');
         Route::delete('/{program}', [\App\Http\Controllers\Admin\TrainingProgramController::class, 'destroy'])->name('destroy');
+    });
+
+    // Contract Staffing — admin-posted contract roles (stored in job_listings with is_contract_staffing=true)
+    Route::prefix('contract-staffing')->name('admin.contract-staffing.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ContractStaffingJobController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\ContractStaffingJobController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\ContractStaffingJobController::class, 'store'])->name('store');
+        Route::get('/{job}/edit', [\App\Http\Controllers\Admin\ContractStaffingJobController::class, 'edit'])->name('edit');
+        Route::put('/{job}', [\App\Http\Controllers\Admin\ContractStaffingJobController::class, 'update'])->name('update');
+        Route::delete('/{job}', [\App\Http\Controllers\Admin\ContractStaffingJobController::class, 'destroy'])->name('destroy');
+    });
+
+    // Training Categories
+    Route::prefix('training-categories')->name('admin.training-categories.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\TrainingCategoryController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\Admin\TrainingCategoryController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\Admin\TrainingCategoryController::class, 'store'])->name('store');
+        Route::put('/{category}', [\App\Http\Controllers\Admin\TrainingCategoryController::class, 'update'])->name('update');
+        Route::delete('/{category}', [\App\Http\Controllers\Admin\TrainingCategoryController::class, 'destroy'])->name('destroy');
     });
 
     // Newsletter Subscribers

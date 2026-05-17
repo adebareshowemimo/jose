@@ -42,10 +42,10 @@
                          class="w-full h-[400px] object-cover rounded-[24px] mb-12 shadow-lg" loading="lazy" />
 
                     <div class="bg-[#F9FAFB] border border-gray-100 rounded-[24px] p-10 lg:p-14">
-                        <span class="sr-only">Jose Consulting operates two sectors: Maritime/Logistics and Energy Workforce Development.</span>
+                        <span class="sr-only">Jose Consulting focuses on two sectors: Energy Workforce Development and Maritime/Logistics.</span>
 
                         <div class="flex justify-center">
-                            <div class="rounded-xl bg-[#073057] text-white px-10 py-4 text-base font-extrabold shadow-md tracking-wide">2 SECTORS</div>
+                            <div class="rounded-xl bg-[#073057] text-white px-10 py-4 text-base font-extrabold shadow-md tracking-wide">TWO SECTORS FOCUSED</div>
                         </div>
 
                         <div class="relative h-12" aria-hidden="true">
@@ -57,13 +57,11 @@
                         </div>
 
                         <div class="grid grid-cols-2 gap-8">
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm">
-                                <div class="text-[12px] font-bold uppercase tracking-widest text-[#1AAD94] mb-3">Maritime/Logistics</div>
-                                <p class="text-sm leading-relaxed text-gray-600">Recruitment, crew management, ship chandelling, and logistics workforce development.</p>
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm flex items-center justify-center min-h-[120px]">
+                                <div class="text-xl md:text-2xl font-black uppercase tracking-wide text-[#073057] leading-tight">Energy Workforce Development</div>
                             </div>
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm">
-                                <div class="text-[12px] font-bold uppercase tracking-widest text-[#1AAD94] mb-3">Energy Workforce Development</div>
-                                <p class="text-sm leading-relaxed text-gray-600">Training, consulting, and career pathways for the energy sector.</p>
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm flex items-center justify-center min-h-[120px]">
+                                <div class="text-xl md:text-2xl font-black uppercase tracking-wide text-[#073057] leading-tight">Maritime/Logistics</div>
                             </div>
                         </div>
                     </div>

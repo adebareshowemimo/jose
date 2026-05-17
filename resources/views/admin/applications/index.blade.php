@@ -23,8 +23,16 @@
                     @endforeach
                 </select>
             </div>
+            <div>
+                <label class="text-xs font-medium text-gray-500 mb-1 block">Source</label>
+                <select name="source" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94]">
+                    <option value="">All</option>
+                    <option value="regular" {{ request('source') === 'regular' ? 'selected' : '' }}>Regular Jobs</option>
+                    <option value="contract_staffing" {{ request('source') === 'contract_staffing' ? 'selected' : '' }}>Contract Staffing</option>
+                </select>
+            </div>
             <button type="submit" class="px-4 py-2 bg-[#073057] text-white text-sm font-medium rounded-lg hover:bg-[#073057]/90">Filter</button>
-            @if(request('status'))
+            @if(request()->hasAny(['status', 'source']))
                 <a href="{{ route('admin.applications') }}" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Clear</a>
             @endif
         </form>
@@ -68,7 +76,7 @@
                         </th>
                         <th class="text-left px-5 py-3 font-medium text-gray-500">Candidate</th>
                         <th class="text-left px-5 py-3 font-medium text-gray-500">Job</th>
-                        <th class="text-left px-5 py-3 font-medium text-gray-500">Company</th>
+                        <th class="text-left px-5 py-3 font-medium text-gray-500">Source</th>
                         <th class="text-left px-5 py-3 font-medium text-gray-500">Status</th>
                         <th class="text-left px-5 py-3 font-medium text-gray-500">Applied</th>
                     </tr>
@@ -85,7 +93,15 @@
                                 <p class="text-xs text-gray-500">{{ $app->candidate?->user?->email ?? '' }}</p>
                             </td>
                             <td class="px-5 py-3 text-gray-700">{{ $app->jobListing?->title ?? '—' }}</td>
-                            <td class="px-5 py-3 text-gray-600">{{ $app->jobListing?->company?->name ?? '—' }}</td>
+                            <td class="px-5 py-3">
+                                @if ($app->jobListing?->is_contract_staffing)
+                                    <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700">Contract Staffing</span>
+                                @elseif ($app->jobListing?->company)
+                                    <span class="text-xs text-gray-600">{{ $app->jobListing->company->name }}</span>
+                                @else
+                                    <span class="text-xs text-gray-400">—</span>
+                                @endif
+                            </td>
                             <td class="px-5 py-3">
                                 <span class="text-xs px-2 py-1 rounded-full
                                     {{ $app->status === 'hired' ? 'bg-green-100 text-green-700' : ($app->status === 'shortlisted' ? 'bg-blue-100 text-blue-700' : ($app->status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700')) }}">

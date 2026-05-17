@@ -17,7 +17,7 @@
             </div>
         @endisset
 
-        <div class="grid lg:grid-cols-[1fr_320px] gap-6">
+        <div class="grid lg:grid-cols-[1fr_360px] gap-6">
             <div class="bg-white border border-[#E0E0E0] rounded-[12px] p-8">
                 <h1 class="text-[38px] font-extrabold text-[#073057] leading-tight mb-3">{{ $job['title'] ?? 'Job Detail' }}</h1>
                 <p class="text-[#6B7280] mb-6">{{ $job['company'] ?? '' }} • {{ $job['location'] ?? '' }}</p>
@@ -28,7 +28,7 @@
                 </div>
 
                 <h2 class="text-[#073057] text-xl font-bold mb-3">Role Summary</h2>
-                <p class="text-[#2C2C2C] leading-relaxed mb-8">{{ $job['description'] ?? '' }}</p>
+                <div class="text-[#2C2C2C] leading-relaxed mb-8 prose prose-slate max-w-none">{!! $job['description'] ?? '' !!}</div>
 
                 @if(!empty($job['requirements']))
                     <h2 class="text-[#073057] text-xl font-bold mb-3">Requirements</h2>
@@ -40,15 +40,21 @@
                 @endif
 
                 <div class="flex flex-wrap gap-3">
-                    <x-ui.button href="#" variant="dark">Apply Now</x-ui.button>
                     <x-ui.button :href="route('job.index')" variant="outline">Back to Jobs</x-ui.button>
                 </div>
             </div>
 
-            <div class="bg-white border border-[#E0E0E0] rounded-[12px] p-6 h-fit">
-                <h3 class="text-[#073057] text-lg font-bold mb-4">Quick Actions</h3>
-                <div class="space-y-3">
-                    <x-ui.button href="#" variant="primary" class="w-full">Save Job</x-ui.button>
+            <div class="space-y-4 h-fit">
+                @isset($jobListing)
+                    <x-jobs.application-form :job="$jobListing" />
+                @else
+                    <div class="bg-white border border-[#E0E0E0] rounded-[12px] p-6">
+                        <h3 class="text-[#073057] text-lg font-bold mb-4">Apply for this role</h3>
+                        <p class="text-sm text-[#6B7280]">This sample role is for preview only. Please browse our active listings to apply.</p>
+                    </div>
+                @endisset
+                <div class="bg-white border border-[#E0E0E0] rounded-[12px] p-6">
+                    <h3 class="text-[#073057] text-base font-bold mb-3">Need help?</h3>
                     <x-ui.button :href="route('contact.index')" variant="outline" class="w-full">Ask Recruiter</x-ui.button>
                 </div>
             </div>

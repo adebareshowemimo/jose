@@ -452,6 +452,13 @@ class AdminController extends Controller
             $query->where('status', $request->status);
         }
 
+        $source = $request->input('source');
+        if ($source === 'contract_staffing') {
+            $query->whereHas('jobListing', fn ($q) => $q->where('is_contract_staffing', true));
+        } elseif ($source === 'regular') {
+            $query->whereHas('jobListing', fn ($q) => $q->where('is_contract_staffing', false));
+        }
+
         $applications = $query->latest()->paginate(20)->withQueryString();
         return view('admin.applications.index', compact('applications'));
     }

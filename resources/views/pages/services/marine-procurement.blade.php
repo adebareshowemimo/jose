@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $pageTitle . ' — Jose Consulting Limited')
+@section('title', $pageTitle . ' — Jose Ocean Jobs')
 @section('meta_description', $pageDescription)
 
 @section('content')
@@ -15,7 +15,7 @@
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
         <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Marine Procurement</h1>
-        <p class="mt-4 max-w-xl text-lg text-white/70">Strategic sourcing of marine equipment, spares, and technical materials.</p>
+        <p class="mt-4 max-w-2xl text-lg text-white/70">Sourcing the right equipment and supplies — efficiently and cost-effectively.</p>
     </div>
 </section>
 
@@ -28,14 +28,17 @@
                     <iconify-icon icon="lucide:anchor"></iconify-icon>
                     Marine Procurement
                 </div>
-                <h2 class="text-3xl font-extrabold text-[#073057] leading-tight mb-6">Reliable sourcing. Competitive pricing. On-schedule delivery.</h2>
-                <p class="text-[#4B5563] leading-relaxed mb-8">Jose Ocean Jobs helps vessel operators and ship managers source the marine equipment, spare parts, and technical materials they need — on time and at competitive prices. We manage the procurement process end-to-end, from requisition to delivery.</p>
+                <h2 class="text-3xl font-extrabold text-[#073057] leading-tight mb-6">Sourcing the right equipment and supplies — efficiently and cost-effectively.</h2>
+                <p class="text-[#4B5563] leading-relaxed mb-5">Marine procurement is about getting the right products, parts, and materials to the right place at the right time — and at the right price. Through our licensed procurement partner, Jose Ocean Jobs manages the sourcing, purchasing, and logistics of marine equipment and supplies for vessels, ports, and Maritime and Energy sector operations of all sizes.</p>
+                <p class="text-[#4B5563] leading-relaxed mb-8">From technical spare parts to large-scale equipment orders, our partner brings industry expertise, supplier relationships, and procurement systems that save you time, reduce costs, and keep your operations running smoothly.</p>
+                <div class="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#073057]">What is covered</div>
                 <ul class="space-y-3 mb-10">
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Spare parts for engine, deck, and hydraulic systems</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Safety equipment including LSA and FFA</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Navigation and communication equipment</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Lubricants, paints, and consumables</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Full documentation and certificates supplied with all items</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Marine spare parts and technical equipment</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Safety and navigation equipment</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Deck and engine room supplies</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Port and terminal equipment sourcing</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Vendor management and supplier negotiations</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Logistics and delivery coordination</span></li>
                 </ul>
                 <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-2 px-7 py-3.5 bg-[#1AAD94] hover:bg-[#158f7a] text-white font-bold rounded-xl transition-all">
                     Submit a Requisition
@@ -57,7 +60,7 @@
         <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Start your procurement request today</h2>
         <p class="text-white/70 mb-8 max-w-xl mx-auto">Submit your requisition list and we will return a quote within 24 hours.</p>
         <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-[#1AAD94] hover:bg-[#158f7a] text-white font-bold rounded-xl transition-all shadow-lg">
-            Contact JCL
+            Contact Jose Ocean Jobs
             <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
     </div>

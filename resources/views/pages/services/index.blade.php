@@ -50,13 +50,14 @@
 
         @php
             $services = [
-                ['route' => 'services.training',          'icon' => 'lucide:graduation-cap', 'title' => 'Training',                       'desc' => 'Professional training programs aligned to international maritime and energy standards — from STCW and NEBOSH to soft skills and leadership.', 'color' => 'teal'],
-                ['route' => 'services.crew-management',   'icon' => 'lucide:users',           'title' => 'Crew Management',                'desc' => 'End-to-end crew management services for vessel operators — sourcing, documentation, welfare, and rotation support.', 'color' => 'navy'],
-                ['route' => 'services.ship-chandelling',  'icon' => 'lucide:package',         'title' => 'Ship Chandelling',               'desc' => 'Comprehensive vessel supply and ship chandelling services to keep your fleet operational and well-provisioned.', 'color' => 'teal'],
-                ['route' => 'services.crew-abandonment',  'icon' => 'lucide:life-buoy',       'title' => 'Crew Abandonment Support',   'desc' => 'Specialist support and resolution services for seafarers and vessels affected by crew abandonment situations.', 'color' => 'navy'],
-                ['route' => 'services.marine-procurement','icon' => 'lucide:anchor',          'title' => 'Marine Procurement',             'desc' => 'Strategic marine procurement — sourcing equipment, spares, and technical materials for vessel and offshore operations.', 'color' => 'teal'],
-                ['route' => 'services.marine-insurance',  'icon' => 'lucide:shield-check',    'title' => 'Marine Insurance',               'desc' => 'Marine insurance advisory and placement services helping operators and professionals secure the right coverage globally.', 'color' => 'navy'],
-                ['route' => 'services.travel-management', 'icon' => 'lucide:plane',           'title' => 'Travel Management Service',      'desc' => 'End-to-end travel management for crew and offshore personnel — visas, flights, and logistics coordination.', 'color' => 'teal'],
+                ['route' => 'job.index',                       'icon' => 'lucide:search',          'title' => 'Jobs',                         'desc' => 'Browse live maritime, offshore, and energy roles — from permanent placements to contract rotations.', 'color' => 'teal'],
+                ['route' => 'services.contract-staffing',      'icon' => 'lucide:briefcase',       'title' => 'Contract Staffing',            'desc' => 'Flexible fixed-term and project-based staffing — pre-vetted professionals, managed contracts, payroll, and compliance.', 'color' => 'navy'],
+                ['route' => 'services.self-employment-setup',  'icon' => 'lucide:rocket',          'title' => 'Self Employment Setup',        'desc' => 'Launch your own consulting practice, agency, or freelance career — with JCL\'s structure and support behind you.', 'color' => 'teal'],
+                ['route' => 'services.training',               'icon' => 'lucide:graduation-cap',  'title' => 'Training and Certifications',  'desc' => 'Industry-aligned training and certification programs — STCW, NEBOSH, leadership, soft skills, and technical disciplines.', 'color' => 'navy'],
+                ['route' => 'services.global-opportunity',     'icon' => 'lucide:globe-2',         'title' => 'Global Opportunity',           'desc' => 'International placements, secondments, and cross-border careers — with visa, mobilization, and welfare support.', 'color' => 'teal'],
+                ['route' => 'services.travel-management',      'icon' => 'lucide:plane',           'title' => 'Marine Travel',                'desc' => 'Crew change travel and offshore logistics — flights, visas, transfers, and a 24/7 travel desk.', 'color' => 'navy'],
+                ['route' => 'services.academic-partnerships',  'icon' => 'lucide:school',          'title' => 'Academic Partnerships',        'desc' => 'Curriculum co-design, accredited delivery, internships, and direct-to-employer placement with academic institutions.', 'color' => 'teal'],
+                ['route' => 'services.business-partnership',   'icon' => 'lucide:handshake',       'title' => 'Business Partnership',         'desc' => 'Procurement, ship chandelling, marine insurance, crew management, and mobilization — all under one partnership.', 'color' => 'navy'],
             ];
         @endphp
 
@@ -86,7 +87,7 @@
     <div class="container mx-auto px-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             @foreach([
-                ['value' => '7+',    'label' => 'Service Areas'],
+                ['value' => '8+',    'label' => 'Service Areas'],
                 ['value' => '100+',  'label' => 'Trained Professionals'],
                 ['value' => 'Global','label' => 'Industry Standards'],
                 ['value' => '24/7',  'label' => 'Client Support'],

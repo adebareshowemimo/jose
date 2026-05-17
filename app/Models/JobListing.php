@@ -18,7 +18,7 @@ class JobListing extends Model
         'salary_min', 'salary_max', 'salary_type', 'experience_required',
         'gender_preference', 'deadline', 'apply_method', 'apply_url', 'apply_email',
         'vacancies', 'thumbnail', 'gallery', 'video_url', 'hours', 'hours_type',
-        'is_featured', 'is_urgent', 'is_approved', 'status',
+        'is_featured', 'is_urgent', 'is_approved', 'is_contract_staffing', 'status',
     ];
 
     protected function casts(): array
@@ -33,7 +33,18 @@ class JobListing extends Model
             'is_featured' => 'boolean',
             'is_urgent' => 'boolean',
             'is_approved' => 'boolean',
+            'is_contract_staffing' => 'boolean',
         ];
+    }
+
+    public function scopeContractStaffing($query)
+    {
+        return $query->where('is_contract_staffing', true);
+    }
+
+    public function scopeRegularJobs($query)
+    {
+        return $query->where('is_contract_staffing', false);
     }
 
     public function company(): BelongsTo

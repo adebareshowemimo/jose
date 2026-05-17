@@ -36,16 +36,23 @@ $mobileNavItems = [
         'route'    => 'services.index',
         'icon'     => 'fas fa-cogs',
         'children' => [
-            ['label' => 'Training', 'route' => 'services.training', 'children' => [
-                ['label' => 'Soft Skills',                     'route' => 'services.training.soft'],
+            ['label' => 'Jobs',                  'route' => 'job.index',                      'children' => []],
+            ['label' => 'Contract Staffing',     'route' => 'services.contract-staffing',     'children' => []],
+            ['label' => 'Self Employment Setup', 'route' => 'services.self-employment-setup', 'children' => []],
+            ['label' => 'Training and Certifications', 'route' => 'services.training', 'children' => [
+                ['label' => 'Soft Skills',                      'route' => 'services.training.soft'],
                 ['label' => 'Technical & Non Technical Skills', 'route' => 'services.training.technical'],
             ]],
-            ['label' => 'Crew Management',              'route' => 'services.crew-management',   'children' => []],
-            ['label' => 'Ship Chandelling',              'route' => 'services.ship-chandelling',  'children' => []],
-            ['label' => 'Crew Abandonment Support',  'route' => 'services.crew-abandonment',  'children' => []],
-            ['label' => 'Marine Procurement',            'route' => 'services.marine-procurement', 'children' => []],
-            ['label' => 'Marine Insurance',              'route' => 'services.marine-insurance',  'children' => []],
-            ['label' => 'Travel Management Service',     'route' => 'services.travel-management', 'children' => []],
+            ['label' => 'Global Opportunity',    'route' => 'services.global-opportunity',    'children' => []],
+            ['label' => 'Marine Travel',         'route' => 'services.travel-management',     'children' => []],
+            ['label' => 'Academic Partnerships', 'route' => 'services.academic-partnerships', 'children' => []],
+            ['label' => 'Business Partnership',  'route' => 'services.business-partnership',  'children' => [
+                ['label' => 'Procurement',           'route' => 'services.marine-procurement'],
+                ['label' => 'Ship Chandelling',      'route' => 'services.ship-chandelling'],
+                ['label' => 'Marine Insurance',      'route' => 'services.marine-insurance'],
+                ['label' => 'Crew Management',       'route' => 'services.crew-management'],
+                ['label' => 'Mobilization Services', 'route' => 'services.mobilization'],
+            ]],
         ],
     ],
     [

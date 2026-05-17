@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\Storage;
@@ -16,7 +17,8 @@ class TrainingProgram extends Model
     protected $fillable = [
         'slug', 'title', 'type', 'short_description', 'long_description',
         'image_path', 'price', 'currency', 'duration', 'level', 'capacity',
-        'starts_at', 'enrol_deadline', 'category', 'is_active', 'is_featured', 'sort_order',
+        'starts_at', 'enrol_deadline', 'category', 'training_category_id',
+        'is_active', 'is_featured', 'sort_order',
     ];
 
     protected function casts(): array
@@ -51,6 +53,11 @@ class TrainingProgram extends Model
         return $this->morphMany(OrderItem::class, 'orderable');
     }
 
+    public function trainingCategory(): BelongsTo
+    {
+        return $this->belongsTo(TrainingCategory::class, 'training_category_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -59,6 +66,14 @@ class TrainingProgram extends Model
     public function scopeOfType($query, string $type)
     {
         return $query->where('type', $type);
+    }
+
+    public function scopeInCategory($query, int|string $category)
+    {
+        if (is_numeric($category)) {
+            return $query->where('training_category_id', (int) $category);
+        }
+        return $query->whereHas('trainingCategory', fn ($q) => $q->where('slug', $category));
     }
 
     public function getImageUrlAttribute(): ?string

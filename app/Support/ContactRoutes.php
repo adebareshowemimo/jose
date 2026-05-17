@@ -15,7 +15,7 @@ class ContactRoutes
         ['label' => 'Crew Abandonment Support',                     'email' => 'support@joseoceanjobs.com'],
         ['label' => 'Marine Procurement',                           'email' => 'business@joseoceanjobs.com'],
         ['label' => 'Marine Insurance',                             'email' => 'business@joseoceanjobs.com'],
-        ['label' => 'Travel Management Service',                    'email' => 'business@joseoceanjobs.com'],
+        ['label' => 'Marine Travel',                                'email' => 'business@joseoceanjobs.com'],
         ['label' => 'Job Placement Services',                       'email' => 'support@joseoceanjobs.com'],
         ['label' => 'Partnership Proposal',                         'email' => 'business@joseoceanjobs.com'],
     ];

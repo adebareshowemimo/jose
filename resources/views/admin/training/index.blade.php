@@ -54,6 +54,15 @@
                         </select>
                     </div>
                     <div>
+                        <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1 block">Category</label>
+                        <select name="training_category_id" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94]">
+                            <option value="">All</option>
+                            @foreach ($trainingCategories as $cat)
+                                <option value="{{ $cat->id }}" {{ (int) request('training_category_id') === (int) $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
                         <label class="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1 block">Status</label>
                         <select name="status" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94]">
                             <option value="">All</option>
@@ -62,7 +71,7 @@
                         </select>
                     </div>
                     <button type="submit" class="px-4 py-2 bg-[#073057] text-white text-sm font-semibold rounded-lg hover:brightness-110">Filter</button>
-                    @if(request()->hasAny(['search', 'type', 'status']))
+                    @if(request()->hasAny(['search', 'type', 'training_category_id', 'status']))
                         <a href="{{ route('admin.training.index') }}" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Clear</a>
                     @endif
                 </form>
@@ -91,6 +100,11 @@
                                     <span class="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold {{ $program->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500' }}">
                                         {{ $program->is_active ? 'Active' : 'Inactive' }}
                                     </span>
+                                    @if ($program->trainingCategory)
+                                        <span class="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-sky-100 text-sky-700">
+                                            {{ $program->trainingCategory->name }}
+                                        </span>
+                                    @endif
                                     @if ($program->category)
                                         <span class="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-semibold bg-gray-100 text-gray-700">{{ $program->category }}</span>
                                     @endif

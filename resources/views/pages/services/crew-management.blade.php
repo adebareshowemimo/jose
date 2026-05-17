@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $pageTitle . ' — Jose Consulting Limited')
+@section('title', $pageTitle . ' — Jose Ocean Jobs')
 @section('meta_description', $pageDescription)
 
 @section('content')
@@ -15,7 +15,7 @@
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
         <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Crew Management</h1>
-        <p class="mt-4 max-w-xl text-lg text-white/70">End-to-end crew management solutions for vessel operators and offshore employers.</p>
+        <p class="mt-4 max-w-2xl text-lg text-white/70">The right crew, managed the right way.</p>
     </div>
 </section>
 
@@ -28,14 +28,17 @@
                     <iconify-icon icon="lucide:anchor"></iconify-icon>
                     Crew Management
                 </div>
-                <h2 class="text-3xl font-extrabold text-[#073057] leading-tight mb-6">The right crew. On time. Fully compliant.</h2>
-                <p class="text-[#4B5563] leading-relaxed mb-8">Jose Ocean Jobs provides professional crew management solutions for vessel owners and operators, connecting them with qualified, certified maritime personnel across all ranks and vessel types. We handle the full crew lifecycle — from sourcing and compliance to deployment and repatriation — so your operations run without disruption.</p>
+                <h2 class="text-3xl font-extrabold text-[#073057] leading-tight mb-6">The right crew, managed the right way.</h2>
+                <p class="text-[#4B5563] leading-relaxed mb-5">Managing a crew is one of the most complex and critical responsibilities in the Maritime and Energy sector. Through our licensed crew management partner, Jose Ocean Jobs offers comprehensive crew management solutions that take the pressure off ship owners and operators — handling everything from recruitment and contracts to payroll and welfare.</p>
+                <p class="text-[#4B5563] leading-relaxed mb-8">Our partner operates in full compliance with MLC (Maritime Labour Convention) standards, ensuring that every crew member is treated fairly, paid correctly, and supported throughout their time on board.</p>
+                <div class="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#073057]">What is covered</div>
                 <ul class="space-y-3 mb-10">
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Recruitment and placement of deck, engine, and catering officers</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>STCW certification verification and pre-employment medical coordination</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Crew documentation, visa, and flag state compliance</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Payroll and Collective Bargaining Agreement (CBA) management</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Crew change coordination and repatriation</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Crew recruitment and selection</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Contract management and documentation</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Payroll and allotment processing</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Visa, travel, and joining arrangements</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Crew welfare and repatriation</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Flag state compliance and certification checks</span></li>
                 </ul>
                 <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-2 px-7 py-3.5 bg-[#1AAD94] hover:bg-[#158f7a] text-white font-bold rounded-xl transition-all">
                     Get in Touch
@@ -57,7 +60,7 @@
         <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Let's manage your crew together</h2>
         <p class="text-white/70 mb-8 max-w-xl mx-auto">Get in touch to discuss your crewing requirements — we will respond promptly.</p>
         <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-[#1AAD94] hover:bg-[#158f7a] text-white font-bold rounded-xl transition-all shadow-lg">
-            Contact JCL
+            Contact Jose Ocean Jobs
             <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
     </div>

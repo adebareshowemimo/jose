@@ -167,14 +167,14 @@ class JclProfileContent
             ],
             'stats' => [
                 [
-                    'value' => '2 Sectors',
-                    'label' => 'Maritime/Logistics',
-                    'description' => 'Recruitment, crew management, ship chandelling, and logistics workforce development.',
-                ],
-                [
                     'value' => 'End-to-End',
                     'label' => 'Energy Workforce Development',
                     'description' => 'Training, consulting, and career pathways for the energy sector.',
+                ],
+                [
+                    'value' => '2 Sectors',
+                    'label' => 'Maritime/Logistics',
+                    'description' => 'Recruitment, crew management, ship chandelling, and logistics workforce development.',
                 ],
             ],
             'journey' => [

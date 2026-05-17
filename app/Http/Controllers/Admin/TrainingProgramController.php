@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\TrainingCategory;
 use App\Models\TrainingProgram;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,7 +14,7 @@ class TrainingProgramController extends Controller
 {
     public function index(Request $request)
     {
-        $query = TrainingProgram::query()->withCount('enrolments');
+        $query = TrainingProgram::query()->with('trainingCategory')->withCount('enrolments');
 
         if ($request->filled('search')) {
             $search = (string) $request->input('search');
@@ -25,6 +26,9 @@ class TrainingProgramController extends Controller
         if ($request->filled('type')) {
             $query->where('type', $request->input('type'));
         }
+        if ($request->filled('training_category_id')) {
+            $query->where('training_category_id', $request->input('training_category_id'));
+        }
         if ($request->filled('status')) {
             $query->where('is_active', $request->input('status') === 'active');
         }
@@ -34,12 +38,15 @@ class TrainingProgramController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('admin.training.index', compact('programs'));
+        $trainingCategories = TrainingCategory::active()->orderBy('sort_order')->orderBy('name')->get();
+
+        return view('admin.training.index', compact('programs', 'trainingCategories'));
     }
 
     public function create()
     {
-        return view('admin.training.create');
+        $trainingCategories = TrainingCategory::active()->orderBy('sort_order')->orderBy('name')->get();
+        return view('admin.training.create', compact('trainingCategories'));
     }
 
     public function store(Request $request)
@@ -81,6 +88,7 @@ class TrainingProgramController extends Controller
             'starts_at' => ['nullable', 'date'],
             'enrol_deadline' => ['nullable', 'date'],
             'category' => ['nullable', 'string', 'max:100'],
+            'training_category_id' => ['required', 'exists:training_categories,id'],
             'is_active' => ['nullable', 'boolean'],
             'is_featured' => ['nullable', 'boolean'],
             'sort_order' => ['nullable', 'integer', 'min:0'],

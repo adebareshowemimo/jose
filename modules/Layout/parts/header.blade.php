@@ -1,6 +1,6 @@
 <nav
     class="sticky top-0 z-50 border-b border-white/10 bg-[#073057]/95 backdrop-blur supports-[backdrop-filter]:bg-[#073057]/90"
-    x-data="{ mobileMenuOpen: false, aboutOpen: false, jobsOpen: false, careerOpen: false, serviceOpen: false, serviceTrainingOpen: false, mAboutOpen: false, mJobsOpen: false, mCareerOpen: false, mServiceOpen: false, mServiceTrainingOpen: false }"
+    x-data="{ mobileMenuOpen: false, aboutOpen: false, jobsOpen: false, careerOpen: false, serviceOpen: false, serviceBpOpen: false, serviceTrainingOpen: false, mAboutOpen: false, mJobsOpen: false, mCareerOpen: false, mServiceOpen: false, mServiceBpOpen: false, mServiceTrainingOpen: false }"
     @click.outside="aboutOpen = false; jobsOpen = false; careerOpen = false; serviceOpen = false"
 >
     <div class="container mx-auto px-6">
@@ -56,7 +56,7 @@
                 </div>
 
                 {{-- Services dropdown --}}
-                <div class="relative" @mouseenter="serviceOpen = true" @mouseleave="serviceOpen = false; serviceTrainingOpen = false">
+                <div class="relative" @mouseenter="serviceOpen = true" @mouseleave="serviceOpen = false; serviceBpOpen = false; serviceTrainingOpen = false">
                     <a href="{{ route('services.index') }}"
                        class="flex items-center gap-1 text-[13px] font-semibold uppercase tracking-[0.08em] text-white/80 transition-colors hover:text-[#1AAD94]">
                         Services
@@ -65,13 +65,15 @@
                     <div x-show="serviceOpen" x-transition.origin.top.duration.150ms
                          class="absolute top-full left-0 mt-2 w-64 rounded-[14px] border border-white/10 bg-[#073057] shadow-2xl py-2 z-50" x-cloak>
                         <a href="{{ route('job.index') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Jobs</a>
-                        {{-- Training nested --}}
-                        <div class="relative group/training"
+                        <a href="{{ route('services.contract-staffing') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Contract Staffing</a>
+                        <a href="{{ route('services.self-employment-setup') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Self Employment Setup</a>
+                        {{-- Training and Certifications nested --}}
+                        <div class="relative"
                              @mouseenter="serviceTrainingOpen = true"
                              @mouseleave="serviceTrainingOpen = false">
                             <a href="{{ route('services.training') }}"
                                class="flex items-center justify-between px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">
-                                Training
+                                Training and Certifications
                                 <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
                             </a>
                             <div x-show="serviceTrainingOpen" x-transition.origin.left.duration.150ms
@@ -80,12 +82,27 @@
                                 <a href="{{ route('services.training.technical') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Technical &amp; Non-Technical Skills</a>
                             </div>
                         </div>
-                        <a href="{{ route('services.crew-management') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Crew Management</a>
-                        <a href="{{ route('services.ship-chandelling') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Ship Chandelling</a>
-                        <a href="{{ route('services.crew-abandonment') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Crew Abandonment Support</a>
-                        <a href="{{ route('services.marine-procurement') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Marine Procurement</a>
-                        <a href="{{ route('services.marine-insurance') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Marine Insurance</a>
-                        <a href="{{ route('services.travel-management') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Travel Management Service</a>
+                        <a href="{{ route('services.global-opportunity') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Global Opportunity</a>
+                        <a href="{{ route('services.travel-management') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Marine Travel</a>
+                        <a href="{{ route('services.academic-partnerships') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Academic Partnerships</a>
+                        {{-- Business Partnership nested --}}
+                        <div class="relative"
+                             @mouseenter="serviceBpOpen = true"
+                             @mouseleave="serviceBpOpen = false">
+                            <a href="{{ route('services.business-partnership') }}"
+                               class="flex items-center justify-between px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">
+                                Business Partnership
+                                <iconify-icon icon="lucide:chevron-right" class="text-xs"></iconify-icon>
+                            </a>
+                            <div x-show="serviceBpOpen" x-transition.origin.left.duration.150ms
+                                 class="absolute top-0 left-full ml-1 w-64 rounded-[14px] border border-white/10 bg-[#073057] shadow-2xl py-2 z-50" x-cloak>
+                                <a href="{{ route('services.marine-procurement') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Procurement</a>
+                                <a href="{{ route('services.ship-chandelling') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Ship Chandelling</a>
+                                <a href="{{ route('services.marine-insurance') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Marine Insurance</a>
+                                <a href="{{ route('services.crew-management') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Crew Management</a>
+                                <a href="{{ route('services.mobilization') }}" class="block px-5 py-3 text-[12px] font-semibold uppercase tracking-[0.08em] text-white/75 hover:text-white hover:bg-white/10 transition-colors">Mobilization Services</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -185,11 +202,13 @@
                         </button>
                         <div x-show="mServiceOpen" x-transition class="pl-4 space-y-1 mt-1" x-cloak>
                             <a href="{{ route('job.index') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Jobs</a>
-                            {{-- Training nested --}}
+                            <a href="{{ route('services.contract-staffing') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Contract Staffing</a>
+                            <a href="{{ route('services.self-employment-setup') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Self Employment Setup</a>
+                            {{-- Training and Certifications nested --}}
                             <div>
                                 <button @click="mServiceTrainingOpen = !mServiceTrainingOpen"
                                         class="w-full flex items-center justify-between rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">
-                                    Training
+                                    Training and Certifications
                                     <iconify-icon icon="lucide:chevron-down" class="text-xs transition-transform duration-150" :class="mServiceTrainingOpen ? 'rotate-180' : ''"></iconify-icon>
                                 </button>
                                 <div x-show="mServiceTrainingOpen" x-transition class="pl-4 space-y-1 mt-1" x-cloak>
@@ -197,12 +216,24 @@
                                     <a href="{{ route('services.training.technical') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">Technical &amp; Non-Technical Skills</a>
                                 </div>
                             </div>
-                            <a href="{{ route('services.crew-management') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Crew Management</a>
-                            <a href="{{ route('services.ship-chandelling') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Ship Chandelling</a>
-                            <a href="{{ route('services.crew-abandonment') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Crew Abandonment Support</a>
-                            <a href="{{ route('services.marine-procurement') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Marine Procurement</a>
-                            <a href="{{ route('services.marine-insurance') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Marine Insurance</a>
-                            <a href="{{ route('services.travel-management') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Travel Management Service</a>
+                            <a href="{{ route('services.global-opportunity') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Global Opportunity</a>
+                            <a href="{{ route('services.travel-management') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Marine Travel</a>
+                            <a href="{{ route('services.academic-partnerships') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">Academic Partnerships</a>
+                            {{-- Business Partnership nested --}}
+                            <div>
+                                <button @click="mServiceBpOpen = !mServiceBpOpen"
+                                        class="w-full flex items-center justify-between rounded-[10px] px-4 py-2.5 text-sm font-semibold uppercase tracking-[0.08em] text-white/70 hover:bg-white/10 hover:text-white transition-colors">
+                                    Business Partnership
+                                    <iconify-icon icon="lucide:chevron-down" class="text-xs transition-transform duration-150" :class="mServiceBpOpen ? 'rotate-180' : ''"></iconify-icon>
+                                </button>
+                                <div x-show="mServiceBpOpen" x-transition class="pl-4 space-y-1 mt-1" x-cloak>
+                                    <a href="{{ route('services.marine-procurement') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">Procurement</a>
+                                    <a href="{{ route('services.ship-chandelling') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">Ship Chandelling</a>
+                                    <a href="{{ route('services.marine-insurance') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">Marine Insurance</a>
+                                    <a href="{{ route('services.crew-management') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">Crew Management</a>
+                                    <a href="{{ route('services.mobilization') }}" @click="mobileMenuOpen = false" class="block rounded-[10px] px-4 py-2 text-sm text-white/60 hover:bg-white/10 hover:text-white transition-colors">Mobilization Services</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

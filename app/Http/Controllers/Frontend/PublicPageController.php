@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Models\Event;
 use App\Models\JobListing;
 use App\Models\NewsArticle;
+use App\Models\TrainingCategory;
 use App\Models\TrainingProgram;
 use App\Support\JclProfileContent;
 use Illuminate\Http\Request;
@@ -174,7 +175,8 @@ class PublicPageController extends BasePageController
 
     public function jobDetail(string $slug)
     {
-        $listing = JobListing::with(['company', 'location', 'jobType'])
+        $listing = JobListing::regularJobs()
+            ->with(['company', 'location', 'jobType'])
             ->where('slug', $slug)
             ->first();
 
@@ -213,6 +215,7 @@ class PublicPageController extends BasePageController
                     ['label' => $job['title']],
                 ],
                 'job' => $job,
+                'jobListing' => $listing,
                 'previewStatus' => $previewStatus,
             ]);
         }
@@ -658,6 +661,7 @@ class PublicPageController extends BasePageController
         $profile = JclProfileContent::company();
 
         $dbPrograms = collect();
+        $categories = collect();
         if (Schema::hasTable('training_programs')) {
             $dbPrograms = TrainingProgram::active()
                 ->ofType(TrainingProgram::TYPE_TRAINING)
@@ -667,47 +671,56 @@ class PublicPageController extends BasePageController
                 ->take(12)
                 ->get();
         }
+        if (Schema::hasTable('training_categories')) {
+            $categories = TrainingCategory::active()->orderBy('sort_order')->orderBy('name')->get();
+        }
 
         return view('pages.services.training', $this->buildJclPageData(
-            title: 'Training',
-            description: 'Professional training programs aligned to international maritime and energy standards.',
+            title: 'Training and Certifications',
+            description: 'Professional training and certification programs aligned to international maritime and energy standards.',
             breadcrumbs: [
                 ['label' => 'Home', 'url' => url('/')],
                 ['label' => 'Services', 'url' => route('services.index')],
-                ['label' => 'Training'],
+                ['label' => 'Training and Certifications'],
             ],
             extra: [
                 'profile' => $profile,
                 'programs' => $profile['training_programs'],
                 'dbPrograms' => $dbPrograms,
+                'categories' => $categories,
             ],
         ));
     }
 
-    public function servicesTrainingSoft()
+    public function servicesTrainingCategory(string $slug)
     {
-        return view('pages.services.soft-skills', $this->buildJclPageData(
-            title: 'Soft Skills Training',
-            description: 'Communication, leadership, and workplace effectiveness programs for maritime and energy professionals.',
-            breadcrumbs: [
-                ['label' => 'Home', 'url' => url('/')],
-                ['label' => 'Services', 'url' => route('services.index')],
-                ['label' => 'Training', 'url' => route('services.training')],
-                ['label' => 'Soft Skills'],
-            ],
-        ));
-    }
+        if (! Schema::hasTable('training_categories')) {
+            abort(404);
+        }
 
-    public function servicesTrainingTechnical()
-    {
-        return view('pages.services.technical-skills', $this->buildJclPageData(
-            title: 'Technical & Non Technical Skills',
-            description: 'Industry-aligned technical and operational skills training for maritime and energy sector professionals.',
+        $category = TrainingCategory::active()->where('slug', $slug)->firstOrFail();
+
+        $dbPrograms = TrainingProgram::active()
+            ->ofType(TrainingProgram::TYPE_TRAINING)
+            ->where('training_category_id', $category->id)
+            ->orderByDesc('is_featured')
+            ->orderBy('sort_order')
+            ->orderByDesc('id')
+            ->take(24)
+            ->get();
+
+        return view('pages.services.training-category', $this->buildJclPageData(
+            title: $category->name,
+            description: $category->short_description ?: ('Training programs in ' . $category->name . '.'),
             breadcrumbs: [
                 ['label' => 'Home', 'url' => url('/')],
                 ['label' => 'Services', 'url' => route('services.index')],
-                ['label' => 'Training', 'url' => route('services.training')],
-                ['label' => 'Technical & Non Technical Skills'],
+                ['label' => 'Training and Certifications', 'url' => route('services.training')],
+                ['label' => $category->name],
+            ],
+            extra: [
+                'category' => $category,
+                'dbPrograms' => $dbPrograms,
             ],
         ));
     }
@@ -780,12 +793,167 @@ class PublicPageController extends BasePageController
     public function servicesTravelManagement()
     {
         return view('pages.services.travel-management', $this->buildJclPageData(
-            title: 'Travel Management Service',
-            description: 'End-to-end travel management for crew, maritime professionals, and offshore personnel.',
+            title: 'Marine Travel',
+            description: 'End-to-end marine travel for crew, maritime professionals, and offshore personnel.',
             breadcrumbs: [
                 ['label' => 'Home', 'url' => url('/')],
                 ['label' => 'Services', 'url' => route('services.index')],
-                ['label' => 'Travel Management Service'],
+                ['label' => 'Marine Travel'],
+            ],
+        ));
+    }
+
+    public function servicesSelfEmploymentSetup()
+    {
+        return view('pages.services.self-employment-setup', $this->buildJclPageData(
+            title: 'Self Employment Setup',
+            description: 'Launch your own consulting practice, agency, or freelance career — with JCL\'s structure and support.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Self Employment Setup'],
+            ],
+        ));
+    }
+
+    public function servicesGlobalOpportunity()
+    {
+        return view('pages.services.global-opportunity', $this->buildJclPageData(
+            title: 'Global Opportunity',
+            description: 'International placements, secondments, and cross-border careers for ambitious professionals.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Global Opportunity'],
+            ],
+        ));
+    }
+
+    public function servicesAcademicPartnerships()
+    {
+        return view('pages.services.academic-partnerships', $this->buildJclPageData(
+            title: 'Academic Partnerships',
+            description: 'Bridging maritime academies, technical institutes, and industry to build the next generation of professionals.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Academic Partnerships'],
+            ],
+        ));
+    }
+
+    public function servicesBusinessPartnership()
+    {
+        return view('pages.services.business-partnership', $this->buildJclPageData(
+            title: 'Business Partnership',
+            description: 'Operational partnerships — procurement, crewing, insurance, and mobilization under one roof.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Business Partnership'],
+            ],
+        ));
+    }
+
+    public function servicesMobilization()
+    {
+        return view('pages.services.mobilization-services', $this->buildJclPageData(
+            title: 'Mobilization Services',
+            description: 'Personnel mobilization — visas, flights, briefings, and on-arrival logistics handled end-to-end.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Business Partnership', 'url' => route('services.business-partnership')],
+                ['label' => 'Mobilization Services'],
+            ],
+        ));
+    }
+
+    public function servicesContractStaffing()
+    {
+        $featuredJobs = JobListing::contractStaffing()
+            ->where('status', 'active')
+            ->orderByDesc('is_featured')
+            ->orderByDesc('id')
+            ->take(3)
+            ->get();
+
+        return view('pages.services.contract-staffing', $this->buildJclPageData(
+            title: 'Contract Staffing',
+            description: 'Flexible contract staffing solutions for maritime, energy, and offshore operations — sourced and vetted by JCL.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Contract Staffing'],
+            ],
+            extra: [
+                'featuredJobs' => $featuredJobs,
+            ],
+        ));
+    }
+
+    public function contractStaffingJobs(Request $request)
+    {
+        $query = JobListing::contractStaffing()
+            ->where('status', 'active')
+            ->with(['category', 'location', 'jobType']);
+
+        if ($request->filled('q')) {
+            $term = (string) $request->input('q');
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', "%{$term}%")
+                  ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+        if ($request->filled('location')) {
+            $query->where('location_id', $request->input('location'));
+        }
+
+        $jobs = $query->orderByDesc('is_featured')->orderByDesc('id')->paginate(12)->withQueryString();
+
+        $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+        $locations = \App\Models\Location::orderBy('name')->get();
+
+        return view('pages.services.contract-staffing-jobs', $this->buildJclPageData(
+            title: 'Open Contract Staffing Roles',
+            description: 'Active contract staffing opportunities with JCL.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Contract Staffing', 'url' => route('services.contract-staffing')],
+                ['label' => 'Open Roles'],
+            ],
+            extra: [
+                'jobs' => $jobs,
+                'categories' => $categories,
+                'locations' => $locations,
+            ],
+        ));
+    }
+
+    public function contractStaffingJobShow(string $slug)
+    {
+        $job = JobListing::contractStaffing()
+            ->where('slug', $slug)
+            ->where('status', 'active')
+            ->with(['category', 'location', 'jobType'])
+            ->firstOrFail();
+
+        return view('pages.services.contract-staffing-detail', $this->buildJclPageData(
+            title: $job->title,
+            description: \Illuminate\Support\Str::limit(strip_tags((string) $job->description), 160),
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Services', 'url' => route('services.index')],
+                ['label' => 'Contract Staffing', 'url' => route('services.contract-staffing')],
+                ['label' => 'Open Roles', 'url' => route('services.contract-staffing.jobs')],
+                ['label' => $job->title],
+            ],
+            extra: [
+                'job' => $job,
             ],
         ));
     }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $pageTitle . ' — Jose Consulting Limited')
+@section('title', $pageTitle . ' — Jose Ocean Jobs')
 @section('meta_description', $pageDescription)
 
 @section('content')
@@ -15,7 +15,7 @@
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
         <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Marine Insurance</h1>
-        <p class="mt-4 max-w-xl text-lg text-white/70">Expert advisory on marine insurance — protecting vessels, cargo, and crew.</p>
+        <p class="mt-4 max-w-2xl text-lg text-white/70">Protecting what matters most — at sea and on shore.</p>
     </div>
 </section>
 
@@ -28,14 +28,17 @@
                     <iconify-icon icon="lucide:anchor"></iconify-icon>
                     Marine Insurance
                 </div>
-                <h2 class="text-3xl font-extrabold text-[#073057] leading-tight mb-6">Comprehensive maritime risk coverage, tailored to your operations.</h2>
-                <p class="text-[#4B5563] leading-relaxed mb-8">Protecting your vessel, cargo, and crew is not optional — it is essential. Jose Ocean Jobs works alongside qualified marine insurance professionals to help maritime clients secure the right cover at the right premium, with clear advice at every step.</p>
+                <h2 class="text-3xl font-extrabold text-[#073057] leading-tight mb-6">Protecting what matters most — at sea and on shore.</h2>
+                <p class="text-[#4B5563] leading-relaxed mb-5">The Maritime and Energy sector carries real risk — and having the right insurance in place is not optional, it is essential. Through our licensed marine insurance partner, Jose Ocean Jobs connects vessel owners, operators, cargo owners, and maritime businesses with tailored insurance solutions that provide genuine protection and peace of mind.</p>
+                <p class="text-[#4B5563] leading-relaxed mb-8">Our partner works across a range of marine insurance products, ensuring that whatever your exposure, there is a policy designed to cover it.</p>
+                <div class="mb-3 text-[11px] font-bold uppercase tracking-[0.15em] text-[#073057]">What is covered</div>
                 <ul class="space-y-3 mb-10">
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Hull &amp; Machinery (H&amp;M) insurance</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Protection &amp; Indemnity (P&amp;I) coverage</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Cargo insurance for goods in transit</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Crew personal accident and medical cover — MLC compliant</span></li>
-                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Loss of hire and marine liability</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Hull and machinery insurance</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Protection and indemnity (P&amp;I) cover</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Cargo and freight insurance</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Offshore and energy risk cover</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Liability insurance for maritime businesses</span></li>
+                        <li class="flex items-start gap-2 text-[#4B5563]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1 shrink-0"></iconify-icon><span>Small vessel and pleasure craft cover</span></li>
                 </ul>
                 <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-2 px-7 py-3.5 bg-[#1AAD94] hover:bg-[#158f7a] text-white font-bold rounded-xl transition-all">
                     Discuss Your Cover Needs
@@ -86,7 +89,7 @@
         <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">Protect your maritime assets today</h2>
         <p class="text-white/70 mb-8 max-w-xl mx-auto">Speak with us about your insurance needs and we will connect you with Our Team.</p>
         <a href="{{ route('contact.index') }}" class="inline-flex items-center gap-2 px-8 py-4 bg-[#1AAD94] hover:bg-[#158f7a] text-white font-bold rounded-xl transition-all shadow-lg">
-            Contact JCL
+            Contact Jose Ocean Jobs
             <iconify-icon icon="lucide:arrow-right"></iconify-icon>
         </a>
     </div>

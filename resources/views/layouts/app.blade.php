@@ -53,6 +53,20 @@
     @include('Layout::parts.footer')
 
 </div>
+
+{{-- Floating WhatsApp chat button --}}
+<a href="https://wa.me/2349024304210?text=Hello%20Jose%20Ocean%20Jobs%2C%20I%27d%20like%20to%20make%20an%20enquiry."
+   target="_blank"
+   rel="noopener"
+   aria-label="Chat with us on WhatsApp"
+   class="fixed bottom-6 right-6 z-[9999] flex items-center gap-2 rounded-full bg-[#25D366] hover:bg-[#1ebe5d] text-white shadow-2xl shadow-[#25D366]/40 px-4 py-3 md:px-5 md:py-3.5 transition-all hover:scale-105 group">
+    <span class="relative flex h-6 w-6 md:h-7 md:w-7 items-center justify-center">
+        <span class="absolute inset-0 rounded-full bg-white/30 animate-ping"></span>
+        <iconify-icon icon="mdi:whatsapp" class="text-2xl md:text-3xl relative"></iconify-icon>
+    </span>
+    <span class="hidden md:inline text-sm font-bold tracking-wide">Chat on WhatsApp</span>
+</a>
+
 @stack('scripts')
 </body>
 </html>

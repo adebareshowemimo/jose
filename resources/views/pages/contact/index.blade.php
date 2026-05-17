@@ -122,7 +122,19 @@
                         </div>
                         <div>
                             <h5 class="text-[11px] font-bold uppercase tracking-widest text-[#073057]/60 mb-1">Phone Support</h5>
-                            <p class="text-sm font-semibold text-[#073057]">9024304210</p>
+                            <a href="tel:+2349024304210" class="text-sm font-semibold text-[#073057] hover:text-[#1AAD94] transition-colors">0902 430 4210</a>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366]">
+                            <iconify-icon icon="mdi:whatsapp" class="text-xl"></iconify-icon>
+                        </div>
+                        <div>
+                            <h5 class="text-[11px] font-bold uppercase tracking-widest text-[#073057]/60 mb-1">WhatsApp</h5>
+                            <a href="https://wa.me/2349024304210?text=Hello%20Jose%20Ocean%20Jobs%2C%20I%27d%20like%20to%20make%20an%20enquiry." target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-[#073057] hover:text-[#25D366] transition-colors">
+                                0902 430 4210
+                                <iconify-icon icon="lucide:external-link" class="text-xs"></iconify-icon>
+                            </a>
                         </div>
                     </div>
                     <div class="flex items-start gap-4">

@@ -71,9 +71,8 @@
 
             <div class="mt-16 grid grid-cols-1 gap-6 md:grid-cols-6">
                 @foreach(($profile['stats'] ?? []) as $stat)
-                    <div class="md:col-span-3 rounded-[18px] border border-white/10 bg-white/5 p-6 backdrop-blur-sm shadow-[0_16px_40px_rgba(0,0,0,0.18)]">
-                        <div class="text-[10px] font-bold uppercase tracking-[0.2em] text-[#7DE1D1]">{{ $stat['label'] }}</div>
-                        <div class="mt-2 text-sm text-white/70 leading-snug">{{ $stat['description'] }}</div>
+                    <div class="md:col-span-3 rounded-[18px] border border-white/10 bg-white/5 p-8 backdrop-blur-sm shadow-[0_16px_40px_rgba(0,0,0,0.18)] flex items-center justify-center min-h-[120px]">
+                        <div class="text-xl md:text-2xl font-black uppercase tracking-wide text-white text-center leading-tight">{{ $stat['label'] }}</div>
                     </div>
                 @endforeach
             </div>
