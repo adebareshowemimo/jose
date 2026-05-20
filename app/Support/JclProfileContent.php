@@ -405,6 +405,11 @@ class JclProfileContent
             'training_hero'      => asset('images/premium/training-hero.jpg'),
             'soft_skills_hero'   => asset('images/premium/soft-skills-hero.jpg'),
             'travel_management_hero' => asset('images/premium/travel-management-hero.jpg'),
+            'academic_partnerships_hero' => asset('images/premium/New/Academic Partnership.jpg'),
+            'business_partnership_hero' => asset('images/premium/New/Business partnership.jpg'),
+            'global_opportunity_hero' => asset('images/premium/New/Global opportunities.jpg'),
+            'mobilization_hero' => asset('images/premium/New/Mobilization service.jpg'),
+            'self_employment_hero' => asset('images/premium/New/Self employment.jpg'),
             'news_marine'        => asset('images/news marine.jpg'),
             'auth_bg'            => asset('images/sing in or register.jpg'),
         ];

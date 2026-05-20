@@ -41,27 +41,27 @@
                          alt="About Jose Consulting Limited"
                          class="w-full h-[400px] object-cover rounded-[24px] mb-12 shadow-lg" loading="lazy" />
 
-                    <div class="bg-[#F9FAFB] border border-gray-100 rounded-[24px] p-10 lg:p-14">
+                    <div class="bg-[#F9FAFB] border border-gray-100 rounded-[24px] p-5 sm:p-8 lg:p-14">
                         <span class="sr-only">Jose Consulting focuses on two sectors: Energy Workforce Development and Maritime/Logistics.</span>
 
                         <div class="flex justify-center">
-                            <div class="rounded-xl bg-[#073057] text-white px-10 py-4 text-base font-extrabold shadow-md tracking-wide">TWO SECTORS FOCUSED</div>
+                            <div class="rounded-xl bg-[#073057] text-white px-5 py-3 text-center text-sm font-extrabold shadow-md tracking-wide sm:px-10 sm:py-4 sm:text-base">TWO SECTORS FOCUSED</div>
                         </div>
 
-                        <div class="relative h-12" aria-hidden="true">
-                            <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] h-6 bg-[#1AAD94]"></div>
+                        <div class="relative h-8 sm:h-12" aria-hidden="true">
+                            <div class="absolute left-1/2 -translate-x-1/2 top-0 w-[2px] h-8 bg-[#1AAD94] sm:h-6"></div>
                             <div class="absolute top-[18px] left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-[#7DE1D1]"></div>
-                            <div class="absolute top-6 left-1/4 right-1/4 h-[2px] bg-[#1AAD94]"></div>
-                            <div class="absolute top-6 left-1/4 -translate-x-1/2 w-[2px] h-6 bg-[#1AAD94]"></div>
-                            <div class="absolute top-6 right-1/4 translate-x-1/2 w-[2px] h-6 bg-[#1AAD94]"></div>
+                            <div class="absolute top-6 left-1/4 right-1/4 hidden h-[2px] bg-[#1AAD94] sm:block"></div>
+                            <div class="absolute top-6 left-1/4 hidden -translate-x-1/2 w-[2px] h-6 bg-[#1AAD94] sm:block"></div>
+                            <div class="absolute top-6 right-1/4 hidden translate-x-1/2 w-[2px] h-6 bg-[#1AAD94] sm:block"></div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-8">
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm flex items-center justify-center min-h-[120px]">
-                                <div class="text-xl md:text-2xl font-black uppercase tracking-wide text-[#073057] leading-tight">Energy Workforce Development</div>
+                        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-8">
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-5 text-center shadow-sm flex items-center justify-center min-h-[108px] sm:min-h-[120px] sm:p-7">
+                                <div class="text-base sm:text-lg md:text-2xl font-black uppercase tracking-normal sm:tracking-wide text-[#073057] leading-tight break-words">Energy Workforce Development</div>
                             </div>
-                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-7 text-center shadow-sm flex items-center justify-center min-h-[120px]">
-                                <div class="text-xl md:text-2xl font-black uppercase tracking-wide text-[#073057] leading-tight">Maritime/Logistics</div>
+                            <div class="rounded-xl border-2 border-[#1AAD94] bg-white p-5 text-center shadow-sm flex items-center justify-center min-h-[108px] sm:min-h-[120px] sm:p-7">
+                                <div class="text-base sm:text-lg md:text-2xl font-black uppercase tracking-normal sm:tracking-wide text-[#073057] leading-tight break-words">Maritime/<wbr>Logistics</div>
                             </div>
                         </div>
                     </div>

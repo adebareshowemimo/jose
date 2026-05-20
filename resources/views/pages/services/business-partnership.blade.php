@@ -8,8 +8,8 @@
 
 {{-- Hero --}}
 <section class="relative h-[400px] flex items-center overflow-hidden bg-[#073057]">
-    @if (!empty($img['crew_management']))
-        <img src="{{ $img['crew_management'] }}" alt="Business Partnerships" class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
+    @if (!empty($img['business_partnership_hero']))
+        <img src="{{ $img['business_partnership_hero'] }}" alt="Business Partnerships" class="absolute inset-0 w-full h-full object-cover opacity-40" loading="eager" />
     @endif
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/85 to-transparent"></div>
     <div class="container mx-auto px-6 relative z-10">

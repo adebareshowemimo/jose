@@ -16,6 +16,7 @@ class ContactRoutes
         ['label' => 'Marine Procurement',                           'email' => 'business@joseoceanjobs.com'],
         ['label' => 'Marine Insurance',                             'email' => 'business@joseoceanjobs.com'],
         ['label' => 'Marine Travel',                                'email' => 'business@joseoceanjobs.com'],
+        ['label' => 'Self-Employment Setup',                        'email' => 'support@joseoceanjobs.com'],
         ['label' => 'Job Placement Services',                       'email' => 'support@joseoceanjobs.com'],
         ['label' => 'Partnership Proposal',                         'email' => 'business@joseoceanjobs.com'],
     ];
@@ -31,13 +32,15 @@ class ContactRoutes
             return self::DEFAULT_ROUTES;
         }
 
-        return array_values(array_filter(
+        $subjects = array_values(array_filter(
             array_map(fn ($row) => [
-                'label' => (string) ($row['label'] ?? ''),
+                'label' => $this->displayLabel((string) ($row['label'] ?? '')),
                 'email' => (string) ($row['email'] ?? ''),
             ], $stored),
             fn ($row) => $row['label'] !== '',
         ));
+
+        return $this->ensureDefaultSubject($subjects, 'Self-Employment Setup', 'Marine Travel');
     }
 
     /**
@@ -76,5 +79,48 @@ class ContactRoutes
     private function normalize(string $value): string
     {
         return mb_strtolower(trim($value));
+    }
+
+    private function displayLabel(string $label): string
+    {
+        return $this->normalize($label) === 'travel management service'
+            ? 'Marine Travel'
+            : $label;
+    }
+
+    /**
+     * @param array<int, array{label:string,email:string}> $subjects
+     * @return array<int, array{label:string,email:string}>
+     */
+    private function ensureDefaultSubject(array $subjects, string $label, ?string $afterLabel = null): array
+    {
+        $needle = $this->normalize($label);
+
+        foreach ($subjects as $subject) {
+            if ($this->normalize($subject['label']) === $needle) {
+                return $subjects;
+            }
+        }
+
+        foreach (self::DEFAULT_ROUTES as $defaultSubject) {
+            if ($this->normalize($defaultSubject['label']) === $needle) {
+                if ($afterLabel !== null) {
+                    $afterNeedle = $this->normalize($afterLabel);
+
+                    foreach ($subjects as $index => $subject) {
+                        if ($this->normalize($subject['label']) === $afterNeedle) {
+                            array_splice($subjects, $index + 1, 0, [$defaultSubject]);
+
+                            return $subjects;
+                        }
+                    }
+                }
+
+                $subjects[] = $defaultSubject;
+                break;
+            }
+        }
+
+        return $subjects;
     }
 }

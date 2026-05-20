@@ -50,7 +50,7 @@
                         <li><a href="{{ route('about.index') }}">About JCL</a></li>
                         <li><a href="{{ route('leadership.index') }}">Leadership</a></li>
                         <li><a href="{{ route('partnerships.index') }}">Partnerships</a></li>
-                        <li><a href="{{ route('training.index') }}">Training</a></li>
+                        <li><a href="{{ route('training.index') }}">Training and Certification</a></li>
                         <li><a href="{{ route('contact.index') }}">Contact</a></li>
                     </ul>
                 </div>
