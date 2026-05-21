@@ -17,7 +17,7 @@
                     <li><a href="{{ route('about.index') }}" class="hover:text-white transition-colors">About JCL</a></li>
                     <li><a href="{{ route('leadership.index') }}" class="hover:text-white transition-colors">Leadership & Experts</a></li>
                     <li><a href="{{ route('partnerships.index') }}" class="hover:text-white transition-colors">Partnerships & Expertise</a></li>
-                    <li><a href="{{ route('training.index') }}" class="hover:text-white transition-colors">Training</a></li>
+                    <li><a href="{{ route('training.index') }}" class="hover:text-white transition-colors">Training and Certification</a></li>
                     <li><a href="{{ route('events.index') }}" class="hover:text-white transition-colors">Events</a></li>
                     <li><a href="{{ route('contact.index') }}" class="hover:text-white transition-colors">Contact JCL</a></li>
                 </ul>
