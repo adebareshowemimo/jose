@@ -46,6 +46,14 @@ class SocialAuthController extends Controller
             ]);
         }
 
+        // Some providers (e.g. Microsoft Graph) return the avatar as a large
+        // base64 "data:" URI rather than a URL. The avatar column is only 255
+        // chars, so keep it only when it's an http(s) URL that fits.
+        $avatar = $oauthUser->getAvatar();
+        if (! is_string($avatar) || ! Str::startsWith($avatar, ['http://', 'https://']) || strlen($avatar) > 255) {
+            $avatar = null;
+        }
+
         try {
             $user = User::where('email', $email)->first();
 
@@ -69,7 +77,7 @@ class SocialAuthController extends Controller
                     'provider' => $provider,
                     'provider_id' => $oauthUser->getId(),
                     'provider_token' => $oauthUser->token,
-                    'avatar' => $oauthUser->getAvatar(),
+                    'avatar' => $avatar,
                 ]);
             }
         } catch (\Throwable $e) {
