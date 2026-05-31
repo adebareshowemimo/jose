@@ -24,7 +24,7 @@ class CompleteSignupController extends Controller
     {
         $request->validate([
             'role' => 'required|in:candidate,employer',
-            'company_name' => 'required_if:role,employer|string|max:255',
+            'company_name' => 'nullable|required_if:role,employer|string|max:255',
         ], [
             'role.required' => 'Please choose an account type.',
             'company_name.required_if' => 'Company name is required for employer accounts.',
