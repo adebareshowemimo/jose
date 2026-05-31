@@ -36,11 +36,10 @@
                     <iconify-icon icon="lucide:arrow-right"></iconify-icon>
                 </a>
             </div>
-            <div class="rounded-[32px] overflow-hidden shadow-xl bg-gradient-to-br from-[#073057] via-[#0a4275] to-[#1AAD94] min-h-[480px] flex items-center justify-center text-white">
-                <div class="text-center p-12">
-                    <iconify-icon icon="lucide:globe-2" class="text-7xl mb-4 opacity-80"></iconify-icon>
-                    <p class="text-lg font-bold uppercase tracking-[0.15em] opacity-80">Careers without borders</p>
-                </div>
+            <div class="relative rounded-[32px] overflow-hidden shadow-xl bg-gradient-to-br from-[#073057] via-[#0a4275] to-[#1AAD94] min-h-[480px]">
+                @if (!empty($img['global_opportunity_hero']))
+                    <img src="{{ $img['global_opportunity_hero'] }}" alt="Global Opportunities" class="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                @endif
             </div>
         </div>
     </div>
