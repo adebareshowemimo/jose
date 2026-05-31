@@ -46,29 +46,37 @@ class SocialAuthController extends Controller
             ]);
         }
 
-        $user = User::where('email', $email)->first();
+        try {
+            $user = User::where('email', $email)->first();
 
-        if ($user) {
-            $user->forceFill([
-                'provider' => $provider,
-                'provider_id' => $oauthUser->getId(),
-                'provider_token' => $oauthUser->token,
-                'email_verified_at' => $user->email_verified_at ?? now(),
-                'is_verified' => true,
-            ])->save();
-        } else {
-            $user = User::create([
-                'name' => $oauthUser->getName() ?: $oauthUser->getNickname() ?: explode('@', $email)[0],
-                'email' => $email,
-                'password' => Hash::make(Str::random(40)),
-                'role_id' => null,
-                'status' => 'active',
-                'email_verified_at' => now(),
-                'is_verified' => true,
-                'provider' => $provider,
-                'provider_id' => $oauthUser->getId(),
-                'provider_token' => $oauthUser->token,
-                'avatar' => $oauthUser->getAvatar(),
+            if ($user) {
+                $user->forceFill([
+                    'provider' => $provider,
+                    'provider_id' => $oauthUser->getId(),
+                    'provider_token' => $oauthUser->token,
+                    'email_verified_at' => $user->email_verified_at ?? now(),
+                    'is_verified' => true,
+                ])->save();
+            } else {
+                $user = User::create([
+                    'name' => $oauthUser->getName() ?: $oauthUser->getNickname() ?: explode('@', $email)[0],
+                    'email' => $email,
+                    'password' => Hash::make(Str::random(40)),
+                    'role_id' => null,
+                    'status' => 'active',
+                    'email_verified_at' => now(),
+                    'is_verified' => true,
+                    'provider' => $provider,
+                    'provider_id' => $oauthUser->getId(),
+                    'provider_token' => $oauthUser->token,
+                    'avatar' => $oauthUser->getAvatar(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()->route('auth.login')->withErrors([
+                'email' => 'We could not complete your ' . ucfirst($provider) . ' sign-in. Please try again or contact the site administrator.',
             ]);
         }
 
