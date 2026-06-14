@@ -138,43 +138,92 @@ class RecruitmentRequestController extends Controller
     public function attachCandidate(Request $request, RecruitmentRequest $recruitment, EmailDispatcher $dispatcher)
     {
         $data = $request->validate([
-            'candidate_id' => 'required|exists:candidates,id',
-            'summary' => 'nullable|string|max:2000',
+            'candidate_ids' => 'required|array|min:1',
+            'candidate_ids.*' => 'integer|distinct|exists:candidates,id',
+            'summaries' => 'nullable|array',
+            'summaries.*' => 'nullable|string|max:2000',
         ]);
 
-        $candidate = Candidate::with('resumes')->find($data['candidate_id']);
+        $candidates = Candidate::with('resumes')
+            ->whereIn('id', $data['candidate_ids'])
+            ->get();
 
-        $hasCv = $candidate->resumes->contains(fn ($r) => ! empty($r->file_path));
-        if (! $hasCv) {
-            return back()
-                ->withInput()
-                ->with('error', 'Cannot attach this candidate: no CV on file. The candidate must upload a CV (or use "Upload external CV" instead).');
+        // Candidates already delivered on this request — skip rather than duplicate.
+        $alreadyAttached = $recruitment->candidates()
+            ->whereIn('candidate_id', $data['candidate_ids'])
+            ->pluck('candidate_id')
+            ->all();
+
+        $summaries = $data['summaries'] ?? [];
+
+        $attached = 0;
+        $skippedNoCv = [];
+        $skippedDupe = 0;
+
+        DB::transaction(function () use ($candidates, $alreadyAttached, $summaries, $recruitment, &$attached, &$skippedNoCv, &$skippedDupe) {
+            foreach ($candidates as $candidate) {
+                if (in_array($candidate->id, $alreadyAttached, true)) {
+                    $skippedDupe++;
+                    continue;
+                }
+
+                $hasCv = $candidate->resumes->contains(fn ($r) => ! empty($r->file_path));
+                if (! $hasCv) {
+                    $skippedNoCv[] = $candidate->user?->name ?? "Candidate #{$candidate->id}";
+                    continue;
+                }
+
+                $delivery = RecruitmentRequestCandidate::create([
+                    'recruitment_request_id' => $recruitment->id,
+                    'candidate_id' => $candidate->id,
+                    'summary' => $summaries[$candidate->id] ?? null,
+                    'employer_decision' => 'pending',
+                    'delivered_at' => now(),
+                ]);
+
+                ChatConversation::firstOrCreate(
+                    [
+                        'type' => ChatConversation::TYPE_EMPLOYER_CANDIDATE,
+                        'recruitment_request_candidate_id' => $delivery->id,
+                    ],
+                    [
+                        'company_id' => $recruitment->company_id,
+                        'candidate_id' => $candidate->id,
+                        'started_by_user_id' => Auth::id(),
+                        'last_message_at' => now(),
+                    ]
+                );
+
+                $attached++;
+            }
+        });
+
+        if ($attached > 0) {
+            $this->maybeAutoDeliver($recruitment, $dispatcher);
         }
 
-        $delivery = RecruitmentRequestCandidate::create([
-            'recruitment_request_id' => $recruitment->id,
-            'candidate_id' => $candidate->id,
-            'summary' => $data['summary'] ?? null,
-            'employer_decision' => 'pending',
-            'delivered_at' => now(),
-        ]);
+        if ($attached === 0) {
+            $reasons = [];
+            if ($skippedDupe > 0) {
+                $reasons[] = "{$skippedDupe} already attached";
+            }
+            if (! empty($skippedNoCv)) {
+                $reasons[] = count($skippedNoCv) . ' without a CV (' . implode(', ', $skippedNoCv) . ')';
+            }
 
-        ChatConversation::firstOrCreate(
-            [
-                'type' => ChatConversation::TYPE_EMPLOYER_CANDIDATE,
-                'recruitment_request_candidate_id' => $delivery->id,
-            ],
-            [
-                'company_id' => $recruitment->company_id,
-                'candidate_id' => $candidate->id,
-                'started_by_user_id' => Auth::id(),
-                'last_message_at' => now(),
-            ]
-        );
+            return back()->withInput()->with('error',
+                'No candidates were attached' . ($reasons ? ': ' . implode('; ', $reasons) . '.' : '.'));
+        }
 
-        $this->maybeAdvanceToDelivered($recruitment, $dispatcher);
+        $msg = $attached . ' candidate' . ($attached === 1 ? '' : 's') . ' attached.';
+        if ($skippedDupe > 0) {
+            $msg .= " {$skippedDupe} already attached (skipped).";
+        }
+        if (! empty($skippedNoCv)) {
+            $msg .= ' ' . count($skippedNoCv) . ' skipped — no CV on file: ' . implode(', ', $skippedNoCv) . '.';
+        }
 
-        return back()->with('success', 'Candidate attached.');
+        return back()->with('success', $msg);
     }
 
     public function uploadCv(Request $request, RecruitmentRequest $recruitment, EmailDispatcher $dispatcher)
@@ -200,7 +249,7 @@ class RecruitmentRequestController extends Controller
             'delivered_at' => now(),
         ]);
 
-        $this->maybeAdvanceToDelivered($recruitment, $dispatcher);
+        $this->maybeAutoDeliver($recruitment, $dispatcher);
 
         return back()->with('success', 'External CV uploaded.');
     }
@@ -237,18 +286,58 @@ class RecruitmentRequestController extends Controller
             $ok ? 'Email sent.' : 'Failed to send email — see logs.');
     }
 
-    protected function maybeAdvanceToDelivered(RecruitmentRequest $recruitment, EmailDispatcher $dispatcher): void
+    /**
+     * Admin explicitly marks the selection complete and notifies the employer.
+     * Use this to deliver fewer candidates than requested, or to deliver early.
+     */
+    public function deliver(RecruitmentRequest $recruitment, EmailDispatcher $dispatcher)
     {
-        if ($recruitment->status === 'in_progress' || $recruitment->status === 'paid') {
-            $recruitment->update(['status' => 'candidates_delivered']);
+        if (! in_array($recruitment->status, ['paid', 'in_progress'], true)) {
+            return back()->with('error', 'Candidates can only be delivered while the request is paid / in progress.');
+        }
 
-            if ($recruitment->requester) {
-                $dispatcher->send('recruitment.candidates_delivered', $recruitment->requester, [
-                    'job_title' => $recruitment->job_title,
-                    'candidate_count' => $recruitment->candidates()->count(),
-                    'request_url' => route('employer.recruitment-requests.show', $recruitment),
-                ]);
-            }
+        if ($recruitment->candidates()->count() === 0) {
+            return back()->with('error', 'Attach at least one candidate before delivering.');
+        }
+
+        $this->deliverToEmployer($recruitment, $dispatcher);
+
+        return back()->with('success', 'Candidates delivered — the employer has been notified.');
+    }
+
+    /**
+     * Auto-deliver only once the full requested number of candidates is attached.
+     * Partial selections never notify the employer — the admin can deliver early
+     * with the explicit "Deliver" action instead. Lets admins build a selection
+     * across multiple sessions without prematurely emailing the employer.
+     */
+    protected function maybeAutoDeliver(RecruitmentRequest $recruitment, EmailDispatcher $dispatcher): void
+    {
+        if (! in_array($recruitment->status, ['paid', 'in_progress'], true)) {
+            return;
+        }
+
+        $requested = (int) $recruitment->cv_count;
+
+        if ($requested > 0 && $recruitment->candidates()->count() >= $requested) {
+            $this->deliverToEmployer($recruitment, $dispatcher);
+        }
+    }
+
+    /**
+     * Mark the request delivered and notify the employer. Shared by the
+     * auto-deliver path and the admin's explicit "Deliver" action.
+     */
+    protected function deliverToEmployer(RecruitmentRequest $recruitment, EmailDispatcher $dispatcher): void
+    {
+        $recruitment->update(['status' => 'candidates_delivered']);
+
+        if ($recruitment->requester) {
+            $dispatcher->send('recruitment.candidates_delivered', $recruitment->requester, [
+                'job_title' => $recruitment->job_title,
+                'candidate_count' => $recruitment->candidates()->count(),
+                'request_url' => route('employer.recruitment-requests.show', $recruitment),
+            ]);
         }
     }
 }

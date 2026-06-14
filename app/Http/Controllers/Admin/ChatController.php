@@ -110,6 +110,11 @@ class ChatController extends Controller
                     });
                 }
             })
+            // Recruitment delivery can only use candidates with a CV on file; the chat
+            // picker omits this flag and still sees everyone.
+            ->when($request->boolean('with_cv'), function ($q) {
+                $q->whereHas('resumes', fn ($r) => $r->whereNotNull('file_path')->where('file_path', '!=', ''));
+            })
             ->orderByDesc('updated_at')
             ->take(15)
             ->get();

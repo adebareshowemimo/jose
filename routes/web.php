@@ -461,6 +461,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::post('/{recruitment}/candidates/platform', [AdminRecruitmentRequestController::class, 'attachCandidate'])->name('attach-candidate');
         Route::post('/{recruitment}/candidates/external', [AdminRecruitmentRequestController::class, 'uploadCv'])->name('upload-cv');
         Route::delete('/{recruitment}/candidates/{candidate}', [AdminRecruitmentRequestController::class, 'removeCandidate'])->name('remove-candidate');
+        Route::post('/{recruitment}/deliver', [AdminRecruitmentRequestController::class, 'deliver'])->name('deliver');
         Route::post('/{recruitment}/notify', [AdminRecruitmentRequestController::class, 'notify'])->name('notify');
     });
 });
