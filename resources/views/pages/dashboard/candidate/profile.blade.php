@@ -187,13 +187,10 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-[#073057] mb-2">Years of Experience</label>
-                            <select name="experience_years" class="w-full px-4 py-3 border border-[#E5E7EB] rounded-xl focus:ring-2 focus:ring-[#1AAD94] outline-none">
-                                <option value="">Select Experience</option>
-                                <option value="0-2" {{ old('experience_years', $candidate?->experience_years) == '0-2' ? 'selected' : '' }}>0-2 Years</option>
-                                <option value="3-5" {{ old('experience_years', $candidate?->experience_years) == '3-5' ? 'selected' : '' }}>3-5 Years</option>
-                                <option value="5-10" {{ old('experience_years', $candidate?->experience_years) == '5-10' ? 'selected' : '' }}>5-10 Years</option>
-                                <option value="10+" {{ old('experience_years', $candidate?->experience_years) == '10+' ? 'selected' : '' }}>10+ Years</option>
-                            </select>
+                            <input type="number" name="experience_years" min="0" max="60" step="1" value="{{ old('experience_years', $candidate?->experience_years) }}" placeholder="e.g. 7" class="w-full px-4 py-3 border border-[#E5E7EB] rounded-xl focus:ring-2 focus:ring-[#1AAD94] outline-none @error('experience_years') border-red-500 @enderror" />
+                            @error('experience_years')
+                                <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-[#073057] mb-2">Expected Salary (Monthly USD)</label>

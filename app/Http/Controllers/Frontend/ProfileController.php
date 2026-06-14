@@ -50,7 +50,7 @@ class ProfileController extends Controller
             'gender' => 'nullable|in:male,female,other',
             'location_id' => ['nullable', \Illuminate\Validation\Rule::exists('locations', 'id')->where('type', 'country')->where('is_active', true)],
             'title' => 'nullable|string|max:255',
-            'experience_years' => 'nullable|string|max:50',
+            'experience_years' => 'nullable|integer|min:0|max:60',
             'preferred_vessel_type' => 'nullable|string|max:255',
             'expected_salary' => 'nullable|numeric|min:0',
             'bio' => 'nullable|string|max:5000',
@@ -75,7 +75,7 @@ class ProfileController extends Controller
             'bio' => $request->bio,
             'gender' => $request->gender,
             'date_of_birth' => $request->date_of_birth,
-            'experience_years' => $request->experience_years,
+            'experience_years' => $request->filled('experience_years') ? (int) $request->experience_years : null,
             'expected_salary' => $request->expected_salary,
             'location_id' => $request->location_id,
         ]);
