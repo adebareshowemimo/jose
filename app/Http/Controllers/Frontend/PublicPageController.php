@@ -129,48 +129,110 @@ class PublicPageController extends BasePageController
             ],
         ));
     }
-    public function jobsIndex()
+    public function jobsIndex(Request $request)
     {
-        $jobs = [
-            [
-                'slug' => 'technical-superintendent',
-                'title' => 'Technical Superintendent',
-                'company' => 'Maritime Engineering Group Ltd.',
-                'location' => 'Oslo, Norway',
-                'type' => 'Permanent',
-                'salary' => '$14,000 - $18,500',
-                'category' => 'Engineering',
-            ],
-            [
-                'slug' => 'master-mariner',
-                'title' => 'Master Mariner',
-                'company' => 'Blue Star Lines International',
-                'location' => 'South China Sea',
-                'type' => 'Hot Job',
-                'salary' => '$22,000 Tax-Free',
-                'category' => 'Deck',
-            ],
-            [
-                'slug' => 'second-engineer',
-                'title' => 'Second Engineer',
-                'company' => 'Global Fleet Management',
-                'location' => 'Rotterdam, Netherlands',
-                'type' => 'Contract',
-                'salary' => '$9,500 - $11,000',
-                'category' => 'Engineering',
-            ],
-        ];
+        // `keyword` is this page's own field; `s` is the global header search field.
+        $keyword = $request->input('keyword', $request->input('s'));
+
+        $query = JobListing::regularJobs()
+            ->where('status', 'active')
+            ->where('is_approved', true)
+            ->with(['company', 'location', 'jobType', 'category']);
+
+        if (filled($keyword)) {
+            $term = (string) $keyword;
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', "%{$term}%")
+                  ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        if ($request->filled('location')) {
+            $loc = (string) $request->input('location');
+            $query->where(function ($q) use ($loc) {
+                $q->where('address', 'like', "%{$loc}%")
+                  ->orWhereHas('location', fn ($l) => $l->where('name', 'like', "%{$loc}%"));
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+
+        if ($request->filled('type')) {
+            $query->whereIn('job_type_id', array_filter((array) $request->input('type')));
+        }
+
+        if ($request->filled('salary')) {
+            $buckets = array_filter((array) $request->input('salary'));
+            $query->where(function ($q) use ($buckets) {
+                foreach ($buckets as $bucket) {
+                    [$min, $max] = $this->salaryBucketBounds((string) $bucket);
+                    $q->orWhere(function ($qq) use ($min, $max) {
+                        $qq->whereNotNull('salary_min')->where('salary_min', '>=', $min);
+                        if ($max !== null) {
+                            $qq->where('salary_min', '<=', $max);
+                        }
+                    });
+                }
+            });
+        }
+
+        switch ($request->input('sort')) {
+            case 'newest':
+                $query->orderByDesc('id');
+                break;
+            case 'salary':
+                $query->orderByDesc('salary_max')->orderByDesc('salary_min')->orderByDesc('id');
+                break;
+            default: // most relevant
+                $query->orderByDesc('is_featured')->orderByDesc('is_urgent')->orderByDesc('id');
+        }
+
+        $jobs = $query->paginate(10)->withQueryString();
+
+        $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+        $jobTypes = \App\Models\JobType::orderBy('name')->get();
+
+        // So the saved/bookmark heart can reflect current state.
+        $savedJobIds = [];
+        if ($user = $request->user()) {
+            $savedJobIds = \App\Models\Wishlist::where('user_id', $user->id)
+                ->where('wishlistable_type', JobListing::class)
+                ->pluck('wishlistable_id')
+                ->all();
+        }
 
         return view('pages.jobs.index', [
-            'pageTitle' => 'Job Search',
-            'pageDescription' => 'Browse maritime and offshore opportunities.',
+            'pageTitle' => 'Find Maritime Jobs',
+            'pageDescription' => 'Browse maritime, logistics, and energy sector opportunities.',
             'breadcrumbs' => [
                 ['label' => 'Home', 'url' => url('/')],
                 ['label' => 'Jobs'],
             ],
             'jobs' => $jobs,
-            'categories' => ['Engineering', 'Deck', 'Offshore', 'Navigation'],
+            'categories' => $categories,
+            'jobTypes' => $jobTypes,
+            'savedJobIds' => $savedJobIds,
+            'keyword' => $keyword,
         ]);
+    }
+
+    /**
+     * Lower/upper monthly-salary bounds for a salary-range filter bucket.
+     * Upper bound of null means "and above".
+     *
+     * @return array{0:int,1:?int}
+     */
+    private function salaryBucketBounds(string $bucket): array
+    {
+        return match ($bucket) {
+            '0-5000' => [0, 5000],
+            '5000-10000' => [5000, 10000],
+            '10000-15000' => [10000, 15000],
+            '15000+' => [15000, null],
+            default => [0, null],
+        };
     }
 
     public function jobDetail(string $slug)
@@ -249,22 +311,59 @@ class PublicPageController extends BasePageController
 
     public function jobCategory(string $slug)
     {
-        $category = ucwords(str_replace('-', ' ', $slug));
+        $category = \App\Models\Category::where('slug', $slug)->where('is_active', true)->first();
+        abort_unless($category, 404);
+
+        $listings = JobListing::regularJobs()
+            ->where('status', 'active')
+            ->where('is_approved', true)
+            ->where('category_id', $category->id)
+            ->with(['company', 'location', 'jobType'])
+            ->orderByDesc('is_featured')
+            ->orderByDesc('is_urgent')
+            ->orderByDesc('id')
+            ->paginate(12)
+            ->withQueryString();
+
+        $jobs = $listings->getCollection()->map(fn (JobListing $l) => [
+            'slug' => $l->slug,
+            'title' => $l->title,
+            'company' => $l->company?->name ?? 'Confidential',
+            'location' => $l->location?->name ?? $l->address ?? 'Worldwide',
+            'type' => $l->jobType?->name ?? ucfirst((string) $l->hours_type ?: 'Job'),
+            'salary' => $this->formatSalary($l),
+        ])->all();
 
         return view('pages.jobs.category', [
-            'pageTitle' => 'Jobs by Category',
-            'pageDescription' => "Category: {$category}",
+            'pageTitle' => "{$category->name} Jobs",
+            'pageDescription' => "Open {$category->name} roles in maritime, logistics, and energy.",
             'breadcrumbs' => [
                 ['label' => 'Home', 'url' => url('/')],
                 ['label' => 'Jobs', 'url' => route('job.index')],
-                ['label' => $category],
+                ['label' => $category->name],
             ],
-            'category' => $category,
-            'jobs' => [
-                ['slug' => 'offshore-operations-supervisor', 'title' => 'Offshore Operations Supervisor', 'company' => 'Atlantic Offshore', 'location' => 'North Sea'],
-                ['slug' => 'chief-officer-tanker', 'title' => 'Chief Officer (Tanker)', 'company' => 'Marine Crest', 'location' => 'Middle East'],
-            ],
+            'category' => $category->name,
+            'jobs' => $jobs,
+            'paginator' => $listings,
         ]);
+    }
+
+    /**
+     * Human-readable salary string for a job listing, or "Negotiable" when undisclosed.
+     */
+    private function formatSalary(JobListing $job): string
+    {
+        if (! $job->salary_min && ! $job->salary_max) {
+            return 'Negotiable';
+        }
+
+        $range = trim(
+            ($job->salary_min ? '$'.number_format((float) $job->salary_min) : '')
+            .($job->salary_min && $job->salary_max ? ' - ' : '')
+            .($job->salary_max ? '$'.number_format((float) $job->salary_max) : '')
+        );
+
+        return $job->salary_type ? "{$range} / {$job->salary_type}" : $range;
     }
 
     public function candidatesIndex()

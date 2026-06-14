@@ -9,7 +9,7 @@
         : false;
 @endphp
 
-<div class="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+<div id="apply" class="scroll-mt-24 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
     <h3 class="text-[20px] font-extrabold text-[#073057] mb-4">Apply for this role</h3>
 
     @if (session('success'))
