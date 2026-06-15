@@ -120,13 +120,21 @@
     </div>
 </div>
 
+@php
+    // Build the default body without literal {{ }} tokens so Blade doesn't try to
+    // compile the email-variable placeholders as echo statements.
+    $ob = '{' . '{';
+    $cb = '}' . '}';
+    $defaultEmailBody = old('body_html', "<p>Hello {$ob} name {$cb},</p>\n<p></p>\n<p>Kind regards,<br>{$ob} app_name {$cb}</p>");
+@endphp
+
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
 <script>
 function templateCreator() {
     return {
         mode: 'rich',
         quill: null,
-        htmlContent: @json(old('body_html', "<p>Hello {{ name }},</p>\n<p></p>\n<p>Kind regards,<br>{{ app_name }}</p>")),
+        htmlContent: @json($defaultEmailBody),
         copiedVar: '',
 
         init() {
