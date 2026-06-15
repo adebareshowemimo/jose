@@ -88,7 +88,7 @@
                     <span class="text-xs text-[#6B7280]">Closes {{ $job->deadline->format('M d, Y') }}</span>
                     @endif
                 </div>
-                <a href="{{ route('job.show', $job->slug ?? $job->id) }}" class="px-4 py-2 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-medium rounded-lg transition cursor-pointer">View Job</a>
+                <a href="{{ route('job.detail', $job->slug ?? $job->id) }}" class="px-4 py-2 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-medium rounded-lg transition cursor-pointer">View Job</a>
             </div>
 
             <p class="text-xs text-[#9CA3AF] mt-3">Saved {{ $wishlist->created_at->diffForHumans() }}</p>

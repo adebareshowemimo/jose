@@ -78,7 +78,7 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center justify-end gap-2">
                                 @if($job)
-                                <a href="{{ route('job.show', $job->slug ?? $job->id) }}" class="p-2 text-[#6B7280] hover:text-[#1AAD94] hover:bg-[#1AAD94]/10 rounded-lg transition cursor-pointer" title="View Job">
+                                <a href="{{ route('job.detail', $job->slug ?? $job->id) }}" class="p-2 text-[#6B7280] hover:text-[#1AAD94] hover:bg-[#1AAD94]/10 rounded-lg transition cursor-pointer" title="View Job">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                 </a>
                                 @endif
