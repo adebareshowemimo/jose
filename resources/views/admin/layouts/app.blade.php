@@ -127,7 +127,10 @@
 
         <nav class="p-4 space-y-1 overflow-y-auto" style="height: calc(100vh - 4rem);">
 
-            @php $current = request()->route()->getName(); @endphp
+            @php
+                $current = request()->route()->getName();
+                $sidebarCounts = \App\Support\AdminAlerts::sidebarCounts();
+            @endphp
 
             {{-- Dashboard --}}
             <a href="{{ route('admin.dashboard') }}"
@@ -153,6 +156,9 @@
                {{ str_starts_with($current, 'admin.companies') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 Companies
+                @if(($sidebarCounts['companies'] ?? 0) > 0)
+                    <span title="Unverified companies" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['companies'] > 99 ? '99+' : $sidebarCounts['companies'] }}</span>
+                @endif
             </a>
 
             {{-- Applications --}}
@@ -161,6 +167,9 @@
                {{ str_starts_with($current, 'admin.applications') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                 Applications
+                @if(($sidebarCounts['applications'] ?? 0) > 0)
+                    <span title="New applications" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['applications'] > 99 ? '99+' : $sidebarCounts['applications'] }}</span>
+                @endif
             </a>
 
             {{-- Chat --}}
@@ -177,6 +186,9 @@
                {{ str_starts_with($current, 'admin.recruitment-requests') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 Recruitment Requests
+                @if(($sidebarCounts['recruitment'] ?? 0) > 0)
+                    <span title="Unopened requests" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['recruitment'] > 99 ? '99+' : $sidebarCounts['recruitment'] }}</span>
+                @endif
             </a>
 
             {{-- Contact Submissions --}}
@@ -195,6 +207,9 @@
                {{ str_starts_with($current, 'admin.jobs') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 Job Listings
+                @if(($sidebarCounts['jobs'] ?? 0) > 0)
+                    <span title="Jobs pending approval" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['jobs'] > 99 ? '99+' : $sidebarCounts['jobs'] }}</span>
+                @endif
             </a>
 
             {{-- Job Categories --}}

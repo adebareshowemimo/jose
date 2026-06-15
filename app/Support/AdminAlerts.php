@@ -2,7 +2,9 @@
 
 namespace App\Support;
 
+use App\Models\Company;
 use App\Models\ContactSubmission;
+use App\Models\JobApplication;
 use App\Models\JobListing;
 use App\Models\Payment;
 use App\Models\RecruitmentRequest;
@@ -72,6 +74,31 @@ class AdminAlerts
     public static function total(): int
     {
         return array_sum(array_column(self::categories(), 'count'));
+    }
+
+    /**
+     * Per-section counts of new / unopened records for the admin sidebar badges.
+     * Each clears as the admin processes the items (approves the job, verifies the
+     * company, reviews the application, opens the recruitment request).
+     *
+     * @return array{jobs:int,applications:int,companies:int,recruitment:int}
+     */
+    public static function sidebarCounts(): array
+    {
+        return [
+            // Jobs awaiting approval.
+            'jobs' => Schema::hasTable('job_listings')
+                ? JobListing::where('status', 'pending')->count() : 0,
+            // New applications not yet actioned (status set to 'applied' on submit).
+            'applications' => Schema::hasTable('job_applications')
+                ? JobApplication::where('status', 'applied')->count() : 0,
+            // New companies the admin hasn't verified yet.
+            'companies' => Schema::hasTable('companies')
+                ? Company::where('is_verified', false)->count() : 0,
+            // Hiring/CV requests the admin hasn't opened yet.
+            'recruitment' => Schema::hasTable('recruitment_requests')
+                ? RecruitmentRequest::where('status', 'pending')->count() : 0,
+        ];
     }
 
     /**
