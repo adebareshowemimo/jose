@@ -292,6 +292,7 @@ Route::prefix('errors')->group(function () {
 // ─── Admin Panel ─────────────────────────────────────────────
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('/notifications', [AdminController::class, 'notifications'])->name('admin.notifications');
 
     // Users
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');

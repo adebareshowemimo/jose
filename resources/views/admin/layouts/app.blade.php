@@ -48,6 +48,40 @@
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                     View Site
                 </a>
+
+                {{-- Notifications: live "needs attention" feed derived from pending records. --}}
+                @php
+                    $adminAlerts = \App\Support\AdminAlerts::categories();
+                    $adminAlertTotal = array_sum(array_column($adminAlerts, 'count'));
+                @endphp
+                <div class="relative" x-data="{ notifOpen: false }">
+                    <button @click="notifOpen = !notifOpen" title="Notifications"
+                            class="relative p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        @if($adminAlertTotal > 0)
+                            <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#073057] flex items-center justify-center">{{ $adminAlertTotal > 9 ? '9+' : $adminAlertTotal }}</span>
+                        @endif
+                    </button>
+                    <div x-show="notifOpen" @click.away="notifOpen = false" x-transition x-cloak
+                         class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+                        <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100">
+                            <p class="text-sm font-semibold text-gray-900">Needs attention</p>
+                            <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $adminAlertTotal > 0 ? 'bg-[#1AAD94]/10 text-[#1AAD94]' : 'bg-gray-100 text-gray-500' }}">{{ $adminAlertTotal }}</span>
+                        </div>
+                        @forelse($adminAlerts as $alert)
+                            <a href="{{ $alert['url'] }}" class="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-gray-50 transition">
+                                <span class="text-sm text-gray-700">{{ $alert['label'] }}</span>
+                                <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $alert['count'] > 0 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400' }}">{{ $alert['count'] }}</span>
+                            </a>
+                        @empty
+                            <p class="px-4 py-3 text-sm text-gray-400">Nothing pending.</p>
+                        @endforelse
+                        <div class="border-t border-gray-100 mt-1 pt-1">
+                            <a href="{{ route('admin.notifications') }}" class="block px-4 py-2 text-sm font-medium text-[#1AAD94] hover:bg-gray-50">View all</a>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="relative" x-data="{ open: false }">
                     <button @click="open = !open" class="flex items-center gap-2 p-1.5 hover:bg-white/10 rounded-lg transition">
                         <div class="w-8 h-8 bg-[#1AAD94] rounded-full flex items-center justify-center text-white text-sm font-semibold">

@@ -75,6 +75,16 @@ class AdminController extends Controller
         ));
     }
 
+    // ─── Notifications (needs-attention feed) ────────────────────
+
+    public function notifications()
+    {
+        return view('admin.notifications.index', [
+            'feed' => \App\Support\AdminAlerts::feed(),
+            'total' => \App\Support\AdminAlerts::total(),
+        ]);
+    }
+
     // ─── Users ───────────────────────────────────────────────────
 
     public function users(Request $request)
@@ -195,13 +205,24 @@ class AdminController extends Controller
         $query = JobListing::with(['company']);
 
         if ($request->filled('search')) {
-            $query->where('title', 'like', "%{$request->search}%");
+            $term = trim((string) $request->search);
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', "%{$term}%")
+                  ->orWhereHas('company', fn ($c) => $c->where('name', 'like', "%{$term}%"));
+            });
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        $jobs = $query->latest()->paginate(20)->withQueryString();
+        match ($request->input('sort')) {
+            'oldest' => $query->oldest(),
+            'title' => $query->orderBy('title'),
+            'deadline' => $query->orderByRaw('deadline IS NULL')->orderBy('deadline'),
+            default => $query->latest(),
+        };
+
+        $jobs = $query->paginate(20)->withQueryString();
         return view('admin.jobs.index', compact('jobs'));
     }
 
