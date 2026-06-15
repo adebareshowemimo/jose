@@ -125,15 +125,9 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-[1fr_220px] gap-3">
-            <div>
-                <label class="{{ $labelClass }}">Role Title</label>
-                <input type="text" name="title" value="{{ old('title', $job?->title) }}" required class="{{ $inputClass }}">
-            </div>
-            <div>
-                <label class="{{ $labelClass }}">Slug</label>
-                <input type="text" name="slug" value="{{ old('slug', $job?->slug) }}" placeholder="Auto" class="{{ $inputClass }}">
-            </div>
+        <div>
+            <label class="{{ $labelClass }}">Role Title</label>
+            <input type="text" name="title" value="{{ old('title', $job?->title) }}" required class="{{ $inputClass }}">
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">

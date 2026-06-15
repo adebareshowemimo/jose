@@ -10,7 +10,6 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 
 class ContractStaffingJobController extends Controller
 {
@@ -99,7 +98,6 @@ class ContractStaffingJobController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
-            'slug' => ['nullable', 'string', 'max:255', Rule::unique('job_listings', 'slug')->ignore($job?->id)],
             'category_id' => ['nullable', 'exists:categories,id'],
             'job_type_id' => ['nullable', 'exists:job_types,id'],
             'location_id' => ['nullable', 'exists:locations,id'],
@@ -130,15 +128,19 @@ class ContractStaffingJobController extends Controller
             'is_urgent' => ['nullable', 'boolean'],
         ]);
 
-        $baseSlug = filled($validated['slug'] ?? null)
-            ? Str::slug($validated['slug'])
-            : Str::slug($validated['title']);
-        $slug = $baseSlug;
-        $counter = 1;
-        while (JobListing::where('slug', $slug)->when($job, fn ($q) => $q->where('id', '!=', $job->id))->exists()) {
-            $slug = $baseSlug.'-'.$counter++;
+        // Slug is derived from the title on create and kept stable on edit so the
+        // public URL doesn't break. There is no manual slug field.
+        if ($job) {
+            $validated['slug'] = $job->slug;
+        } else {
+            $baseSlug = Str::slug($validated['title']);
+            $slug = $baseSlug;
+            $counter = 1;
+            while (JobListing::where('slug', $slug)->exists()) {
+                $slug = $baseSlug.'-'.$counter++;
+            }
+            $validated['slug'] = $slug;
         }
-        $validated['slug'] = $slug;
 
         $validated['is_contract_staffing'] = true;
         $validated['company_id'] = null;
