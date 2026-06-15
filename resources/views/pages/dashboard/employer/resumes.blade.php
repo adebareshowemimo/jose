@@ -11,8 +11,17 @@
 <div class="space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-[#073057]">Browse Resumes</h2>
-            <p class="text-[#6B7280]">Search real candidate profiles with uploaded CVs.</p>
+            <h2 class="text-2xl font-bold text-[#073057]">{{ $savedOnly ? 'Your Shortlist' : 'Browse Resumes' }}</h2>
+            <p class="text-[#6B7280]">{{ $savedOnly ? 'Candidates you saved from their profiles.' : 'Search real candidate profiles with uploaded CVs.' }}</p>
+        </div>
+        <div class="inline-flex rounded-xl border border-[#E5E7EB] bg-white p-1">
+            <a href="{{ route('employer.resumes') }}"
+               class="px-4 py-2 text-sm font-semibold rounded-lg transition {{ ! $savedOnly ? 'bg-[#1AAD94] text-white' : 'text-[#4B5563] hover:bg-[#F3F4F6]' }}">All Resumes</a>
+            <a href="{{ route('employer.resumes', ['saved' => 1]) }}"
+               class="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-lg transition {{ $savedOnly ? 'bg-[#1AAD94] text-white' : 'text-[#4B5563] hover:bg-[#F3F4F6]' }}">
+                Saved
+                <span class="{{ $savedOnly ? 'bg-white/20 text-white' : 'bg-[#F3F4F6] text-[#4B5563]' }} px-1.5 py-0.5 rounded text-xs">{{ count($savedIds) }}</span>
+            </a>
         </div>
     </div>
 
@@ -32,6 +41,7 @@
     </div>
 
     <form method="GET" action="{{ route('employer.resumes') }}" class="bg-white rounded-xl border border-[#E5E7EB] p-6">
+        @if($savedOnly)<input type="hidden" name="saved" value="1">@endif
         <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
             <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-[#073057] mb-2">Search Keywords</label>
@@ -81,7 +91,7 @@
             </select>
             <div class="flex flex-wrap gap-2">
                 @if(request()->hasAny(['search', 'position', 'experience', 'location_id', 'availability', 'sort']))
-                    <a href="{{ route('employer.resumes') }}" class="px-4 py-2.5 border border-[#E5E7EB] text-[#4B5563] font-semibold rounded-xl hover:bg-[#F9FAFB] transition">Reset</a>
+                    <a href="{{ route('employer.resumes', $savedOnly ? ['saved' => 1] : []) }}" class="px-4 py-2.5 border border-[#E5E7EB] text-[#4B5563] font-semibold rounded-xl hover:bg-[#F9FAFB] transition">Reset</a>
                 @endif
                 <button type="submit" class="px-5 py-2.5 bg-[#1AAD94] hover:bg-[#158f7a] text-white font-semibold rounded-xl transition">Search Resumes</button>
             </div>
@@ -102,6 +112,7 @@
                 $initials = collect(explode(' ', $candidateName))->map(fn ($part) => strtoupper(mb_substr($part, 0, 1)))->take(2)->join('');
                 $resume = $candidate->resumes->firstWhere('is_default', true) ?? $candidate->resumes->first();
                 $salary = $candidate->expected_salary ? number_format((float) $candidate->expected_salary).' / '.($candidate->salary_type ?? 'salary') : 'Salary not set';
+                $isSaved = in_array($candidate->id, $savedIds);
             @endphp
 
             <div class="bg-white rounded-xl border border-[#E5E7EB] p-6 hover:shadow-md transition">
@@ -164,13 +175,27 @@
                         @if($resume)
                             <a href="{{ asset($resume->file_path) }}" target="_blank" class="flex-1 md:flex-none px-5 py-2.5 border border-[#E5E7EB] text-[#4B5563] text-sm font-semibold rounded-xl hover:bg-[#F9FAFB] transition text-center">Open CV</a>
                         @endif
+                        <form method="POST" action="{{ route('employer.saved-candidates.toggle', $candidate->id) }}" class="flex-1 md:flex-none">
+                            @csrf
+                            <button type="submit" title="{{ $isSaved ? 'Remove from shortlist' : 'Save to shortlist' }}"
+                                class="w-full inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-xl transition border {{ $isSaved ? 'border-[#1AAD94] text-[#1AAD94] bg-[#1AAD94]/5 hover:bg-[#1AAD94]/10' : 'border-[#E5E7EB] text-[#4B5563] hover:bg-[#F9FAFB]' }}">
+                                <svg class="w-4 h-4" fill="{{ $isSaved ? 'currentColor' : 'none' }}" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                                {{ $isSaved ? 'Saved' : 'Save' }}
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         @empty
             <div class="bg-white rounded-xl border border-[#E5E7EB] p-10 text-center">
-                <h3 class="text-lg font-bold text-[#073057]">No resumes found</h3>
-                <p class="mt-2 text-[#6B7280]">Searchable candidates with uploaded CVs will appear here. Adjust filters if you expected results.</p>
+                @if($savedOnly)
+                    <h3 class="text-lg font-bold text-[#073057]">No saved candidates yet</h3>
+                    <p class="mt-2 text-[#6B7280]">Open a candidate's profile and tap <span class="font-semibold text-[#073057]">Save Profile</span> to add them to your shortlist.</p>
+                    <a href="{{ route('employer.resumes') }}" class="mt-4 inline-flex px-5 py-2.5 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-semibold rounded-xl transition">Browse all resumes</a>
+                @else
+                    <h3 class="text-lg font-bold text-[#073057]">No resumes found</h3>
+                    <p class="mt-2 text-[#6B7280]">Searchable candidates with uploaded CVs will appear here. Adjust filters if you expected results.</p>
+                @endif
             </div>
         @endforelse
     </div>

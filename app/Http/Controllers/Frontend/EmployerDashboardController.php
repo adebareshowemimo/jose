@@ -538,10 +538,25 @@ class EmployerDashboardController extends BasePageController
 
     public function browseResumes(Request $request)
     {
+        // Candidates this employer has bookmarked from candidate profiles.
+        $savedIds = Wishlist::where('user_id', auth()->id())
+            ->where('wishlistable_type', Candidate::class)
+            ->pluck('wishlistable_id')
+            ->all();
+
+        $savedOnly = $request->boolean('saved');
+
         $query = Candidate::with(['user', 'location', 'skills', 'categories', 'resumes' => fn ($resumeQuery) => $resumeQuery->latest()])
-            ->where('allow_search', true)
-            ->whereHas('user')
-            ->whereHas('resumes');
+            ->whereHas('user');
+
+        if ($savedOnly) {
+            // The shortlist shows every candidate this employer saved — even if the
+            // candidate has since hidden their profile or not uploaded a CV yet.
+            $query->whereIn('candidates.id', $savedIds ?: [0]);
+        } else {
+            // Public resume search: only searchable candidates with an uploaded CV.
+            $query->where('allow_search', true)->whereHas('resumes');
+        }
 
         if ($request->filled('search')) {
             $search = trim((string) $request->input('search'));
@@ -582,16 +597,6 @@ class EmployerDashboardController extends BasePageController
             $query->where('is_available', $request->input('availability') === 'available');
         }
 
-        // Saved/shortlisted candidates this employer bookmarked from candidate profiles.
-        $savedIds = Wishlist::where('user_id', auth()->id())
-            ->where('wishlistable_type', Candidate::class)
-            ->pluck('wishlistable_id')
-            ->all();
-
-        if ($request->boolean('saved')) {
-            $query->whereIn('candidates.id', $savedIds ?: [0]);
-        }
-
         match ($request->input('sort')) {
             'experience' => $query->orderByDesc('experience_years')->latest(),
             'name' => $query
@@ -620,7 +625,7 @@ class EmployerDashboardController extends BasePageController
             'locations' => $locations,
             'stats' => $stats,
             'savedIds' => $savedIds,
-            'savedOnly' => $request->boolean('saved'),
+            'savedOnly' => $savedOnly,
         ]);
     }
 
