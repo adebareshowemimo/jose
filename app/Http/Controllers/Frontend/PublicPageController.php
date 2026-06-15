@@ -3,14 +3,13 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Models\Candidate;
-use App\Models\ChatConversation;
 use App\Models\Event;
 use App\Models\JobListing;
 use App\Models\NewsArticle;
-use App\Models\RecruitmentRequestCandidate;
 use App\Models\TrainingCategory;
 use App\Models\TrainingProgram;
 use App\Models\Wishlist;
+use App\Support\JclLegalContent;
 use App\Support\JclProfileContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -69,6 +68,36 @@ class PublicPageController extends BasePageController
             ],
         ));
     }
+    public function termsOfService()
+    {
+        return view('pages.legal.terms-of-service', $this->buildJclPageData(
+            title: 'Terms of Service',
+            description: 'The terms governing your use of the JoseOceanJobs platform, operated by Jose Consulting Limited.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Terms of Service'],
+            ],
+            extra: [
+                'terms' => JclLegalContent::termsOfService(),
+            ],
+        ));
+    }
+
+    public function definitions()
+    {
+        return view('pages.legal.definition-of-terms', $this->buildJclPageData(
+            title: 'Definition of Terms',
+            description: 'Key terms and expressions used throughout the JoseOceanJobs Terms of Service.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Definition of Terms'],
+            ],
+            extra: [
+                'glossary' => JclLegalContent::definitions(),
+            ],
+        ));
+    }
+
     public function training(Request $request)
     {
         return $this->renderTrainingListing($request, 'training');
@@ -447,37 +476,29 @@ class PublicPageController extends BasePageController
         abort_unless($candidate, 404);
 
         $user = auth()->user();
-        $isOwner = $user && $candidate->user_id === $user->id;
-        $isAdmin = $user && $user->role?->name === 'admin';
-        $isEmployer = $user && $user->role?->name === 'employer';
-        $company = $isEmployer ? $user->company : null;
+        $roleName = $user?->role?->name;
 
-        // Has the admin delivered this candidate to the viewing employer? Drives the
-        // "Invite" action and whether a private profile is visible to this employer.
-        $conversation = null;
-        $isDelivered = false;
-        if ($company) {
-            $conversation = ChatConversation::where('type', ChatConversation::TYPE_EMPLOYER_CANDIDATE)
-                ->where('company_id', $company->id)
-                ->where('candidate_id', $candidate->id)
-                ->orderByDesc('last_message_at')
-                ->first();
-
-            $isDelivered = $conversation !== null
-                || RecruitmentRequestCandidate::where('candidate_id', $candidate->id)
-                    ->whereHas('recruitmentRequest', fn ($q) => $q->where('company_id', $company->id))
-                    ->exists();
+        // Employers don't browse candidate profiles directly. They only ever review the
+        // candidates that have been delivered to them via their recruitment requests, so
+        // send them to that list instead of exposing this profile page.
+        if ($roleName === 'employer') {
+            return redirect()
+                ->route('employer.recruitment-requests.index')
+                ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
         }
 
-        // Private profiles are visible only to the owner, admins, or an employer the
-        // candidate has been delivered to.
-        abort_unless($candidate->allow_search || $isOwner || $isAdmin || $isDelivered, 404);
+        // This is a private profile page: only an admin or the candidate themselves may
+        // view it. Guests are sent to sign in; any other authenticated user is turned away.
+        if (! $user) {
+            return redirect()
+                ->route('auth.login')
+                ->with('error', 'Please sign in to view candidate profiles.');
+        }
 
-        $isSaved = $user
-            && Wishlist::where('user_id', $user->id)
-                ->where('wishlistable_type', Candidate::class)
-                ->where('wishlistable_id', $candidate->id)
-                ->exists();
+        $isAdmin = $roleName === 'admin';
+        $isOwner = $candidate->user_id === $user->id;
+
+        abort_unless($isAdmin || $isOwner, 404);
 
         $name = $candidate->user?->name ?? 'Candidate';
 
@@ -490,10 +511,8 @@ class PublicPageController extends BasePageController
                 ['label' => $name],
             ],
             'candidate' => $candidate,
-            'isEmployer' => $isEmployer,
-            'isDelivered' => $isDelivered,
-            'isSaved' => (bool) $isSaved,
-            'conversation' => $conversation,
+            'isAdmin' => $isAdmin,
+            'isOwner' => $isOwner,
         ]);
     }
 

@@ -173,7 +173,7 @@
                             <a href="{{ route('candidate.detail', $candidate->slug) }}" target="_blank" class="flex-1 md:flex-none px-5 py-2.5 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-semibold rounded-xl transition text-center">View Profile</a>
                         @endif
                         @if($resume)
-                            <a href="{{ asset($resume->file_path) }}" target="_blank" class="flex-1 md:flex-none px-5 py-2.5 border border-[#E5E7EB] text-[#4B5563] text-sm font-semibold rounded-xl hover:bg-[#F9FAFB] transition text-center">Open CV</a>
+                            <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($resume->file_path) }}" target="_blank" rel="noopener" class="flex-1 md:flex-none px-5 py-2.5 border border-[#E5E7EB] text-[#4B5563] text-sm font-semibold rounded-xl hover:bg-[#F9FAFB] transition text-center">Open CV</a>
                         @endif
                         <form method="POST" action="{{ route('employer.saved-candidates.toggle', $candidate->id) }}" class="flex-1 md:flex-none">
                             @csrf

@@ -7,6 +7,7 @@ use App\Models\EmailTemplate;
 use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class EmailTemplateController extends Controller
 {
@@ -14,6 +15,84 @@ class EmailTemplateController extends Controller
     {
         $templates = EmailTemplate::orderBy('category')->orderBy('name')->get()->groupBy('category');
         return view('admin.email-templates.index', compact('templates'));
+    }
+
+    public function create()
+    {
+        $categories = EmailTemplate::query()
+            ->select('category')
+            ->distinct()
+            ->orderBy('category')
+            ->pluck('category');
+
+        return view('admin.email-templates.create', compact('categories'));
+    }
+
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'name' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
+            'subject' => 'required|string|max:255',
+            'body_html' => 'required|string',
+            'is_active' => 'sometimes|boolean',
+        ]);
+
+        $template = EmailTemplate::create([
+            'key' => $this->uniqueKey($data['name']),
+            'name' => $data['name'],
+            'category' => $data['category'],
+            'subject' => $data['subject'],
+            'body_html' => $data['body_html'],
+            'is_active' => $request->boolean('is_active'),
+            'is_custom' => true,
+        ]);
+
+        return redirect()->route('admin.email-templates.edit', $template)
+            ->with('success', 'Template created. It is now selectable on recruitment requests.');
+    }
+
+    public function cloneTemplate(EmailTemplate $template)
+    {
+        $copy = $template->replicate(['key']);
+        $copy->key = $this->uniqueKey($template->name . ' copy');
+        $copy->name = $template->name . ' (Copy)';
+        $copy->is_custom = true;
+        // Inherit the source's active state via replicate() so a clone of an active
+        // template is immediately selectable in the recruitment-request notify modal.
+        $copy->save();
+
+        return redirect()->route('admin.email-templates.edit', $copy)
+            ->with('success', 'Template cloned. Customise the copy below — it is already selectable on recruitment requests.');
+    }
+
+    public function destroy(EmailTemplate $template)
+    {
+        // Never allow deleting the seeded system templates the app sends transactionally.
+        if (! $template->is_custom) {
+            return back()->with('error', 'System templates cannot be deleted — only custom templates can.');
+        }
+
+        $template->delete();
+
+        return redirect()->route('admin.email-templates.index')
+            ->with('success', 'Custom template deleted.');
+    }
+
+    /**
+     * Build a unique, namespaced key for an admin-created/cloned template so it
+     * never collides with the seeded system keys (e.g. "recruitment.quote_sent").
+     */
+    protected function uniqueKey(string $name): string
+    {
+        $base = 'custom.' . (Str::slug($name, '_') ?: 'template');
+        $key = $base;
+        $i = 1;
+        while (EmailTemplate::where('key', $key)->exists()) {
+            $key = $base . '_' . $i++;
+        }
+
+        return $key;
     }
 
     public function edit(EmailTemplate $template)

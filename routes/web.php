@@ -113,6 +113,10 @@ Route::get('/contact/thread/{token}', [ContactSubmissionController::class, 'thre
 Route::post('/contact/thread/{token}', [ContactSubmissionController::class, 'reply'])->name('contact.thread.reply');
 Route::get('/plan', [PublicPageController::class, 'plan'])->name('plan.index');
 
+// Legal pages
+Route::get('/terms-of-service', [PublicPageController::class, 'termsOfService'])->name('legal.terms');
+Route::get('/definition-of-terms', [PublicPageController::class, 'definitions'])->name('legal.definitions');
+
 // Auth pages
 Route::prefix('auth')->group(function () {
     Route::get('/login', [AuthPageController::class, 'login'])->name('auth.login');
@@ -399,8 +403,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Email Templates
     Route::get('/email-templates', [AdminEmailTemplateController::class, 'index'])->name('admin.email-templates.index');
+    Route::get('/email-templates/create', [AdminEmailTemplateController::class, 'create'])->name('admin.email-templates.create');
+    Route::post('/email-templates', [AdminEmailTemplateController::class, 'store'])->name('admin.email-templates.store');
     Route::get('/email-templates/{template}', [AdminEmailTemplateController::class, 'edit'])->name('admin.email-templates.edit');
     Route::put('/email-templates/{template}', [AdminEmailTemplateController::class, 'update'])->name('admin.email-templates.update');
+    Route::post('/email-templates/{template}/clone', [AdminEmailTemplateController::class, 'cloneTemplate'])->name('admin.email-templates.clone');
+    Route::delete('/email-templates/{template}', [AdminEmailTemplateController::class, 'destroy'])->name('admin.email-templates.destroy');
     Route::get('/email-templates/{template}/preview', [AdminEmailTemplateController::class, 'preview'])->name('admin.email-templates.preview');
     Route::post('/email-templates/{template}/send-test', [AdminEmailTemplateController::class, 'sendTest'])->name('admin.email-templates.send-test');
 

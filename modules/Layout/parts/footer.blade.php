@@ -52,6 +52,10 @@
 
         <div class="pt-10 border-t border-white/10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <p class="text-[12px] font-medium tracking-[0.1em] uppercase text-white/25">© {{ date('Y') }} Jose Consulting Limited. All rights reserved.</p>
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-white/55 text-[11px] font-bold uppercase tracking-[0.12em]">
+                <a href="{{ route('legal.terms') }}" class="hover:text-white transition-colors">Terms of Service</a>
+                <a href="{{ route('legal.definitions') }}" class="hover:text-white transition-colors">Definition of Terms</a>
+            </div>
             <div class="flex flex-wrap items-center gap-6 text-white/30 text-[11px] font-bold uppercase tracking-[0.12em]">
                 <div class="flex items-center gap-2"><iconify-icon icon="lucide:globe" class="text-lg"></iconify-icon><span>Global collaboration</span></div>
                 <div class="flex items-center gap-2"><iconify-icon icon="lucide:badge-check" class="text-lg"></iconify-icon><span>Industry-ready capability</span></div>

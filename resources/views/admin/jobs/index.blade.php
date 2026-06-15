@@ -8,7 +8,7 @@
         <form method="GET" class="flex flex-wrap items-end gap-3">
             <div class="flex-1 min-w-[200px]">
                 <label class="text-xs font-medium text-gray-500 mb-1 block">Search</label>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Job title..."
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Job title or company..."
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
             </div>
             <div>
@@ -20,8 +20,16 @@
                     @endforeach
                 </select>
             </div>
+            <div>
+                <label class="text-xs font-medium text-gray-500 mb-1 block">Sort</label>
+                <select name="sort" class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94]">
+                    @foreach(['newest' => 'Newest', 'oldest' => 'Oldest', 'deadline' => 'Deadline', 'title' => 'Title (A–Z)'] as $value => $label)
+                        <option value="{{ $value }}" {{ request('sort', 'newest') === $value ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
             <button type="submit" class="px-4 py-2 bg-[#073057] text-white text-sm font-medium rounded-lg hover:bg-[#073057]/90">Filter</button>
-            @if(request()->hasAny(['search', 'status']))
+            @if(request()->hasAny(['search', 'status', 'sort']))
                 <a href="{{ route('admin.jobs') }}" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Clear</a>
             @endif
         </form>
@@ -55,24 +63,21 @@
                             </td>
                             <td class="px-5 py-3 text-gray-500">{{ $job->created_at?->format('M d, Y') ?? '—' }}</td>
                             <td class="px-5 py-3 text-gray-500">{{ $job->deadline?->format('M d, Y') ?? '—' }}</td>
-                            <td class="px-5 py-3 text-right">
-                                <div class="flex items-center justify-end gap-2" x-data="{ open: false }">
+                            <td class="px-5 py-3">
+                                <div class="flex items-center justify-end gap-3">
                                     <a href="{{ route('admin.jobs.show', $job) }}" class="text-gray-600 hover:text-[#073057] hover:underline text-sm">View</a>
-                                    <div class="relative">
-                                        <button @click="open = !open" class="text-[#1AAD94] hover:underline text-sm">Status ▾</button>
-                                        <div x-show="open" @click.away="open = false" x-cloak
-                                             class="absolute right-0 mt-1 w-32 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
+
+                                    {{-- Native select avoids the overflow-clipping that hid the old dropdown, and auto-submits the status change. --}}
+                                    <form method="POST" action="{{ route('admin.jobs.update', $job) }}" class="inline-flex">
+                                        @csrf @method('PUT')
+                                        <select name="status" onchange="this.form.submit()" title="Change status"
+                                                class="px-2 py-1 border border-gray-300 rounded-md text-xs text-gray-700 cursor-pointer focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent">
                                             @foreach(['pending', 'active', 'paused', 'closed', 'expired', 'draft'] as $s)
-                                                <form method="POST" action="{{ route('admin.jobs.update', $job) }}">
-                                                    @csrf @method('PUT')
-                                                    <input type="hidden" name="status" value="{{ $s }}">
-                                                    <button type="submit" class="w-full text-left px-3 py-1.5 text-sm hover:bg-gray-50 {{ $job->status === $s ? 'font-semibold text-[#1AAD94]' : 'text-gray-600' }}">
-                                                        {{ ucfirst($s) }}
-                                                    </button>
-                                                </form>
+                                                <option value="{{ $s }}" {{ $job->status === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
                                             @endforeach
-                                        </div>
-                                    </div>
+                                        </select>
+                                    </form>
+
                                     <form method="POST" action="{{ route('admin.jobs.delete', $job) }}"
                                           onsubmit="return confirm('Delete this job?')">
                                         @csrf @method('DELETE')
@@ -87,8 +92,13 @@
                 </tbody>
             </table>
         </div>
-        @if($jobs->hasPages())
-            <div class="px-5 py-3 border-t border-gray-200">{{ $jobs->links() }}</div>
+        @if($jobs->total() > 0)
+            <div class="px-5 py-3 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3">
+                <p class="text-xs text-gray-500">Showing {{ $jobs->firstItem() }}–{{ $jobs->lastItem() }} of {{ $jobs->total() }} jobs</p>
+                @if($jobs->hasPages())
+                    <div>{{ $jobs->links() }}</div>
+                @endif
+            </div>
         @endif
     </div>
 @endsection

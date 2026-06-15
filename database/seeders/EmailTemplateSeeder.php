@@ -9,7 +9,24 @@ class EmailTemplateSeeder extends Seeder
 {
     public function run(): void
     {
-        $templates = [
+        foreach (static::definitions() as $row) {
+            EmailTemplate::updateOrCreate(
+                ['key' => $row['key']],
+                $row + ['is_active' => true]
+            );
+        }
+    }
+
+    /**
+     * The canonical set of system email templates, keyed by `key`.
+     * Shared by the seeder and the `emails:repair-templates` command so both
+     * stay in sync from a single source of truth.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public static function definitions(): array
+    {
+        return [
             // ── Auth ──────────────────────────────────────────────────
             [
                 'key' => 'auth.registration_confirmation',
@@ -368,12 +385,5 @@ HTML,
 HTML,
             ],
         ];
-
-        foreach ($templates as $row) {
-            EmailTemplate::updateOrCreate(
-                ['key' => $row['key']],
-                $row + ['is_active' => true]
-            );
-        }
     }
 }

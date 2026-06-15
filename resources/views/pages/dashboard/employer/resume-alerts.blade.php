@@ -141,7 +141,7 @@
                                 <a href="{{ route('candidate.detail', $candidate->slug) }}" target="_blank" class="px-4 py-2 border border-[#E5E7EB] text-[#073057] text-sm font-semibold rounded-lg hover:bg-[#F9FAFB]">View Profile</a>
                             @endif
                             @if($resume)
-                                <a href="{{ asset($resume->file_path) }}" target="_blank" class="px-4 py-2 bg-[#1AAD94] text-white text-sm font-semibold rounded-lg hover:bg-[#158f7a]">Open CV</a>
+                                <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($resume->file_path) }}" target="_blank" rel="noopener" class="px-4 py-2 bg-[#1AAD94] text-white text-sm font-semibold rounded-lg hover:bg-[#158f7a]">Open CV</a>
                             @endif
                         </div>
                     </div>

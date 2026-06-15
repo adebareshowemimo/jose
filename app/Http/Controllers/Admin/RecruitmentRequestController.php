@@ -43,8 +43,14 @@ class RecruitmentRequestController extends Controller
             'candidates.candidate.user',
         ]);
 
+        // Offer the built-in recruitment/job templates plus every admin-created or
+        // cloned (custom) template, so anything made on the Email Templates page is
+        // selectable here.
         $jobNotificationTemplates = EmailTemplate::where('is_active', true)
-            ->whereIn('category', ['Recruitment', 'Job Notification'])
+            ->where(function ($q) {
+                $q->whereIn('category', ['Recruitment', 'Job Notification'])
+                  ->orWhere('is_custom', true);
+            })
             ->orderBy('name')
             ->get(['key', 'name']);
 
