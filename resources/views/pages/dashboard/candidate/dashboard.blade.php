@@ -112,7 +112,7 @@
         <div class="bg-white rounded-xl border border-[#E5E7EB]">
             <div class="flex items-center justify-between p-5 border-b border-[#E5E7EB]">
                 <h3 class="text-lg font-semibold text-[#073057]">Notifications</h3>
-                <a href="#" class="text-sm text-[#1AAD94] hover:underline">View all</a>
+                <a href="{{ route('user.notifications') }}" class="text-sm text-[#1AAD94] hover:underline">View all</a>
             </div>
             <div class="divide-y divide-[#E5E7EB]">
                 <div class="p-4 hover:bg-[#F9FAFB] transition">
