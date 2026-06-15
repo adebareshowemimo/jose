@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Models\Candidate;
+use App\Models\ChatConversation;
 use App\Models\Event;
 use App\Models\JobListing;
 use App\Models\NewsArticle;
+use App\Models\RecruitmentRequestCandidate;
 use App\Models\TrainingCategory;
 use App\Models\TrainingProgram;
+use App\Models\Wishlist;
 use App\Support\JclProfileContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
@@ -436,26 +440,60 @@ class PublicPageController extends BasePageController
 
     public function candidateDetail(string $slug)
     {
-        $candidate = [
-            'slug' => $slug,
-            'name' => ucwords(str_replace('-', ' ', $slug)),
-            'role' => 'Marine Professional',
-            'location' => 'Global Mobility',
-            'experience' => '10+ years',
-            'availability' => 'Immediate',
-            'summary' => 'Experienced maritime professional with proven vessel operations, safety compliance, and cross-cultural crew leadership.',
-            'certifications' => ['STCW', 'GMDSS', 'Advanced Fire Fighting'],
-        ];
+        $candidate = Candidate::with(['user', 'location', 'skills', 'resumes' => fn ($q) => $q->latest()])
+            ->where('slug', $slug)
+            ->first();
+
+        abort_unless($candidate, 404);
+
+        $user = auth()->user();
+        $isOwner = $user && $candidate->user_id === $user->id;
+        $isAdmin = $user && $user->role?->name === 'admin';
+        $isEmployer = $user && $user->role?->name === 'employer';
+        $company = $isEmployer ? $user->company : null;
+
+        // Has the admin delivered this candidate to the viewing employer? Drives the
+        // "Invite" action and whether a private profile is visible to this employer.
+        $conversation = null;
+        $isDelivered = false;
+        if ($company) {
+            $conversation = ChatConversation::where('type', ChatConversation::TYPE_EMPLOYER_CANDIDATE)
+                ->where('company_id', $company->id)
+                ->where('candidate_id', $candidate->id)
+                ->orderByDesc('last_message_at')
+                ->first();
+
+            $isDelivered = $conversation !== null
+                || RecruitmentRequestCandidate::where('candidate_id', $candidate->id)
+                    ->whereHas('recruitmentRequest', fn ($q) => $q->where('company_id', $company->id))
+                    ->exists();
+        }
+
+        // Private profiles are visible only to the owner, admins, or an employer the
+        // candidate has been delivered to.
+        abort_unless($candidate->allow_search || $isOwner || $isAdmin || $isDelivered, 404);
+
+        $isSaved = $user
+            && Wishlist::where('user_id', $user->id)
+                ->where('wishlistable_type', Candidate::class)
+                ->where('wishlistable_id', $candidate->id)
+                ->exists();
+
+        $name = $candidate->user?->name ?? 'Candidate';
 
         return view('pages.candidates.detail', [
-            'pageTitle' => 'Candidate Profile',
-            'pageDescription' => "Viewing profile: {$candidate['name']}",
+            'pageTitle' => $name,
+            'pageDescription' => "Candidate profile: {$name}",
             'breadcrumbs' => [
                 ['label' => 'Home', 'url' => url('/')],
                 ['label' => 'Candidates', 'url' => route('candidate.index')],
-                ['label' => $candidate['name']],
+                ['label' => $name],
             ],
             'candidate' => $candidate,
+            'isEmployer' => $isEmployer,
+            'isDelivered' => $isDelivered,
+            'isSaved' => (bool) $isSaved,
+            'conversation' => $conversation,
         ]);
     }
 

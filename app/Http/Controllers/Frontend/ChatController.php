@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Events\ChatMessageSent;
 use App\Http\Controllers\Controller;
+use App\Models\Candidate;
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
 use App\Models\RecruitmentRequestCandidate;
@@ -208,6 +209,87 @@ class ChatController extends Controller
         $this->emailCandidate($conversation, $dispatcher, 'chat.offer_sent', array_merge($this->emailVars($conversation), $data));
 
         return back()->with('success', 'Offer sent.');
+    }
+
+    /**
+     * Employer invites a delivered candidate to a meeting / pre-screening interview
+     * straight from the candidate profile. Posts into the existing employer↔candidate
+     * thread and emails the candidate. Only candidates delivered by admin are allowed.
+     */
+    public function invite(Request $request, Candidate $candidate, EmailDispatcher $dispatcher)
+    {
+        $company = $request->user()->company;
+
+        if (! $company) {
+            return redirect()->route('employer.company.profile')
+                ->with('error', 'Set up your company profile before inviting candidates.');
+        }
+
+        $data = $request->validate([
+            'invite_type' => 'required|in:pre_screening,interview,meeting',
+            'scheduled_at' => 'required|string|max:255',
+            'location' => 'required|string|max:255',
+            'note' => 'nullable|string|max:2000',
+        ]);
+
+        $conversation = ChatConversation::where('type', ChatConversation::TYPE_EMPLOYER_CANDIDATE)
+            ->where('company_id', $company->id)
+            ->where('candidate_id', $candidate->id)
+            ->orderByDesc('last_message_at')
+            ->first();
+
+        // No thread yet but a delivery exists → create it (mirrors syncEmployerConversations).
+        if (! $conversation) {
+            $delivery = RecruitmentRequestCandidate::where('candidate_id', $candidate->id)
+                ->whereHas('recruitmentRequest', fn ($q) => $q->where('company_id', $company->id))
+                ->latest('delivered_at')
+                ->first();
+
+            if ($delivery) {
+                $conversation = ChatConversation::firstOrCreate(
+                    [
+                        'type' => ChatConversation::TYPE_EMPLOYER_CANDIDATE,
+                        'recruitment_request_candidate_id' => $delivery->id,
+                    ],
+                    [
+                        'company_id' => $company->id,
+                        'candidate_id' => $candidate->id,
+                        'started_by_user_id' => $request->user()->id,
+                        'last_message_at' => now(),
+                    ]
+                );
+            }
+        }
+
+        if (! $conversation) {
+            return back()->with('error', 'You can only invite candidates that have been delivered to you.');
+        }
+
+        $labels = ['pre_screening' => 'Pre-screening interview', 'interview' => 'Interview', 'meeting' => 'Meeting'];
+        $label = $labels[$data['invite_type']];
+
+        $body = "{$label} invitation\nWhen: {$data['scheduled_at']}\nWhere: {$data['location']}";
+        if (! empty($data['note'])) {
+            $body .= "\n\n{$data['note']}";
+        }
+
+        $this->createMessage($conversation, $request->user(), ChatMessage::ROLE_EMPLOYER, $body, 'schedule_interview', [
+            'invite_type' => $data['invite_type'],
+            'interview_date' => $data['scheduled_at'],
+            'interview_location' => $data['location'],
+            'note' => $data['note'] ?? null,
+        ]);
+
+        $conversation->recruitmentRequestCandidate?->update(['employer_decision' => 'contacted']);
+
+        $this->emailCandidate($conversation, $dispatcher, 'chat.interview_scheduled', array_merge($this->emailVars($conversation), [
+            'interview_date' => $data['scheduled_at'],
+            'interview_location' => $data['location'],
+            'note' => $data['note'] ?? '',
+        ]));
+
+        return redirect()->route('employer.chat', ['conversation' => $conversation->id])
+            ->with('success', $label.' invitation sent to '.($candidate->user?->name ?? 'the candidate').'.');
     }
 
     private function syncEmployerConversations(int $companyId, int $userId): void

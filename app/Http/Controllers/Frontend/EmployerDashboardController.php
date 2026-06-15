@@ -8,6 +8,7 @@ use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\JobType;
 use App\Models\Location;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -581,6 +582,16 @@ class EmployerDashboardController extends BasePageController
             $query->where('is_available', $request->input('availability') === 'available');
         }
 
+        // Saved/shortlisted candidates this employer bookmarked from candidate profiles.
+        $savedIds = Wishlist::where('user_id', auth()->id())
+            ->where('wishlistable_type', Candidate::class)
+            ->pluck('wishlistable_id')
+            ->all();
+
+        if ($request->boolean('saved')) {
+            $query->whereIn('candidates.id', $savedIds ?: [0]);
+        }
+
         match ($request->input('sort')) {
             'experience' => $query->orderByDesc('experience_years')->latest(),
             'name' => $query
@@ -608,7 +619,36 @@ class EmployerDashboardController extends BasePageController
             'candidates' => $candidates,
             'locations' => $locations,
             'stats' => $stats,
+            'savedIds' => $savedIds,
+            'savedOnly' => $request->boolean('saved'),
         ]);
+    }
+
+    /**
+     * Toggle a candidate in the employer's saved shortlist (polymorphic wishlist).
+     */
+    public function toggleSavedCandidate(Candidate $candidate)
+    {
+        $userId = auth()->id();
+
+        $existing = Wishlist::where('user_id', $userId)
+            ->where('wishlistable_type', Candidate::class)
+            ->where('wishlistable_id', $candidate->id)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+
+            return back()->with('success', 'Candidate removed from your saved list.');
+        }
+
+        Wishlist::create([
+            'user_id' => $userId,
+            'wishlistable_type' => Candidate::class,
+            'wishlistable_id' => $candidate->id,
+        ]);
+
+        return back()->with('success', 'Candidate saved to your shortlist.');
     }
 
     public function resumeAlerts()
