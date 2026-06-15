@@ -26,11 +26,5 @@
     <form method="POST" action="{{ route('admin.contract-staffing.update', $job) }}" enctype="multipart/form-data" class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8 space-y-5 max-w-5xl">
         @csrf @method('PUT')
         @include('admin.contract-staffing.partials.form', ['job' => $job])
-        <div class="flex justify-end gap-2 pt-4 border-t border-gray-100">
-            <a href="{{ route('admin.contract-staffing.index') }}" class="px-5 py-2.5 text-sm text-gray-600 hover:text-gray-900">Cancel</a>
-            <button type="submit" class="px-6 py-2.5 bg-[#073057] hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-lg shadow transition">
-                Save Changes
-            </button>
-        </div>
     </form>
 @endsection
