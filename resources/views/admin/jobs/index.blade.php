@@ -57,6 +57,7 @@
                             <td class="px-5 py-3 text-gray-500">{{ $job->deadline?->format('M d, Y') ?? '—' }}</td>
                             <td class="px-5 py-3 text-right">
                                 <div class="flex items-center justify-end gap-2" x-data="{ open: false }">
+                                    <a href="{{ route('admin.jobs.show', $job) }}" class="text-gray-600 hover:text-[#073057] hover:underline text-sm">View</a>
                                     <div class="relative">
                                         <button @click="open = !open" class="text-[#1AAD94] hover:underline text-sm">Status ▾</button>
                                         <div x-show="open" @click.away="open = false" x-cloak

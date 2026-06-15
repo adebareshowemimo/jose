@@ -216,6 +216,14 @@ class AdminController extends Controller
         return back()->with('success', 'Job status updated.');
     }
 
+    public function showJob(JobListing $job)
+    {
+        $job->load(['company', 'postedBy', 'category', 'jobType', 'location'])
+            ->loadCount('applications');
+
+        return view('admin.jobs.show', compact('job'));
+    }
+
     public function deleteJob(JobListing $job)
     {
         $job->delete();
