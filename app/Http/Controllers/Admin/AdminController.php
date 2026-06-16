@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
+use App\Models\Category;
 use App\Models\Company;
 use App\Models\JobApplication;
 use App\Models\JobListing;
+use App\Models\JobType;
+use App\Models\Location;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Plan;
@@ -233,7 +236,10 @@ class AdminController extends Controller
         return view('admin.jobs.index', compact('jobs'));
     }
 
-    public function updateJob(Request $request, JobListing $job)
+    /**
+     * Quick status change from the job detail dropdown.
+     */
+    public function updateJobStatus(Request $request, JobListing $job)
     {
         $request->validate(['status' => 'required|in:draft,pending,active,paused,closed,expired']);
         $job->update([
@@ -242,6 +248,72 @@ class AdminController extends Controller
         ]);
 
         return back()->with('success', 'Job status updated.');
+    }
+
+    /**
+     * Full edit form for an employer's job posting.
+     */
+    public function editJob(JobListing $job)
+    {
+        $job->load(['company', 'category', 'jobType', 'location']);
+
+        return view('admin.jobs.edit', [
+            'job' => $job,
+            'categories' => Category::where('is_active', true)->orderBy('name')->get(),
+            'jobTypes' => JobType::where('is_active', true)->orderBy('name')->get(),
+            'locations' => Location::where('type', 'country')->where('is_active', true)->orderBy('name')->get(),
+        ]);
+    }
+
+    /**
+     * Persist admin edits to a job posting (all fields, plus approval/visibility).
+     */
+    public function updateJob(Request $request, JobListing $job)
+    {
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'category_id' => ['nullable', 'exists:categories,id'],
+            'job_type_id' => ['nullable', 'exists:job_types,id'],
+            'location_id' => ['nullable', Rule::exists('locations', 'id')->where('type', 'country')],
+            'address' => ['nullable', 'string', 'max:255'],
+            'description' => ['required', 'string', 'max:10000'],
+            'qualification' => ['nullable', 'string', 'max:5000'],
+            'experience_required' => ['nullable', 'string', 'max:255'],
+            'salary_min' => ['nullable', 'numeric', 'min:0'],
+            'salary_max' => ['nullable', 'numeric', 'min:0', 'gte:salary_min'],
+            'salary_type' => ['nullable', 'in:hourly,monthly,yearly'],
+            'deadline' => ['nullable', 'date'],
+            'vacancies' => ['nullable', 'integer', 'min:1'],
+            'hours' => ['nullable', 'string', 'max:255'],
+            'hours_type' => ['nullable', 'in:full-time,part-time'],
+            'gender_preference' => ['nullable', 'in:any,male,female'],
+            'status' => ['required', 'in:draft,pending,active,paused,closed,expired'],
+        ]);
+
+        $job->update([
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'qualification' => $data['qualification'] ?? null,
+            'category_id' => $data['category_id'] ?? null,
+            'job_type_id' => $data['job_type_id'] ?? null,
+            'location_id' => $data['location_id'] ?? null,
+            'address' => $data['address'] ?? null,
+            'salary_min' => $data['salary_min'] ?? null,
+            'salary_max' => $data['salary_max'] ?? null,
+            'salary_type' => $data['salary_type'] ?? null,
+            'experience_required' => $data['experience_required'] ?? null,
+            'deadline' => $data['deadline'] ?? null,
+            'vacancies' => $data['vacancies'] ?? null,
+            'hours' => $data['hours'] ?? null,
+            'hours_type' => $data['hours_type'] ?? null,
+            'gender_preference' => $data['gender_preference'] ?? 'any',
+            'status' => $data['status'],
+            'is_approved' => $request->boolean('is_approved'),
+            'is_featured' => $request->boolean('is_featured'),
+            'is_urgent' => $request->boolean('is_urgent'),
+        ]);
+
+        return redirect()->route('admin.jobs.show', $job)->with('success', 'Job updated successfully.');
     }
 
     public function showJob(JobListing $job)

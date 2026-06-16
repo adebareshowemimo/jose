@@ -315,7 +315,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Job Listings
     Route::get('/jobs', [AdminController::class, 'jobs'])->name('admin.jobs');
     Route::get('/jobs/{job}', [AdminController::class, 'showJob'])->name('admin.jobs.show');
+    Route::get('/jobs/{job}/edit', [AdminController::class, 'editJob'])->name('admin.jobs.edit');
     Route::put('/jobs/{job}', [AdminController::class, 'updateJob'])->name('admin.jobs.update');
+    Route::patch('/jobs/{job}/status', [AdminController::class, 'updateJobStatus'])->name('admin.jobs.status');
     Route::delete('/jobs/{job}', [AdminController::class, 'deleteJob'])->name('admin.jobs.delete');
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.categories.index');
     Route::post('/categories', [AdminCategoryController::class, 'store'])->name('admin.categories.store');

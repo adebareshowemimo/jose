@@ -54,13 +54,15 @@
                     <a href="{{ route('job.detail', $job->slug) }}" target="_blank"
                        class="px-3 py-2 text-sm font-medium border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">View public listing ↗</a>
                 @endif
+                <a href="{{ route('admin.jobs.edit', $job) }}"
+                   class="px-3 py-2 text-sm font-medium bg-[#1AAD94] text-white rounded-lg hover:bg-[#1AAD94]/90">Edit Job</a>
                 <div class="relative">
                     <button @click="open = !open" class="px-3 py-2 text-sm font-medium bg-[#073057] text-white rounded-lg hover:bg-[#073057]/90">Change Status ▾</button>
                     <div x-show="open" @click.away="open = false" x-cloak
                          class="absolute right-0 mt-1 w-36 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-10">
                         @foreach(['pending', 'active', 'paused', 'closed', 'expired', 'draft'] as $s)
-                            <form method="POST" action="{{ route('admin.jobs.update', $job) }}">
-                                @csrf @method('PUT')
+                            <form method="POST" action="{{ route('admin.jobs.status', $job) }}">
+                                @csrf @method('PATCH')
                                 <input type="hidden" name="status" value="{{ $s }}">
                                 <button type="submit" class="w-full text-left px-3 py-1.5 text-sm hover:bg-gray-50 {{ $job->status === $s ? 'font-semibold text-[#1AAD94]' : 'text-gray-600' }}">
                                     {{ ucfirst($s) }}
