@@ -659,7 +659,7 @@ class EmployerDashboardController extends BasePageController
                 ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
         }
 
-        $candidate->load(['user', 'location', 'skills', 'resumes' => fn ($q) => $q->latest()]);
+        $candidate->load(['user', 'location', 'skills', 'categories', 'resumes' => fn ($q) => $q->latest()]);
 
         $isSaved = Wishlist::where('user_id', $user->id)
             ->where('wishlistable_type', Candidate::class)

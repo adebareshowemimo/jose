@@ -21,8 +21,18 @@
     $awards = is_array($candidate->awards) ? $candidate->awards : [];
     $languages = is_array($candidate->languages) ? $candidate->languages : [];
     $social = is_array($candidate->social_links) ? $candidate->social_links : [];
-    $cv = $candidate->resumes->first(fn ($r) => ! empty($r->file_path));
+    $cvs = $candidate->resumes->filter(fn ($r) => ! empty($r->file_path))->values();
+    $cv = $cvs->first();
     $fmt = fn ($d) => $d ? \Illuminate\Support\Carbon::parse($d)->format('M Y') : null;
+
+    $email = $candidate->user?->email;
+    $phone = $candidate->user?->phone;
+    $dob = $candidate->date_of_birth;
+    $age = $dob ? $dob->age : null;
+    $categories = $candidate->categories;
+    $memberSince = $candidate->user?->created_at ?? $candidate->created_at;
+    $hasDetails = $candidate->gender || $dob || $candidate->education_level
+        || $candidate->expected_salary || $candidate->salary_type || $categories->isNotEmpty() || $memberSince;
 @endphp
 
 <div x-data="{ inviteOpen: false }">
@@ -176,6 +186,76 @@
                     </div>
                 </div>
             @endif
+
+            {{-- Candidate Details --}}
+            @if ($hasDetails)
+                <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 md:p-8">
+                    <h2 class="text-[#073057] text-lg font-bold mb-4">Candidate Details</h2>
+                    <dl class="grid sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
+                        @if ($candidate->gender)
+                            <div><dt class="text-xs uppercase tracking-widest text-gray-400 mb-1">Gender</dt><dd class="text-[#073057] font-semibold">{{ ucfirst($candidate->gender) }}</dd></div>
+                        @endif
+                        @if ($dob)
+                            <div><dt class="text-xs uppercase tracking-widest text-gray-400 mb-1">Date of birth</dt><dd class="text-[#073057] font-semibold">{{ $dob->format('M d, Y') }}@if ($age) <span class="text-[#6B7280] font-normal">({{ $age }} yrs)</span>@endif</dd></div>
+                        @endif
+                        @if ($candidate->education_level)
+                            <div><dt class="text-xs uppercase tracking-widest text-gray-400 mb-1">Education level</dt><dd class="text-[#073057] font-semibold">{{ $candidate->education_level }}</dd></div>
+                        @endif
+                        @if ($candidate->expected_salary || $candidate->salary_type)
+                            <div>
+                                <dt class="text-xs uppercase tracking-widest text-gray-400 mb-1">Expected salary</dt>
+                                <dd class="text-[#073057] font-semibold">
+                                    @if ($candidate->expected_salary)${{ number_format((float) $candidate->expected_salary) }}@endif
+                                    @if ($candidate->salary_type)<span class="text-[#6B7280] font-normal"> / {{ $candidate->salary_type }}</span>@endif
+                                </dd>
+                            </div>
+                        @endif
+                        @if ($memberSince)
+                            <div><dt class="text-xs uppercase tracking-widest text-gray-400 mb-1">Member since</dt><dd class="text-[#073057] font-semibold">{{ $memberSince->format('M Y') }}</dd></div>
+                        @endif
+                    </dl>
+
+                    @if ($categories->isNotEmpty())
+                        <div class="mt-5 pt-5 border-t border-gray-100">
+                            <p class="text-xs uppercase tracking-widest text-gray-400 mb-2">Desired roles</p>
+                            <div class="flex flex-wrap gap-2">
+                                @foreach ($categories as $cat)
+                                    <span class="px-3 py-1 bg-[#F3F4F6] text-[#4B5563] text-sm font-medium rounded-full">{{ $cat->name }}</span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            {{-- Intro video --}}
+            @if ($candidate->video_url)
+                <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 md:p-8">
+                    <h2 class="text-[#073057] text-lg font-bold mb-4">Intro Video</h2>
+                    <a href="{{ $candidate->video_url }}" target="_blank" rel="noopener" class="inline-flex items-center gap-2 text-[#1AAD94] font-semibold hover:underline">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Watch introduction video
+                    </a>
+                </div>
+            @endif
+
+            {{-- CVs / Documents --}}
+            @if ($cvs->isNotEmpty())
+                <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 md:p-8">
+                    <h2 class="text-[#073057] text-lg font-bold mb-4">CVs &amp; Documents</h2>
+                    <ul class="space-y-2">
+                        @foreach ($cvs as $r)
+                            <li>
+                                <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($r->file_path) }}" target="_blank" rel="noopener" download
+                                   class="flex items-center gap-2 text-sm font-semibold text-[#073057] hover:text-[#1AAD94]">
+                                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                    {{ $r->title ?: 'CV' }}@if ($r->is_default) <span class="text-xs font-normal text-[#6B7280]">· default</span>@endif
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
         </div>
 
         {{-- Sidebar actions --}}
@@ -221,6 +301,27 @@
                     <x-ui.button :href="route('employer.recruitment-requests.index')" variant="outline" class="w-full">Back to Hiring Services</x-ui.button>
                 </div>
             </div>
+
+            {{-- Contact --}}
+            @if ($email || $phone)
+                <div class="bg-white border border-[#E5E7EB] rounded-xl p-6">
+                    <h3 class="text-[#073057] text-base font-bold mb-3">Contact</h3>
+                    <div class="space-y-3 text-sm">
+                        @if ($email)
+                            <a href="mailto:{{ $email }}" class="flex items-center gap-3 text-[#4B5563] hover:text-[#1AAD94] break-all">
+                                <svg class="w-4 h-4 shrink-0 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                {{ $email }}
+                            </a>
+                        @endif
+                        @if ($phone)
+                            <a href="tel:{{ $phone }}" class="flex items-center gap-3 text-[#4B5563] hover:text-[#1AAD94]">
+                                <svg class="w-4 h-4 shrink-0 text-[#6B7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                {{ $phone }}
+                            </a>
+                        @endif
+                    </div>
+                </div>
+            @endif
 
             {{-- Links --}}
             @if (! empty($social) && (($social['linkedin'] ?? false) || ($social['twitter'] ?? false) || ($social['github'] ?? false) || $candidate->website))
