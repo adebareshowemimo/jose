@@ -21,11 +21,13 @@ class ContactSubmission extends Model
         'status',
         'priority',
         'reply_token',
+        'admin_viewed_at',
         'last_responded_at',
         'closed_at',
     ];
 
     protected $casts = [
+        'admin_viewed_at' => 'datetime',
         'last_responded_at' => 'datetime',
         'closed_at' => 'datetime',
     ];

@@ -178,6 +178,9 @@
                {{ str_starts_with($current, 'admin.chat') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.82L3 20l1.3-3.25A7.33 7.33 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                 Chat
+                @if(($sidebarCounts['chat'] ?? 0) > 0)
+                    <span title="Unread messages" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['chat'] > 99 ? '99+' : $sidebarCounts['chat'] }}</span>
+                @endif
             </a>
 
             {{-- Recruitment Requests --}}
@@ -197,6 +200,9 @@
                {{ str_starts_with($current, 'admin.contacts') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.82L3 20l1.3-3.25A7.33 7.33 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                 Contacts
+                @if(($sidebarCounts['contacts'] ?? 0) > 0)
+                    <span title="New contact messages" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['contacts'] > 99 ? '99+' : $sidebarCounts['contacts'] }}</span>
+                @endif
             </a>
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-white/30 uppercase tracking-wider">Jobs</p>
@@ -208,7 +214,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 Job Listings
                 @if(($sidebarCounts['jobs'] ?? 0) > 0)
-                    <span title="Jobs pending approval" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['jobs'] > 99 ? '99+' : $sidebarCounts['jobs'] }}</span>
+                    <span title="New job listings" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['jobs'] > 99 ? '99+' : $sidebarCounts['jobs'] }}</span>
                 @endif
             </a>
 

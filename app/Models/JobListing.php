@@ -19,6 +19,7 @@ class JobListing extends Model
         'gender_preference', 'deadline', 'apply_method', 'apply_url', 'apply_email',
         'vacancies', 'thumbnail', 'gallery', 'video_url', 'hours', 'hours_type',
         'is_featured', 'is_urgent', 'is_approved', 'is_contract_staffing', 'status',
+        'admin_viewed_at',
     ];
 
     protected function casts(): array
@@ -30,6 +31,7 @@ class JobListing extends Model
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'deadline' => 'date',
+            'admin_viewed_at' => 'datetime',
             'is_featured' => 'boolean',
             'is_urgent' => 'boolean',
             'is_approved' => 'boolean',

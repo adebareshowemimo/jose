@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use App\Models\ChatConversation;
+use App\Models\ChatMessage;
 use App\Models\Company;
 use App\Models\ContactSubmission;
 use App\Models\JobApplication;
@@ -78,17 +80,18 @@ class AdminAlerts
 
     /**
      * Per-section counts of new / unopened records for the admin sidebar badges.
-     * Each clears as the admin processes the items (approves the job, verifies the
-     * company, reviews the application, opens the recruitment request).
+     * Each clears as the admin processes the items (opens the job listing, verifies
+     * the company, reviews the application, opens the request, reads the message).
      *
-     * @return array{jobs:int,applications:int,companies:int,recruitment:int}
+     * @return array{jobs:int,applications:int,companies:int,recruitment:int,contacts:int,chat:int}
      */
     public static function sidebarCounts(): array
     {
         return [
-            // Jobs awaiting approval.
+            // New job listings the admin hasn't opened yet (contract staffing is
+            // managed elsewhere, so it's excluded to match the jobs list).
             'jobs' => Schema::hasTable('job_listings')
-                ? JobListing::where('status', 'pending')->count() : 0,
+                ? JobListing::regularJobs()->whereNull('admin_viewed_at')->count() : 0,
             // New applications not yet actioned (status set to 'applied' on submit).
             'applications' => Schema::hasTable('job_applications')
                 ? JobApplication::where('status', 'applied')->count() : 0,
@@ -98,6 +101,21 @@ class AdminAlerts
             // Hiring/CV requests the admin hasn't opened yet.
             'recruitment' => Schema::hasTable('recruitment_requests')
                 ? RecruitmentRequest::where('status', 'pending')->count() : 0,
+            // Contact submissions the admin hasn't opened yet.
+            'contacts' => Schema::hasTable('contact_submissions')
+                ? ContactSubmission::whereNull('admin_viewed_at')->count() : 0,
+            // Unread chat messages addressed to the admin (cleared when the
+            // conversation is opened — see Admin\ChatController::index()).
+            'chat' => Schema::hasTable('chat_messages')
+                ? ChatMessage::query()
+                    ->whereNull('read_at')
+                    ->where('sender_role', '!=', ChatMessage::ROLE_ADMIN)
+                    ->whereHas('conversation', fn ($q) => $q->whereIn('type', [
+                        ChatConversation::TYPE_ADMIN_CANDIDATE,
+                        ChatConversation::TYPE_ADMIN_EMPLOYER,
+                    ]))
+                    ->count()
+                : 0,
         ];
     }
 

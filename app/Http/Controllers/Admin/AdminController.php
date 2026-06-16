@@ -202,7 +202,8 @@ class AdminController extends Controller
 
     public function jobs(Request $request)
     {
-        $query = JobListing::with(['company']);
+        // Contract-staffing postings have their own admin section; keep them out of the jobs list.
+        $query = JobListing::regularJobs()->with(['company']);
 
         if ($request->filled('search')) {
             $term = trim((string) $request->search);
@@ -239,6 +240,12 @@ class AdminController extends Controller
 
     public function showJob(JobListing $job)
     {
+        // Clear the sidebar "new listing" badge for this job (without bumping updated_at).
+        if (is_null($job->admin_viewed_at)) {
+            JobListing::whereKey($job->getKey())->toBase()->update(['admin_viewed_at' => now()]);
+            $job->admin_viewed_at = now();
+        }
+
         $job->load(['company', 'postedBy', 'category', 'jobType', 'location'])
             ->loadCount('applications');
 

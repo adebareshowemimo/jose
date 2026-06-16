@@ -58,6 +58,12 @@ class ContactSubmissionController extends Controller
 
     public function show(ContactSubmission $contact)
     {
+        // Clear the sidebar "new message" badge for this submission (without bumping updated_at).
+        if (is_null($contact->admin_viewed_at)) {
+            ContactSubmission::whereKey($contact->getKey())->toBase()->update(['admin_viewed_at' => now()]);
+            $contact->admin_viewed_at = now();
+        }
+
         $contact->load('chronologicalMessages');
 
         return view('admin.contacts.show', compact('contact'));
