@@ -11,8 +11,8 @@
 <div class="space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-[#073057]">{{ $savedOnly ? 'Your Shortlist' : 'Browse Resumes' }}</h2>
-            <p class="text-[#6B7280]">{{ $savedOnly ? 'Candidates you saved from their profiles.' : 'Search real candidate profiles with uploaded CVs.' }}</p>
+            <h2 class="text-2xl font-bold text-[#073057]">{{ $savedOnly ? 'Your Saved CVs' : 'Browse Resumes' }}</h2>
+            <p class="text-[#6B7280]">{{ $savedOnly ? 'CVs from the candidates you saved to your shortlist.' : 'Search real candidate profiles with uploaded CVs.' }}</p>
         </div>
         <div class="inline-flex rounded-xl border border-[#E5E7EB] bg-white p-1">
             <a href="{{ route('employer.resumes') }}"
@@ -132,7 +132,7 @@
                                 </div>
                                 <p class="text-[#1AAD94] font-medium">{{ $candidate->title ?? 'Candidate profile' }}</p>
                             </div>
-                            <span class="text-xs text-[#6B7280]">CV uploaded {{ $resume?->created_at?->diffForHumans() }}</span>
+                            <span class="text-xs text-[#6B7280]">{{ $resume ? 'CV uploaded '.$resume->created_at?->diffForHumans() : 'No CV on file' }}</span>
                         </div>
 
                         <div class="flex flex-wrap items-center gap-4 text-sm text-[#6B7280] mb-3">
@@ -169,11 +169,20 @@
                     </div>
 
                     <div class="flex md:flex-col gap-2 md:w-auto w-full">
-                        @if($candidate->slug)
-                            <a href="{{ route('candidate.detail', $candidate->slug) }}" target="_blank" class="flex-1 md:flex-none px-5 py-2.5 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-semibold rounded-xl transition text-center">View Profile</a>
-                        @endif
                         @if($resume)
-                            <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($resume->file_path) }}" target="_blank" rel="noopener" class="flex-1 md:flex-none px-5 py-2.5 border border-[#E5E7EB] text-[#4B5563] text-sm font-semibold rounded-xl hover:bg-[#F9FAFB] transition text-center">Open CV</a>
+                            <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($resume->file_path) }}" target="_blank" rel="noopener"
+                               class="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-xl transition text-center {{ $savedOnly ? 'bg-[#1AAD94] hover:bg-[#158f7a] text-white' : 'border border-[#E5E7EB] text-[#4B5563] hover:bg-[#F9FAFB]' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                Open CV
+                            </a>
+                        @elseif($savedOnly)
+                            <span class="flex-1 md:flex-none inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-sm font-semibold rounded-xl text-center border border-dashed border-[#E5E7EB] text-[#9CA3AF] cursor-default" title="This candidate has not uploaded a CV yet">
+                                No CV uploaded yet
+                            </span>
+                        @endif
+                        @if($candidate->slug)
+                            <a href="{{ route('candidate.detail', $candidate->slug) }}" target="_blank"
+                               class="flex-1 md:flex-none px-5 py-2.5 text-sm font-semibold rounded-xl transition text-center {{ $savedOnly ? 'border border-[#E5E7EB] text-[#4B5563] hover:bg-[#F9FAFB]' : 'bg-[#1AAD94] hover:bg-[#158f7a] text-white' }}">View Profile</a>
                         @endif
                         <form method="POST" action="{{ route('employer.saved-candidates.toggle', $candidate->id) }}" class="flex-1 md:flex-none">
                             @csrf
