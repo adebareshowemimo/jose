@@ -24,3 +24,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Misplaced / local-only artifacts (not part of the app)
+/public/images/premium/OneDrive_1_4-30-2026.zip
+/public/images/premium/New/certificate/
+/public/images/premium/New/coursecertificate/
+*cs-page.html
