@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRecruitmentRequest;
+use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\JobType;
 use App\Models\Location;
@@ -11,6 +12,7 @@ use App\Models\RecruitmentRequest;
 use App\Models\RecruitmentRequestCandidate;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Wishlist;
 use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -171,6 +173,18 @@ class RecruitmentRequestController extends Controller
             'employer_decision' => $data['decision'],
             'employer_feedback' => $data['feedback'] ?? $candidate->employer_feedback,
         ]);
+
+        // Mirror a "shortlisted" decision into the employer's Saved CVs shortlist so the
+        // candidate also surfaces under /employer/resumes?saved=1 (which reads the
+        // wishlist). Only platform candidates have a Candidate profile to show there.
+        // We add but never auto-remove, so a manual save is never silently undone.
+        if ($data['decision'] === 'shortlisted' && $candidate->candidate_id) {
+            Wishlist::firstOrCreate([
+                'user_id' => $request->user()->id,
+                'wishlistable_type' => Candidate::class,
+                'wishlistable_id' => $candidate->candidate_id,
+            ]);
+        }
 
         return back()->with('success', "Marked as {$data['decision']}.");
     }
