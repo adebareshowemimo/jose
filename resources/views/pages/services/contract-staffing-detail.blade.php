@@ -1,104 +1,60 @@
 @extends('layouts.app')
 
-@section('title', $pageTitle . ' — Jose Consulting Limited')
-@section('meta_description', $pageDescription)
+@section('title', ($job->title ?? 'Contract Role') . ' — Jose Consulting Limited')
+@section('meta_description', $pageDescription ?? '')
 
 @section('content')
-
-{{-- Hero --}}
-<section class="relative py-16 bg-[#073057] overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-br from-[#073057] via-[#073057] to-[#0a4275] opacity-95"></div>
-    <div class="container mx-auto px-6 relative z-10">
-        <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
-        <div class="flex flex-wrap items-center gap-3 mb-4">
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-[#1AAD94]/15 text-[#7DE1D1] px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em]">
-                <iconify-icon icon="lucide:briefcase"></iconify-icon>
-                Contract Role
-            </span>
-            @if ($job->is_urgent)
-                <span class="text-[11px] font-bold uppercase tracking-[0.12em] text-red-300">Urgent</span>
-            @endif
-            @if ($job->is_featured)
-                <span class="text-[11px] font-bold uppercase tracking-[0.12em] text-amber-300">Featured</span>
-            @endif
-        </div>
-        <h1 class="text-[36px] md:text-[48px] font-extrabold text-white leading-tight">{{ $job->title }}</h1>
-        <div class="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-white/70 text-sm">
-            @if ($job->location || $job->address)
-                <span class="inline-flex items-center gap-1.5"><iconify-icon icon="lucide:map-pin"></iconify-icon> {{ $job->location?->name ?? $job->address }}</span>
-            @endif
-            @if ($job->hours)
-                <span class="inline-flex items-center gap-1.5"><iconify-icon icon="lucide:clock"></iconify-icon> {{ $job->hours }}</span>
-            @endif
-            @if ($job->category)
-                <span class="inline-flex items-center gap-1.5"><iconify-icon icon="lucide:tag"></iconify-icon> {{ $job->category->name }}</span>
-            @endif
-            @if ($job->deadline)
-                <span class="inline-flex items-center gap-1.5"><iconify-icon icon="lucide:calendar"></iconify-icon> Apply by {{ $job->deadline->format('M d, Y') }}</span>
-            @endif
-        </div>
-    </div>
-</section>
-
-{{-- Main content --}}
-<section class="py-16 bg-white">
+@php
+    // Mirror the regular job-detail page (pages/jobs/detail) so contract roles
+    // present identically: title, company • location, type/salary pills, summary,
+    // requirements and the apply sidebar.
+    $type = $job->jobType?->name ?? ucfirst((string) ($job->hours_type ?: 'Contract'));
+    $company = $job->company?->name ?? 'Jose Consulting Limited';
+    $location = $job->location?->name ?? $job->address ?? 'Worldwide';
+    $salary = ($job->salary_min || $job->salary_max)
+        ? trim(($job->salary_min ? number_format((float) $job->salary_min) : '') . ' - ' . ($job->salary_max ? number_format((float) $job->salary_max) : '') . ' ' . ($job->salary_type ?? ''))
+        : 'Not disclosed';
+    $requirements = array_filter(preg_split('/\r\n|\r|\n/', (string) $job->qualification));
+@endphp
+<section class="py-16 bg-[#F9FAFB] min-h-[65vh]">
     <div class="container mx-auto px-6">
-        <div class="grid lg:grid-cols-[1fr_360px] gap-10 items-start">
-            {{-- Description --}}
-            <article class="prose prose-slate max-w-none">
-                {!! $job->description !!}
+        <x-ui.breadcrumbs :items="$breadcrumbs ?? []" />
 
-                @if ($job->qualification)
-                    <h3 class="mt-8">Qualifications</h3>
-                    <p>{{ $job->qualification }}</p>
-                @endif
-            </article>
+        <div class="grid lg:grid-cols-[1fr_360px] gap-6">
+            <div class="bg-white border border-[#E0E0E0] rounded-[12px] p-8">
+                <h1 class="text-[38px] font-extrabold text-[#073057] leading-tight mb-3">{{ $job->title }}</h1>
+                <p class="text-[#6B7280] mb-6">{{ $company }} • {{ $location }}</p>
 
-            {{-- Sidebar --}}
-            <aside class="space-y-6 lg:sticky lg:top-24">
-                <div class="rounded-2xl border border-[#E5E7EB] bg-[#F9FAFB] p-6">
-                    <h3 class="text-[14px] font-bold uppercase tracking-[0.1em] text-[#073057] mb-4">Role Snapshot</h3>
-                    <dl class="space-y-3 text-sm">
-                        @if ($job->salary_min || $job->salary_max)
-                            <div class="flex justify-between gap-3">
-                                <dt class="text-[#6B7280]">Salary</dt>
-                                <dd class="font-bold text-[#073057] text-right">
-                                    {{ $job->salary_min ? number_format((float) $job->salary_min, 0) : '?' }}–{{ $job->salary_max ? number_format((float) $job->salary_max, 0) : '?' }}
-                                    <span class="font-normal text-[#6B7280] text-xs">/ {{ $job->salary_type ?? '—' }}</span>
-                                </dd>
-                            </div>
-                        @endif
-                        @if ($job->experience_required)
-                            <div class="flex justify-between gap-3">
-                                <dt class="text-[#6B7280]">Experience</dt>
-                                <dd class="font-semibold text-[#073057] text-right">{{ $job->experience_required }}</dd>
-                            </div>
-                        @endif
-                        @if ($job->vacancies)
-                            <div class="flex justify-between gap-3">
-                                <dt class="text-[#6B7280]">Vacancies</dt>
-                                <dd class="font-semibold text-[#073057]">{{ $job->vacancies }}</dd>
-                            </div>
-                        @endif
-                        @if ($job->hours_type)
-                            <div class="flex justify-between gap-3">
-                                <dt class="text-[#6B7280]">Schedule</dt>
-                                <dd class="font-semibold text-[#073057]">{{ ucfirst(str_replace('-', ' ', $job->hours_type)) }}</dd>
-                            </div>
-                        @endif
-                        @if ($job->deadline)
-                            <div class="flex justify-between gap-3">
-                                <dt class="text-[#6B7280]">Deadline</dt>
-                                <dd class="font-semibold text-[#073057]">{{ $job->deadline->format('M d, Y') }}</dd>
-                            </div>
-                        @endif
-                    </dl>
+                <div class="flex flex-wrap gap-3 mb-6">
+                    <span class="px-3 py-1 rounded-full bg-[#1AAD94]/10 text-[#1AAD94] text-xs font-bold uppercase">{{ $type }}</span>
+                    <span class="px-3 py-1 rounded-full bg-[#16A34A]/10 text-[#16A34A] text-xs font-bold">{{ $salary }}</span>
                 </div>
 
+                <h2 class="text-[#073057] text-xl font-bold mb-3">Role Summary</h2>
+                <div class="text-[#2C2C2C] leading-relaxed mb-8 prose prose-slate max-w-none">{!! $job->description !!}</div>
+
+                @if(!empty($requirements))
+                    <h2 class="text-[#073057] text-xl font-bold mb-3">Requirements</h2>
+                    <ul class="space-y-2 mb-8">
+                        @foreach($requirements as $requirement)
+                            <li class="flex items-start gap-2 text-[#2C2C2C]"><iconify-icon icon="lucide:check-circle-2" class="text-[#1AAD94] mt-1"></iconify-icon><span>{{ $requirement }}</span></li>
+                        @endforeach
+                    </ul>
+                @endif
+
+                <div class="flex flex-wrap gap-3">
+                    <x-ui.button :href="route('services.contract-staffing.jobs')" variant="outline">Back to Roles</x-ui.button>
+                </div>
+            </div>
+
+            <div class="space-y-4 h-fit">
                 <x-jobs.application-form :job="$job" />
-            </aside>
+                <div class="bg-white border border-[#E0E0E0] rounded-[12px] p-6">
+                    <h3 class="text-[#073057] text-base font-bold mb-3">Need help?</h3>
+                    <x-ui.button :href="route('contact.index')" variant="outline" class="w-full">Ask Recruiter</x-ui.button>
+                </div>
+            </div>
         </div>
     </div>
 </section>
-
 @endsection

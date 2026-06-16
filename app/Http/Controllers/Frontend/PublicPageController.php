@@ -1130,7 +1130,7 @@ class PublicPageController extends BasePageController
         $job = JobListing::contractStaffing()
             ->where('slug', $slug)
             ->where('status', 'active')
-            ->with(['category', 'location', 'jobType'])
+            ->with(['category', 'location', 'jobType', 'company'])
             ->firstOrFail();
 
         return view('pages.services.contract-staffing-detail', $this->buildJclPageData(
