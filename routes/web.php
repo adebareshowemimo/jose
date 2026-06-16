@@ -239,6 +239,7 @@ Route::prefix('employer')->middleware(['auth', 'role.selected'])->group(function
     Route::get('/applicants', [EmployerDashboardController::class, 'applicants'])->name('employer.applicants');
     Route::get('/resumes', [EmployerDashboardController::class, 'browseResumes'])->name('employer.resumes');
     Route::post('/saved-candidates/{candidate}', [EmployerDashboardController::class, 'toggleSavedCandidate'])->name('employer.saved-candidates.toggle');
+    Route::get('/candidates/{candidate}', [EmployerDashboardController::class, 'showCandidate'])->name('employer.candidates.show');
     Route::post('/candidates/{candidate}/invite', [ChatController::class, 'invite'])->name('employer.candidates.invite');
     Route::get('/resume-alerts', [EmployerDashboardController::class, 'resumeAlerts'])->name('employer.resume-alerts');
     Route::get('/chat', [ChatController::class, 'employer'])->name('employer.chat');

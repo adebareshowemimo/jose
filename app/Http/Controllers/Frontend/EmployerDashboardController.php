@@ -8,6 +8,7 @@ use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\JobType;
 use App\Models\Location;
+use App\Models\RecruitmentRequestCandidate;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -626,6 +627,48 @@ class EmployerDashboardController extends BasePageController
             'stats' => $stats,
             'savedIds' => $savedIds,
             'savedOnly' => $savedOnly,
+        ]);
+    }
+
+    /**
+     * Employer-dedicated candidate profile. Lets the employer review the full profile,
+     * save the CV, save the candidate to their shortlist and invite them — all in one
+     * place. Access is restricted to candidates delivered to the employer's own
+     * recruitment requests (mirrors PublicPageController::candidateDetail()).
+     */
+    public function showCandidate(Candidate $candidate)
+    {
+        $user = auth()->user();
+        $companyId = $user->company?->id;
+
+        $isDeliveredToEmployer = RecruitmentRequestCandidate::query()
+            ->where('candidate_id', $candidate->id)
+            ->whereHas('recruitmentRequest', function ($q) use ($user, $companyId) {
+                $q->where(function ($sub) use ($user, $companyId) {
+                    $sub->where('requested_by_user_id', $user->id);
+                    if ($companyId) {
+                        $sub->orWhere('company_id', $companyId);
+                    }
+                });
+            })
+            ->exists();
+
+        if (! $isDeliveredToEmployer) {
+            return redirect()
+                ->route('employer.recruitment-requests.index')
+                ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
+        }
+
+        $candidate->load(['user', 'location', 'skills', 'resumes' => fn ($q) => $q->latest()]);
+
+        $isSaved = Wishlist::where('user_id', $user->id)
+            ->where('wishlistable_type', Candidate::class)
+            ->where('wishlistable_id', $candidate->id)
+            ->exists();
+
+        return view('pages.dashboard.employer.candidates.show', [
+            'candidate' => $candidate,
+            'isSaved' => $isSaved,
         ]);
     }
 
