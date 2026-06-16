@@ -6,6 +6,7 @@ use App\Models\Candidate;
 use App\Models\Event;
 use App\Models\JobListing;
 use App\Models\NewsArticle;
+use App\Models\RecruitmentRequestCandidate;
 use App\Models\TrainingCategory;
 use App\Models\TrainingProgram;
 use App\Models\Wishlist;
@@ -478,13 +479,47 @@ class PublicPageController extends BasePageController
         $user = auth()->user();
         $roleName = $user?->role?->name;
 
-        // Employers don't browse candidate profiles directly. They only ever review the
-        // candidates that have been delivered to them via their recruitment requests, so
-        // send them to that list instead of exposing this profile page.
+        // Employers don't browse candidate profiles directly. They may only view a profile
+        // for a candidate that has actually been delivered to one of their own recruitment
+        // requests. Any other candidate is off-limits, so send them back to that list.
         if ($roleName === 'employer') {
-            return redirect()
-                ->route('employer.recruitment-requests.index')
-                ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
+            $companyId = $user->company?->id;
+
+            // A candidate is viewable to this employer when they've been delivered to a
+            // recruitment request that belongs to the employer — linked either by the user
+            // who raised the request or by the employer's company. We check both because a
+            // request may have been created/delivered before the company profile was set,
+            // leaving company_id null while requested_by_user_id still points at the employer.
+            $isDeliveredToEmployer = RecruitmentRequestCandidate::query()
+                ->where('candidate_id', $candidate->id)
+                ->whereHas('recruitmentRequest', function ($q) use ($user, $companyId) {
+                    $q->where(function ($sub) use ($user, $companyId) {
+                        $sub->where('requested_by_user_id', $user->id);
+                        if ($companyId) {
+                            $sub->orWhere('company_id', $companyId);
+                        }
+                    });
+                })
+                ->exists();
+
+            if (! $isDeliveredToEmployer) {
+                return redirect()
+                    ->route('employer.recruitment-requests.index')
+                    ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
+            }
+
+            return view('pages.candidates.detail', [
+                'pageTitle' => $candidate->user?->name ?? 'Candidate',
+                'pageDescription' => 'Candidate profile: ' . ($candidate->user?->name ?? 'Candidate'),
+                'breadcrumbs' => [
+                    ['label' => 'Home', 'url' => url('/')],
+                    ['label' => 'Recruitment Requests', 'url' => route('employer.recruitment-requests.index')],
+                    ['label' => $candidate->user?->name ?? 'Candidate'],
+                ],
+                'candidate' => $candidate,
+                'isAdmin' => false,
+                'isOwner' => false,
+            ]);
         }
 
         // This is a private profile page: only an admin or the candidate themselves may
