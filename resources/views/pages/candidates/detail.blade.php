@@ -174,7 +174,7 @@
 
                     <div class="space-y-3">
                         @if ($cv)
-                            <a href="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($cv->file_path) }}" target="_blank" rel="noopener"
+                            <a href="{{ $cv->url() }}" target="_blank" rel="noopener"
                                class="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#073057] hover:brightness-110 text-white text-sm font-bold rounded-lg transition">
                                 <iconify-icon icon="lucide:download"></iconify-icon>
                                 Download CV
