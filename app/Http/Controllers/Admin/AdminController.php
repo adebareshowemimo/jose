@@ -173,6 +173,12 @@ class AdminController extends Controller
 
     public function showCompany(Company $company)
     {
+        // Clear the sidebar "new company" badge for this record (without bumping updated_at).
+        if (is_null($company->admin_viewed_at)) {
+            Company::whereKey($company->getKey())->toBase()->update(['admin_viewed_at' => now()]);
+            $company->admin_viewed_at = now();
+        }
+
         $company->load(['owner', 'location', 'industries', 'jobListings', 'reviews']);
         return view('admin.companies.show', compact('company'));
     }
@@ -494,6 +500,10 @@ class AdminController extends Controller
         } elseif ($source === 'regular') {
             $query->whereHas('jobListing', fn ($q) => $q->where('is_contract_staffing', false));
         }
+
+        // Opening the applications screen clears the sidebar "new applications" badge
+        // for everything matching the current filter (without bumping updated_at).
+        (clone $query)->whereNull('admin_viewed_at')->toBase()->update(['admin_viewed_at' => now()]);
 
         $applications = $query->latest()->paginate(20)->withQueryString();
         return view('admin.applications.index', compact('applications'));

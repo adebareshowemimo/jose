@@ -17,7 +17,7 @@ class Company extends Model
         'owner_id', 'name', 'slug', 'email', 'phone', 'website', 'about',
         'logo', 'cover_image', 'founded_in', 'company_size', 'location_id',
         'address', 'latitude', 'longitude', 'social_links', 'review_score',
-        'is_featured', 'is_verified', 'allow_search', 'status',
+        'is_featured', 'is_verified', 'allow_search', 'status', 'admin_viewed_at',
     ];
 
     protected function casts(): array
@@ -30,6 +30,7 @@ class Company extends Model
             'is_featured' => 'boolean',
             'is_verified' => 'boolean',
             'allow_search' => 'boolean',
+            'admin_viewed_at' => 'datetime',
         ];
     }
 

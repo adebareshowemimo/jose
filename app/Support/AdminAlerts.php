@@ -92,12 +92,12 @@ class AdminAlerts
             // managed elsewhere, so it's excluded to match the jobs list).
             'jobs' => Schema::hasTable('job_listings')
                 ? JobListing::regularJobs()->whereNull('admin_viewed_at')->count() : 0,
-            // New applications not yet actioned (status set to 'applied' on submit).
+            // New applications the admin hasn't opened on the applications screen yet.
             'applications' => Schema::hasTable('job_applications')
-                ? JobApplication::where('status', 'applied')->count() : 0,
-            // New companies the admin hasn't verified yet.
+                ? JobApplication::whereNull('admin_viewed_at')->count() : 0,
+            // New companies the admin hasn't opened yet.
             'companies' => Schema::hasTable('companies')
-                ? Company::where('is_verified', false)->count() : 0,
+                ? Company::whereNull('admin_viewed_at')->count() : 0,
             // Hiring/CV requests the admin hasn't opened yet.
             'recruitment' => Schema::hasTable('recruitment_requests')
                 ? RecruitmentRequest::where('status', 'pending')->count() : 0,
