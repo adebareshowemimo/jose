@@ -17,7 +17,7 @@
     <div class="absolute inset-0 hero-overlay"></div>
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
-        <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-tight max-w-3xl">{{ $pageTitle ?? 'Amplifying Impact through Strategic Alliances' }}</h1>
+        <h1 class="text-[32px] sm:text-[48px] md:text-[64px] font-extrabold text-white leading-tight max-w-3xl">{{ $pageTitle ?? 'Amplifying Impact through Strategic Alliances' }}</h1>
         @if(!empty($pageDescription))
             <p class="mt-4 max-w-xl text-lg text-white/70">{{ $pageDescription }}</p>
         @endif
@@ -28,7 +28,7 @@
 <section class="bg-[#F9FAFB] py-24">
     <div class="container mx-auto px-6">
         <div class="grid gap-8 lg:grid-cols-2">
-            <div class="rounded-[32px] bg-white border border-[#E0E0E0] p-10 shadow-sm flex flex-col h-full">
+            <div class="rounded-[32px] bg-white border border-[#E0E0E0] p-6 sm:p-10 shadow-sm flex flex-col h-full">
                 <div class="inline-flex self-start rounded-full bg-[#1AAD94]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#1AAD94] mb-6">Expertise & Scale</div>
                 <h2 class="text-[36px] font-extrabold text-[#073057] leading-tight mb-6">Scaling specialist delivery for the global maritime fleet.</h2>
                 <p class="text-[#6B7280] leading-relaxed mb-8">Through its leadership network and technical partners, JCL can mobilize specialized training teams within two weeks' notice, enabling a flexible response to corporate, institutional, or group needs.</p>
@@ -47,7 +47,7 @@
             </div>
 
             <div class="flex flex-col gap-8">
-                <div class="rounded-[32px] bg-[#073057] p-10 text-white shadow-xl relative overflow-hidden flex-1 flex flex-col justify-center">
+                <div class="rounded-[32px] bg-[#073057] p-6 sm:p-10 text-white shadow-xl relative overflow-hidden flex-1 flex flex-col justify-center">
                     <div class="absolute right-0 top-0 h-40 w-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                     <div class="relative z-10">
                         <div class="inline-flex rounded-full bg-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#7DE1D1] mb-6">Mobilization Promise</div>
@@ -75,7 +75,7 @@
                              alt="{{ $partner['name'] }} operations"
                              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
                     </div>
-                    <div class="p-10">
+                    <div class="p-6 sm:p-10">
                         <div class="flex justify-between items-start mb-6">
                             <div class="inline-flex rounded-full bg-[#1AAD94]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#1AAD94]">{{ $partner['lead'] }}</div>
                             <iconify-icon icon="lucide:network" class="text-2xl text-[#073057]/20"></iconify-icon>
@@ -94,7 +94,7 @@
 <section class="bg-[#F9FAFB] py-24">
     <div class="container mx-auto px-6">
         <div class="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
-            <div class="rounded-[32px] bg-white border border-[#E0E0E0] p-12 shadow-sm h-full">
+            <div class="rounded-[32px] bg-white border border-[#E0E0E0] p-6 sm:p-12 shadow-sm h-full">
                 <div class="inline-flex rounded-full bg-[#1AAD94]/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#1AAD94] mb-8">Value Proposition</div>
                 <h2 class="text-[40px] font-extrabold text-[#073057] leading-tight mb-8">Connecting local talent to international standards.</h2>
                 <div class="grid gap-6 md:grid-cols-2">
@@ -113,7 +113,7 @@
                 </div>
             </div>
 
-            <div class="rounded-[32px] bg-[#073057] p-10 text-white shadow-xl h-full flex flex-col">
+            <div class="rounded-[32px] bg-[#073057] p-6 sm:p-10 text-white shadow-xl h-full flex flex-col">
                 <div class="inline-flex self-start rounded-full bg-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#7DE1D1] mb-8">Take the next step</div>
                 <p class="text-white/70 text-lg leading-relaxed mb-10">Ready to integrate our expertise into your operations or join our elite network of maritime professionals?</p>
                 <div class="flex flex-col gap-4 mt-auto">

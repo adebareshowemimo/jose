@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* Explicitly register every Blade source so the compiled stylesheet contains
+   all utility classes used by the public site, dashboard, admin and the
+   Layout module — independent of Tailwind's automatic content detection.
+   (The public + admin layouts previously relied on the Tailwind Play CDN,
+   so their classes were never compiled into this file.) */
+@source "../views";
+@source "../../modules";
+
 /* ===================================================
    JOSEOCEANJOBS — Design Tokens & Custom Theme
    Based on JCL Brand Guide

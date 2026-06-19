@@ -14,6 +14,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
+        /* Prevent wide content (long numbers/emails/tables) from making the page
+           wider than the device on mobile. `clip` keeps the sticky/fixed UI intact. */
+        html, body { overflow-x: clip; }
         [x-cloak] { display: none !important; }
         button:not(:disabled), [type="button"]:not(:disabled), [type="submit"]:not(:disabled), [type="reset"]:not(:disabled), [role="button"], a[href], label[for], label:has(input[type="checkbox"]), label:has(input[type="radio"]), summary, select, input[type="checkbox"], input[type="radio"], input[type="file"] { cursor: pointer; }
         button:disabled, [type="button"]:disabled, [type="submit"]:disabled, [type="reset"]:disabled { cursor: not-allowed; }
@@ -157,8 +160,13 @@
     <div class="sidebar-backdrop" :class="{ 'active': sidebarOpen }" @click="sidebarOpen = false"></div>
 
     {{-- Sidebar --}}
-    <aside class="fixed top-0 left-0 w-64 h-full bg-white border-r border-[#E5E7EB] z-50 transition-transform duration-300 -translate-x-full lg:translate-x-0"
-           :class="sidebarOpen ? 'translate-x-0' : ''">
+    {{-- Mobile drawer. NOTE: no `transition-transform` here. Tailwind v4's
+         translate-x-* utilities derive from a non-interpolatable @property var,
+         so a CSS transition on them stalls and the drawer never finishes
+         sliding in. Without the transition the translate swap applies instantly
+         and reliably. --}}
+    <aside class="fixed top-0 left-0 w-64 h-full bg-white border-r border-[#E5E7EB] z-50 lg:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0' : '-translate-x-64'">
         
         {{-- Logo --}}
         <div class="h-16 flex items-center justify-between px-4 bg-[#073057] border-b border-white/10">

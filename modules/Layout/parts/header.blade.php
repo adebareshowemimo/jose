@@ -6,17 +6,20 @@
     <div class="container mx-auto px-6">
         <div class="flex min-h-[84px] items-center justify-between gap-4">
 
-            {{-- Logo --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-3 no-underline shrink-0">
+            {{-- Logo — must shrink on narrow phones so the hamburger always fits.
+                 (A fixed-width brand lockup here previously pushed the mobile
+                 toggle off-screen and forced the viewport wider than the device,
+                 making the whole site look "zoomed out".) --}}
+            <a href="{{ route('home') }}" class="flex items-center gap-2 sm:gap-3 no-underline min-w-0 shrink">
                 <img src="{{ asset('images/dark_logo.png') }}" alt="JCL Logo"
-                     class="h-12 w-auto"
+                     class="h-10 sm:h-12 w-auto shrink-0"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-                <div class="hidden h-12 w-12 items-center justify-center rounded-full bg-[#1AAD94] shrink-0 shadow-[0_8px_24px_rgba(26,173,148,0.25)]">
-                    <span class="text-base font-bold tracking-widest text-white">JCL</span>
+                <div class="hidden h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-[#1AAD94] shrink-0 shadow-[0_8px_24px_rgba(26,173,148,0.25)]">
+                    <span class="text-sm sm:text-base font-bold tracking-widest text-white">JCL</span>
                 </div>
-                <div class="flex flex-col leading-tight">
-                    <span class="text-2xl font-extrabold tracking-tighter text-white uppercase">JOSEOCEANJOBS</span>
-                    <span class="text-[11px] font-medium uppercase tracking-[0.18em] text-white/50">Powered by Jose Consulting Limited</span>
+                <div class="flex flex-col leading-tight min-w-0">
+                    <span class="text-base sm:text-xl xl:text-2xl font-extrabold tracking-tighter text-white uppercase truncate">JOSEOCEANJOBS</span>
+                    <span class="hidden sm:block text-[11px] font-medium uppercase tracking-[0.18em] text-white/50 truncate">Powered by Jose Consulting Limited</span>
                 </div>
             </a>
 
@@ -148,7 +151,7 @@
             {{-- Mobile hamburger --}}
             <button
                 type="button"
-                class="inline-flex xl:hidden items-center justify-center w-11 h-11 p-2.5 rounded-full border border-white/15 text-white hover:bg-white/10 transition-colors"
+                class="inline-flex xl:hidden shrink-0 items-center justify-center w-11 h-11 p-2.5 rounded-full border border-white/15 text-white hover:bg-white/10 transition-colors"
                 @click="mobileMenuOpen = !mobileMenuOpen"
                 :aria-expanded="mobileMenuOpen.toString()"
                 aria-label="Toggle navigation"

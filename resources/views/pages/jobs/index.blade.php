@@ -15,7 +15,7 @@
 
     <div class="container mx-auto px-6 relative z-10">
         <div class="max-w-3xl mx-auto text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-white mb-4">Find Your Maritime/Logistics &amp; Energy Sector Jobs</h1>
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 break-words">Find Your Maritime/Logistics &amp; Energy Sector Jobs</h1>
         </div>
 
         {{-- Search Form --}}

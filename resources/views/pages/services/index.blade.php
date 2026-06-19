@@ -14,7 +14,7 @@
                 <iconify-icon icon="lucide:layers" class="text-sm"></iconify-icon>
                 <span>What We Offer</span>
             </div>
-            <h1 class="text-[48px] md:text-[64px] font-extrabold leading-[1.05] tracking-tight text-white mb-6">
+            <h1 class="text-[32px] sm:text-[48px] md:text-[64px] font-extrabold leading-[1.05] tracking-tight text-white mb-6">
                 End-to-end <span class="text-[#1AAD94]">Maritime &amp; Energy</span> Workforce Solutions
             </h1>
             <p class="text-xl text-white/70 leading-relaxed max-w-2xl mb-10">

@@ -50,7 +50,7 @@
                 <span>{{ $hero['eyebrow'] ?? 'Jose Consulting Limited' }}</span>
             </div>
 
-            <h1 class="max-w-4xl text-[56px] font-extrabold leading-[1.05] tracking-tight text-white md:text-[72px]">
+            <h1 class="max-w-4xl text-[32px] sm:text-[44px] font-extrabold leading-[1.1] sm:leading-[1.05] tracking-tight text-white md:text-[72px] break-words">
                 {{ $hero['headline'] ?? 'World-class training, consulting, and career pathways.' }}
             </h1>
 
@@ -141,7 +141,7 @@
         <div class="grid gap-8 lg:grid-cols-2">
             <div class="rounded-[32px] bg-white border border-[#E0E0E0] p-10 shadow-sm">
                 <div class="inline-flex rounded-full bg-[#073057]/5 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#073057] mb-6">Our vision</div>
-                <h2 class="text-[36px] font-extrabold text-[#073057] leading-tight mb-8">{{ $profile['vision']['statement'] ?? '' }}</h2>
+                <h2 class="text-[26px] sm:text-[36px] font-extrabold text-[#073057] leading-tight mb-8">{{ $profile['vision']['statement'] ?? '' }}</h2>
                 <ul class="space-y-4">
                     @foreach(($profile['vision']['pillars'] ?? []) as $pillar)
                         <li class="flex items-center gap-4 text-[#2C2C2C]">
@@ -158,7 +158,7 @@
                 <div class="absolute right-0 top-0 h-40 w-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
                 <div class="relative z-10">
                     <div class="inline-flex rounded-full bg-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#7DE1D1] mb-6">Our mission</div>
-                    <h2 class="text-[36px] font-extrabold leading-tight mb-8">{{ $profile['mission']['statement'] ?? '' }}</h2>
+                    <h2 class="text-[26px] sm:text-[36px] font-extrabold leading-tight mb-8">{{ $profile['mission']['statement'] ?? '' }}</h2>
                     <ul class="space-y-4">
                         @foreach(($profile['mission']['actions'] ?? []) as $action)
                             <li class="flex items-center gap-4 text-white/80">

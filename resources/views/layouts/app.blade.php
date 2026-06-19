@@ -13,15 +13,22 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
     <link rel="manifest" href="{{ asset('images/site.webmanifest') }}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    {{-- Compiled Tailwind + Alpine, served from our own origin (no third-party
+         CDN). Previously this layout used the Tailwind Play CDN, which left the
+         entire site unstyled / "zoomed out" whenever that CDN was slow or
+         blocked on a mobile device. --}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         @view-transition { navigation: auto; }
         :root { --color-primary:#073057; --color-accent:#1AAD94; --color-dark:#2C2C2C; --color-light:#F5F5F5; --color-border:#E0E0E0; --color-muted:#6B7280; }
+        /* Safety net: keep decorative absolutely-positioned blobs from widening
+           the page on small screens. `clip` (not `hidden`) does NOT create a
+           scroll container, so the sticky header keeps working. */
+        html, body { overflow-x: clip; }
         body { font-family:'Inter',sans-serif; color:var(--color-dark); background-color:#fff; }
         .font-mono { font-family:'JetBrains Mono',monospace; }
         .hero-dot-grid { background-image:radial-gradient(rgba(26,173,148,.15) 1.5px,transparent 1.5px); background-size:32px 32px; }

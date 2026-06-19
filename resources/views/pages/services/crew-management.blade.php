@@ -14,7 +14,7 @@
     <div class="absolute inset-0 bg-gradient-to-r from-[#073057] via-[#073057]/80 to-transparent"></div>
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-[11px] font-bold uppercase tracking-[0.15em] text-[#7DE1D1]" />
-        <h1 class="text-[48px] md:text-[64px] font-extrabold text-white leading-none">Crew Management</h1>
+        <h1 class="text-[32px] sm:text-[48px] md:text-[64px] font-extrabold text-white leading-none">Crew Management</h1>
         <p class="mt-4 max-w-2xl text-lg text-white/70">The right crew, managed the right way.</p>
     </div>
 </section>

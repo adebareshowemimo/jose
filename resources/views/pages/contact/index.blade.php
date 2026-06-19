@@ -18,7 +18,7 @@
     </div>
     <div class="container mx-auto px-6 relative z-10">
         <x-ui.breadcrumbs :items="$breadcrumbs ?? []" class="mb-6 text-xs font-bold uppercase tracking-widest text-[#1AAD94]" />
-        <h1 class="text-[48px] md:text-[64px] font-extrabold leading-none text-white">Get in touch with <br/><span class="text-[#1AAD94]">our Team.</span></h1>
+        <h1 class="text-[32px] sm:text-[48px] md:text-[64px] font-extrabold leading-none text-white">Get in touch with <br/><span class="text-[#1AAD94]">our Team.</span></h1>
         <p class="mt-6 max-w-xl text-lg text-white/70">{{ $pageDescription ?? 'Have questions about our training programs, job placements, or consulting services? We are here to help you navigate your maritime career.' }}</p>
     </div>
 </section>
