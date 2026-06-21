@@ -40,11 +40,13 @@ class CompleteSignupController extends Controller
         $user->save();
 
         if ($request->input('role') === 'employer' && ! $user->company) {
+            // Self-registered companies start 'pending' for admin review — never
+            // auto-activate (matches AuthController::register).
             $user->company()->create([
                 'name' => $request->input('company_name'),
                 'slug' => Str::slug($request->input('company_name')) . '-' . $user->id,
                 'email' => $user->email,
-                'status' => 'active',
+                'status' => 'pending',
             ]);
         }
 

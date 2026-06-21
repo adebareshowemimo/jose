@@ -99,13 +99,16 @@ class AuthController extends Controller
             'status' => 'active',
         ]);
 
-        // Create company profile for employer accounts
+        // Create company profile for employer accounts. New companies start as
+        // 'pending' so an admin must review and approve (set active) or deny
+        // (set inactive) them from the admin Companies screen — self-registration
+        // must never auto-activate a company.
         if ($request->role === 'employer') {
             $user->company()->create([
                 'name' => $request->company_name,
                 'slug' => \Illuminate\Support\Str::slug($request->company_name) . '-' . $user->id,
                 'email' => $request->email,
-                'status' => 'active',
+                'status' => 'pending',
             ]);
         }
 
