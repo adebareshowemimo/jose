@@ -124,28 +124,30 @@ class AdminAlerts
                     ]))
                     ->count()
                 : 0,
-            // New customer orders the admin hasn't opened yet.
-            'orders' => Schema::hasTable('orders')
+            // New customer orders the admin hasn't opened yet. These badges guard on
+            // hasColumn (not just hasTable) so a server whose admin_viewed_at
+            // migration hasn't run yet shows no badge instead of 500-ing the admin.
+            'orders' => Schema::hasColumn('orders', 'admin_viewed_at')
                 ? Order::whereNull('admin_viewed_at')->count() : 0,
             // New payments the admin hasn't opened yet (separate from the topbar
             // "awaiting confirmation" signal, which is status-based).
-            'payments' => Schema::hasTable('payments')
+            'payments' => Schema::hasColumn('payments', 'admin_viewed_at')
                 ? Payment::whereNull('admin_viewed_at')->count() : 0,
             // New event registrations across all events the admin hasn't reviewed
             // (cleared per event when its registrations page is opened).
-            'events' => Schema::hasTable('event_registrations')
+            'events' => Schema::hasColumn('event_registrations', 'admin_viewed_at')
                 ? EventRegistration::whereNull('admin_viewed_at')->count() : 0,
             // New training enrolments the admin hasn't reviewed yet.
-            'training' => Schema::hasTable('training_enrolments')
+            'training' => Schema::hasColumn('training_enrolments', 'admin_viewed_at')
                 ? TrainingEnrolment::whereNull('admin_viewed_at')->count() : 0,
             // New applications to contract-staffing roles (their own signal, kept
             // out of the regular Applications badge above).
-            'contractStaffing' => Schema::hasTable('job_applications')
+            'contractStaffing' => Schema::hasColumn('job_applications', 'admin_viewed_at')
                 ? JobApplication::whereNull('admin_viewed_at')
                     ->whereHas('jobListing', fn ($q) => $q->where('is_contract_staffing', true))
                     ->count() : 0,
             // New newsletter subscribers the admin hasn't reviewed yet.
-            'newsletter' => Schema::hasTable('newsletter_subscribers')
+            'newsletter' => Schema::hasColumn('newsletter_subscribers', 'admin_viewed_at')
                 ? NewsletterSubscriber::whereNull('admin_viewed_at')->count() : 0,
         ];
     }
