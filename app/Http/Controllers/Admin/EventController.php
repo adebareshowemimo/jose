@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EmailTemplate;
 use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -50,6 +51,47 @@ class EventController extends Controller
         Event::create($this->validatedData($request));
 
         return redirect()->route('admin.events.index')->with('success', 'Event created.');
+    }
+
+    public function show(Event $event)
+    {
+        $event->loadCount([
+            'registrations',
+            'registrations as active_registrations_count' => fn ($q) => $q->whereIn('status', ['pending', 'paid']),
+            'registrations as reminded_registrations_count' => fn ($q) => $q->where('reminder_count', '>', 0),
+        ]);
+
+        $reminderTemplates = EmailTemplate::where('is_active', true)
+            ->orderBy('category')
+            ->orderBy('name')
+            ->get(['key', 'name', 'category']);
+
+        return view('admin.events.show', compact('event', 'reminderTemplates'));
+    }
+
+    public function updateReminders(Request $request, Event $event)
+    {
+        $validated = $request->validate([
+            'reminders_enabled' => ['nullable', 'boolean'],
+            'reminder_template_key' => ['nullable', 'string', 'exists:email_templates,key'],
+            'reminder_lead_days' => ['required', 'integer', 'min:0', 'max:365'],
+            'reminder_frequency' => ['required', 'in:once,repeat'],
+            'reminder_repeat_days' => ['nullable', 'integer', 'min:1', 'max:90', 'required_if:reminder_frequency,repeat'],
+            'reminder_max_count' => ['required', 'integer', 'min:1', 'max:20'],
+        ]);
+
+        $event->update([
+            'reminders_enabled' => $request->boolean('reminders_enabled'),
+            'reminder_template_key' => $validated['reminder_template_key'] ?: Event::DEFAULT_REMINDER_TEMPLATE,
+            'reminder_lead_days' => $validated['reminder_lead_days'],
+            // "Once" clears the repeat cadence; the sender then sends a single reminder.
+            'reminder_repeat_days' => $validated['reminder_frequency'] === 'repeat'
+                ? $validated['reminder_repeat_days']
+                : null,
+            'reminder_max_count' => $validated['reminder_max_count'],
+        ]);
+
+        return back()->with('success', 'Reminder settings saved.');
     }
 
     public function update(Request $request, Event $event)

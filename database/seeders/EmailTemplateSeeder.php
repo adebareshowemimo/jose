@@ -189,6 +189,25 @@ HTML,
 <p style="color:#6B7280; font-size:13px;">PDF or DOCX, up to 5 MB. You can replace it anytime.</p>
 HTML,
             ],
+            [
+                'key' => 'event.reminder',
+                'name' => 'Event Reminder',
+                'category' => 'Reminder',
+                'subject' => 'Reminder: {{event_title}} is coming up',
+                'variables' => ['name', 'event_title', 'event_date', 'event_location', 'days_until', 'ticket_count', 'event_url'],
+                'body_html' => <<<'HTML'
+<h2>See you soon, {{name}} 📅</h2>
+<p>This is a friendly reminder that <strong>{{event_title}}</strong> is just <strong>{{days_until}} day(s)</strong> away.</p>
+<ul>
+  <li><strong>When:</strong> {{event_date}}</li>
+  <li><strong>Where:</strong> {{event_location}}</li>
+  <li><strong>Your tickets:</strong> {{ticket_count}}</li>
+</ul>
+<p>Please arrive a few minutes early. We're looking forward to seeing you there!</p>
+<div class="btn-wrap"><a href="{{event_url}}" class="btn">View event details</a></div>
+<p style="color:#6B7280; font-size:13px;">Can no longer make it? Just reply to this email and let us know.</p>
+HTML,
+            ],
 
             // ── Job Application Stages ────────────────────────────────
             [

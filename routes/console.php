@@ -13,3 +13,9 @@ Artisan::command('inspire', function () {
 Schedule::command('emails:send-candidate-reminders')
     ->dailyAt('09:00')
     ->withoutOverlapping();
+
+// Daily event reminders — emails registered attendees per each event's
+// configured lead-time + repeat cadence.
+Schedule::command('emails:send-event-reminders')
+    ->dailyAt('08:00')
+    ->withoutOverlapping();

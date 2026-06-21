@@ -375,7 +375,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/events', [AdminEventController::class, 'index'])->name('admin.events.index');
     Route::get('/events/create', [AdminEventController::class, 'create'])->name('admin.events.create');
     Route::post('/events', [AdminEventController::class, 'store'])->name('admin.events.store');
+    Route::get('/events/{event}', [AdminEventController::class, 'show'])->name('admin.events.show');
     Route::put('/events/{event}', [AdminEventController::class, 'update'])->name('admin.events.update');
+    Route::put('/events/{event}/reminders', [AdminEventController::class, 'updateReminders'])->name('admin.events.reminders.update');
     Route::delete('/events/{event}', [AdminEventController::class, 'destroy'])->name('admin.events.destroy');
 
     // News

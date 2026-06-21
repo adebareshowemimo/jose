@@ -31,6 +31,11 @@ class Event extends Model
         'status',
         'is_featured',
         'sort_order',
+        'reminders_enabled',
+        'reminder_template_key',
+        'reminder_lead_days',
+        'reminder_repeat_days',
+        'reminder_max_count',
     ];
 
     protected $casts = [
@@ -42,7 +47,22 @@ class Event extends Model
         'capacity' => 'integer',
         'seats_sold' => 'integer',
         'questions' => 'array',
+        'reminders_enabled' => 'boolean',
+        'reminder_lead_days' => 'integer',
+        'reminder_repeat_days' => 'integer',
+        'reminder_max_count' => 'integer',
     ];
+
+    // Default template key used when none is chosen for the event.
+    public const DEFAULT_REMINDER_TEMPLATE = 'event.reminder';
+
+    public function remindableRegistrations(): HasMany
+    {
+        return $this->registrations()->whereIn('status', [
+            EventRegistration::STATUS_PENDING,
+            EventRegistration::STATUS_PAID,
+        ]);
+    }
 
     public function scopePublished($query)
     {
