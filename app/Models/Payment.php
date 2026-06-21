@@ -14,7 +14,7 @@ class Payment extends Model
     protected $fillable = [
         'order_id', 'gateway', 'transaction_id', 'amount',
         'currency', 'exchange_rate', 'status', 'gateway_response',
-        'admin_viewed_at',
+        'admin_viewed_at', 'employer_viewed_at',
     ];
 
     protected function casts(): array
@@ -24,6 +24,7 @@ class Payment extends Model
             'exchange_rate' => 'decimal:6',
             'gateway_response' => 'array',
             'admin_viewed_at' => 'datetime',
+            'employer_viewed_at' => 'datetime',
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
+use App\Models\Receipt;
 use App\Services\ReceiptPdfService;
 use Illuminate\Http\Request;
 
@@ -29,6 +30,13 @@ class UserPaymentController extends Controller
         $this->authorize($request, $payment);
         $payment->load(['order.items', 'receipt']);
 
+        // Opening the payment clears the sidebar "payments & receipts" badge for
+        // this payment and its receipt.
+        $this->markPaymentViewed($payment);
+        if ($payment->receipt) {
+            $this->markReceiptViewed($payment->receipt);
+        }
+
         return view($this->viewPath('show'), compact('payment'));
     }
 
@@ -42,8 +50,31 @@ class UserPaymentController extends Controller
                 ->with('error', 'Receipt not yet available. Please contact support if you need a copy urgently.');
         }
 
+        // Downloading the receipt counts as viewing it.
+        $this->markReceiptViewed($payment->receipt);
+
         return $pdfService->render($payment->receipt)
             ->download($pdfService->filename($payment->receipt));
+    }
+
+    protected function markPaymentViewed(Payment $payment): void
+    {
+        $unseen = is_null($payment->employer_viewed_at)
+            || $payment->employer_viewed_at->lt($payment->updated_at);
+        if ($unseen) {
+            Payment::whereKey($payment->getKey())
+                ->toBase()->update(['employer_viewed_at' => now()]);
+            $payment->employer_viewed_at = now();
+        }
+    }
+
+    protected function markReceiptViewed(Receipt $receipt): void
+    {
+        if (is_null($receipt->employer_viewed_at)) {
+            Receipt::whereKey($receipt->getKey())
+                ->toBase()->update(['employer_viewed_at' => now()]);
+            $receipt->employer_viewed_at = now();
+        }
     }
 
     protected function authorize(Request $request, Payment $payment): void

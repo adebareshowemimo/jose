@@ -32,7 +32,7 @@ class RecruitmentRequest extends Model
         'experience_level', 'salary_min', 'salary_max', 'salary_currency',
         'description', 'skills_list', 'certificates', 'needed_by', 'jd_file_path',
         'status', 'admin_notes', 'assigned_to_admin_user_id',
-        'quoted_amount', 'quoted_at', 'order_id',
+        'quoted_amount', 'quoted_at', 'order_id', 'employer_viewed_at',
     ];
 
     protected function casts(): array
@@ -46,6 +46,7 @@ class RecruitmentRequest extends Model
             'needed_by' => 'date',
             'quoted_amount' => 'decimal:2',
             'quoted_at' => 'datetime',
+            'employer_viewed_at' => 'datetime',
         ];
     }
 

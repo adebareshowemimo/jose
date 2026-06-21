@@ -14,7 +14,7 @@ class Receipt extends Model
     protected $fillable = [
         'payment_id', 'order_id', 'user_id', 'number',
         'amount', 'currency', 'issued_at', 'issued_by_admin_id',
-        'last_emailed_at', 'last_emailed_to', 'notes', 'pdf_path',
+        'last_emailed_at', 'last_emailed_to', 'notes', 'pdf_path', 'employer_viewed_at',
     ];
 
     protected function casts(): array
@@ -23,6 +23,7 @@ class Receipt extends Model
             'amount' => 'decimal:2',
             'issued_at' => 'datetime',
             'last_emailed_at' => 'datetime',
+            'employer_viewed_at' => 'datetime',
         ];
     }
 

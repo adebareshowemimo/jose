@@ -93,6 +93,9 @@ class RecruitmentRequestController extends Controller
             'certificates' => $certificates ?: null,
             'needed_by' => $request->input('needed_by'),
             'status' => 'pending',
+            // The employer has obviously "seen" the request they just created, so
+            // the hiring badge only lights up on later admin activity.
+            'employer_viewed_at' => now(),
         ]);
 
         if ($request->hasFile('jd_file')) {
@@ -132,6 +135,16 @@ class RecruitmentRequestController extends Controller
     public function show(Request $request, RecruitmentRequest $recruitment)
     {
         $this->authorizeOwnership($request, $recruitment);
+
+        // Opening the request clears the sidebar "hiring updates" badge for it.
+        // toBase() avoids bumping updated_at (which would re-trigger the badge).
+        $unseen = is_null($recruitment->employer_viewed_at)
+            || $recruitment->employer_viewed_at->lt($recruitment->updated_at);
+        if ($unseen) {
+            RecruitmentRequest::whereKey($recruitment->getKey())
+                ->toBase()->update(['employer_viewed_at' => now()]);
+            $recruitment->employer_viewed_at = now();
+        }
 
         $recruitment->load([
             'category', 'jobType', 'location', 'order',

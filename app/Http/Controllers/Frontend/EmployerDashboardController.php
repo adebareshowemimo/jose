@@ -469,6 +469,13 @@ class EmployerDashboardController extends BasePageController
         $jobIds = $company->jobListings()->pluck('id');
         $jobs = $company->jobListings()->orderBy('title')->get(['id', 'title']);
 
+        // Opening the applicants list clears the sidebar "new applicants" badge
+        // (without bumping updated_at on each application).
+        JobApplication::whereIn('job_listing_id', $jobIds)
+            ->whereNull('employer_viewed_at')
+            ->toBase()
+            ->update(['employer_viewed_at' => now()]);
+
         $baseQuery = JobApplication::whereIn('job_listing_id', $jobIds);
 
         $stats = [

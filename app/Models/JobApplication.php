@@ -12,13 +12,14 @@ class JobApplication extends Model
 
     protected $fillable = [
         'job_listing_id', 'candidate_id', 'resume_id',
-        'cover_letter', 'status', 'employer_notes', 'admin_viewed_at',
+        'cover_letter', 'status', 'employer_notes', 'admin_viewed_at', 'employer_viewed_at',
     ];
 
     protected function casts(): array
     {
         return [
             'admin_viewed_at' => 'datetime',
+            'employer_viewed_at' => 'datetime',
         ];
     }
 
