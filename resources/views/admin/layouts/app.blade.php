@@ -258,6 +258,9 @@
                {{ str_starts_with($current, 'admin.events') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 Events
+                @if(($sidebarCounts['events'] ?? 0) > 0)
+                    <span title="New event registrations" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['events'] > 99 ? '99+' : $sidebarCounts['events'] }}</span>
+                @endif
             </a>
 
             {{-- News --}}
@@ -276,6 +279,9 @@
                {{ str_starts_with($current, 'admin.orders') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                 Orders
+                @if(($sidebarCounts['orders'] ?? 0) > 0)
+                    <span title="New orders" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['orders'] > 99 ? '99+' : $sidebarCounts['orders'] }}</span>
+                @endif
             </a>
 
             {{-- Payments --}}
@@ -284,6 +290,9 @@
                {{ str_starts_with($current, 'admin.payments') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 Payments
+                @if(($sidebarCounts['payments'] ?? 0) > 0)
+                    <span title="New payments" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['payments'] > 99 ? '99+' : $sidebarCounts['payments'] }}</span>
+                @endif
             </a>
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-white/30 uppercase tracking-wider">Monetization</p>
@@ -294,6 +303,9 @@
                {{ str_starts_with($current, 'admin.training.') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
                 Training
+                @if(($sidebarCounts['training'] ?? 0) > 0)
+                    <span title="New enrolments" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['training'] > 99 ? '99+' : $sidebarCounts['training'] }}</span>
+                @endif
             </a>
 
             {{-- Training Categories --}}
@@ -310,6 +322,9 @@
                {{ str_starts_with($current, 'admin.contract-staffing.') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 Contract Staffing
+                @if(($sidebarCounts['contractStaffing'] ?? 0) > 0)
+                    <span title="New contract applications" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['contractStaffing'] > 99 ? '99+' : $sidebarCounts['contractStaffing'] }}</span>
+                @endif
             </a>
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-white/30 uppercase tracking-wider">System</p>
@@ -328,6 +343,9 @@
                {{ str_starts_with($current, 'admin.newsletter') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 Newsletter
+                @if(($sidebarCounts['newsletter'] ?? 0) > 0)
+                    <span title="New subscribers" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['newsletter'] > 99 ? '99+' : $sidebarCounts['newsletter'] }}</span>
+                @endif
             </a>
 
             {{-- Social Media --}}

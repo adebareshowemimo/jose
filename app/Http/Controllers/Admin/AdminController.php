@@ -450,6 +450,12 @@ class AdminController extends Controller
 
     public function showOrder(Order $order)
     {
+        // Clear the sidebar "new order" badge for this record (without bumping updated_at).
+        if (is_null($order->admin_viewed_at)) {
+            Order::whereKey($order->getKey())->toBase()->update(['admin_viewed_at' => now()]);
+            $order->admin_viewed_at = now();
+        }
+
         $order->load(['user', 'items', 'payments']);
         return view('admin.orders.show', compact('order'));
     }

@@ -11,6 +11,10 @@ class NewsletterSubscriberController extends Controller
 {
     public function index(Request $request)
     {
+        // Opening the subscriber list clears the sidebar "new subscribers" badge
+        // (without bumping updated_at).
+        NewsletterSubscriber::whereNull('admin_viewed_at')->toBase()->update(['admin_viewed_at' => now()]);
+
         $query = NewsletterSubscriber::query();
 
         if ($request->filled('status')) {

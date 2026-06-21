@@ -15,7 +15,7 @@ class TrainingEnrolment extends Model
 
     protected $fillable = [
         'training_program_id', 'user_id', 'order_id', 'status',
-        'enrolled_at', 'completed_at',
+        'enrolled_at', 'completed_at', 'admin_viewed_at',
     ];
 
     protected function casts(): array
@@ -23,6 +23,7 @@ class TrainingEnrolment extends Model
         return [
             'enrolled_at' => 'datetime',
             'completed_at' => 'datetime',
+            'admin_viewed_at' => 'datetime',
         ];
     }
 

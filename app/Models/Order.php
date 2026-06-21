@@ -14,6 +14,7 @@ class Order extends Model
     protected $fillable = [
         'order_number', 'user_id', 'subtotal', 'tax', 'total',
         'currency', 'gateway', 'billing_info', 'status', 'paid_at',
+        'admin_viewed_at',
     ];
 
     protected function casts(): array
@@ -24,6 +25,7 @@ class Order extends Model
             'total' => 'decimal:2',
             'billing_info' => 'array',
             'paid_at' => 'datetime',
+            'admin_viewed_at' => 'datetime',
         ];
     }
 

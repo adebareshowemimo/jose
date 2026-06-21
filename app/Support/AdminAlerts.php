@@ -6,10 +6,14 @@ use App\Models\ChatConversation;
 use App\Models\ChatMessage;
 use App\Models\Company;
 use App\Models\ContactSubmission;
+use App\Models\EventRegistration;
 use App\Models\JobApplication;
 use App\Models\JobListing;
+use App\Models\NewsletterSubscriber;
+use App\Models\Order;
 use App\Models\Payment;
 use App\Models\RecruitmentRequest;
+use App\Models\TrainingEnrolment;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -83,7 +87,7 @@ class AdminAlerts
      * Each clears as the admin processes the items (opens the job listing, verifies
      * the company, reviews the application, opens the request, reads the message).
      *
-     * @return array{jobs:int,applications:int,companies:int,recruitment:int,contacts:int,chat:int}
+     * @return array{jobs:int,applications:int,companies:int,recruitment:int,contacts:int,chat:int,orders:int,payments:int,events:int,training:int,contractStaffing:int,newsletter:int}
      */
     public static function sidebarCounts(): array
     {
@@ -92,9 +96,13 @@ class AdminAlerts
             // managed elsewhere, so it's excluded to match the jobs list).
             'jobs' => Schema::hasTable('job_listings')
                 ? JobListing::regularJobs()->whereNull('admin_viewed_at')->count() : 0,
-            // New applications the admin hasn't opened on the applications screen yet.
+            // New applications to regular jobs the admin hasn't opened yet. Contract
+            // staffing applications are counted under their own section below so the
+            // two badges don't double-count the same row.
             'applications' => Schema::hasTable('job_applications')
-                ? JobApplication::whereNull('admin_viewed_at')->count() : 0,
+                ? JobApplication::whereNull('admin_viewed_at')
+                    ->whereHas('jobListing', fn ($q) => $q->where('is_contract_staffing', false))
+                    ->count() : 0,
             // New companies the admin hasn't opened yet.
             'companies' => Schema::hasTable('companies')
                 ? Company::whereNull('admin_viewed_at')->count() : 0,
@@ -116,6 +124,29 @@ class AdminAlerts
                     ]))
                     ->count()
                 : 0,
+            // New customer orders the admin hasn't opened yet.
+            'orders' => Schema::hasTable('orders')
+                ? Order::whereNull('admin_viewed_at')->count() : 0,
+            // New payments the admin hasn't opened yet (separate from the topbar
+            // "awaiting confirmation" signal, which is status-based).
+            'payments' => Schema::hasTable('payments')
+                ? Payment::whereNull('admin_viewed_at')->count() : 0,
+            // New event registrations across all events the admin hasn't reviewed
+            // (cleared per event when its registrations page is opened).
+            'events' => Schema::hasTable('event_registrations')
+                ? EventRegistration::whereNull('admin_viewed_at')->count() : 0,
+            // New training enrolments the admin hasn't reviewed yet.
+            'training' => Schema::hasTable('training_enrolments')
+                ? TrainingEnrolment::whereNull('admin_viewed_at')->count() : 0,
+            // New applications to contract-staffing roles (their own signal, kept
+            // out of the regular Applications badge above).
+            'contractStaffing' => Schema::hasTable('job_applications')
+                ? JobApplication::whereNull('admin_viewed_at')
+                    ->whereHas('jobListing', fn ($q) => $q->where('is_contract_staffing', true))
+                    ->count() : 0,
+            // New newsletter subscribers the admin hasn't reviewed yet.
+            'newsletter' => Schema::hasTable('newsletter_subscribers')
+                ? NewsletterSubscriber::whereNull('admin_viewed_at')->count() : 0,
         ];
     }
 

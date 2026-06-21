@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\TrainingCategory;
+use App\Models\TrainingEnrolment;
 use App\Models\TrainingProgram;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,6 +15,10 @@ class TrainingProgramController extends Controller
 {
     public function index(Request $request)
     {
+        // Opening the training list clears the sidebar "new enrolments" badge
+        // (without bumping updated_at).
+        TrainingEnrolment::whereNull('admin_viewed_at')->toBase()->update(['admin_viewed_at' => now()]);
+
         $query = TrainingProgram::query()->with('trainingCategory')->withCount('enrolments');
 
         if ($request->filled('search')) {

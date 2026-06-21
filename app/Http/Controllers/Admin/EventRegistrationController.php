@@ -12,6 +12,10 @@ class EventRegistrationController extends Controller
 {
     public function index(Request $request, Event $event)
     {
+        // Opening an event's registrations clears the sidebar "new registrations"
+        // badge for that event (without bumping updated_at).
+        $event->registrations()->whereNull('admin_viewed_at')->toBase()->update(['admin_viewed_at' => now()]);
+
         $query = $event->registrations()->latest('id');
 
         if ($request->filled('status')) {

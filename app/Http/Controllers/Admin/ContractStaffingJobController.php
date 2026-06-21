@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\JobApplication;
 use App\Models\JobListing;
 use App\Models\JobType;
 use App\Models\Location;
@@ -15,6 +16,15 @@ class ContractStaffingJobController extends Controller
 {
     public function index(Request $request)
     {
+        // Opening the contract-staffing list clears its sidebar "new applications"
+        // badge — the unviewed applications to contract roles (without bumping
+        // updated_at). Regular-job applications are tracked separately.
+        JobApplication::query()
+            ->whereHas('jobListing', fn ($q) => $q->where('is_contract_staffing', true))
+            ->whereNull('admin_viewed_at')
+            ->toBase()
+            ->update(['admin_viewed_at' => now()]);
+
         $query = JobListing::contractStaffing()
             ->with(['category', 'jobType', 'location'])
             ->withCount('applications');

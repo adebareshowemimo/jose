@@ -12,7 +12,7 @@ class NewsletterSubscriber extends Model
 
     protected $fillable = [
         'email', 'name', 'status', 'token', 'source',
-        'subscribed_at', 'unsubscribed_at',
+        'subscribed_at', 'unsubscribed_at', 'admin_viewed_at',
     ];
 
     protected function casts(): array
@@ -20,6 +20,7 @@ class NewsletterSubscriber extends Model
         return [
             'subscribed_at' => 'datetime',
             'unsubscribed_at' => 'datetime',
+            'admin_viewed_at' => 'datetime',
         ];
     }
 

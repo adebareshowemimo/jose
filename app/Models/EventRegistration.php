@@ -15,7 +15,7 @@ class EventRegistration extends Model
     protected $fillable = [
         'event_id', 'user_id', 'order_id', 'status', 'ticket_count',
         'buyer_name', 'buyer_email', 'buyer_phone', 'answers',
-        'registered_at',
+        'registered_at', 'admin_viewed_at',
     ];
 
     protected function casts(): array
@@ -24,6 +24,7 @@ class EventRegistration extends Model
             'answers' => 'array',
             'registered_at' => 'datetime',
             'ticket_count' => 'integer',
+            'admin_viewed_at' => 'datetime',
         ];
     }
 

@@ -78,6 +78,12 @@ class PaymentController extends Controller
 
     public function show(Payment $payment)
     {
+        // Clear the sidebar "new payment" badge for this record (without bumping updated_at).
+        if (is_null($payment->admin_viewed_at)) {
+            Payment::whereKey($payment->getKey())->toBase()->update(['admin_viewed_at' => now()]);
+            $payment->admin_viewed_at = now();
+        }
+
         $payment->load(['order.user', 'order.items', 'receipt.issuedBy']);
         return view('admin.payments.show', compact('payment'));
     }
