@@ -6,15 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\Category;
 use App\Models\Company;
+use App\Models\ContactSubmission;
+use App\Models\Event;
+use App\Models\EventRegistration;
 use App\Models\JobApplication;
 use App\Models\JobListing;
 use App\Models\JobType;
 use App\Models\Location;
+use App\Models\NewsletterSubscriber;
 use App\Models\Order;
 use App\Models\Payment;
 use App\Models\Plan;
+use App\Models\RecruitmentRequest;
 use App\Models\Role;
 use App\Models\Subscription;
+use App\Models\TrainingEnrolment;
 use App\Models\User;
 use App\Support\Currency;
 use App\Support\EmailDispatcher;
@@ -40,6 +46,19 @@ class AdminController extends Controller
         $activeJobs      = JobListing::where('status', 'active')->count();
         $pendingJobs     = JobListing::where('status', 'pending')->count();
         $activeSubscriptions = Subscription::where('status', 'active')->count();
+
+        // Platform-wide totals so the dashboard reflects the full database, not just
+        // the headline entities above.
+        $totalApplications       = JobApplication::count();
+        $totalEvents             = Event::count();
+        $totalEventRegistrations = EventRegistration::count();
+        $totalTrainingEnrolments = TrainingEnrolment::count();
+        $totalRecruitment        = RecruitmentRequest::count();
+        $pendingRecruitment      = RecruitmentRequest::where('status', 'pending')->count();
+        $totalContacts           = ContactSubmission::count();
+        $newContacts             = ContactSubmission::where('status', 'new')->count();
+        $newsletterSubscribers   = NewsletterSubscriber::where('status', 'active')->count();
+        $pendingPayments         = Payment::where('status', 'pending')->count();
 
         $recentUsers = User::with('role')->latest()->take(10)->get();
         $recentOrders = Order::with('user')->latest()->take(10)->get();
@@ -74,7 +93,10 @@ class AdminController extends Controller
             'totalUsers', 'totalCompanies', 'totalJobs', 'totalCandidates',
             'totalOrders', 'totalRevenue', 'activeJobs', 'pendingJobs',
             'activeSubscriptions', 'recentUsers', 'recentOrders',
-            'revenueChart', 'userChart'
+            'revenueChart', 'userChart',
+            'totalApplications', 'totalEvents', 'totalEventRegistrations',
+            'totalTrainingEnrolments', 'totalRecruitment', 'pendingRecruitment',
+            'totalContacts', 'newContacts', 'newsletterSubscribers', 'pendingPayments'
         ));
     }
 

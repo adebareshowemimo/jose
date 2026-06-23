@@ -60,6 +60,44 @@
         </div>
     </div>
 
+    {{-- Platform Overview — the rest of what's in the database, each card deep-links
+         to its admin list page. --}}
+    <h3 class="text-base font-semibold text-gray-900 mb-3">Platform Overview</h3>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <a href="{{ route('admin.applications') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalApplications) }}</p>
+            <p class="text-sm text-gray-500">Applications</p>
+        </a>
+        <a href="{{ route('admin.events.index') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalEvents) }}</p>
+            <p class="text-sm text-gray-500">Events <span class="text-gray-400">({{ number_format($totalEventRegistrations) }} regs)</span></p>
+        </a>
+        <a href="{{ route('admin.training.index') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalTrainingEnrolments) }}</p>
+            <p class="text-sm text-gray-500">Training Enrolments</p>
+        </a>
+        <a href="{{ route('admin.recruitment-requests.index') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalRecruitment) }}</p>
+            <p class="text-sm text-gray-500">Recruitment @if($pendingRecruitment > 0)<span class="text-amber-600">({{ $pendingRecruitment }} pending)</span>@endif</p>
+        </a>
+        <a href="{{ route('admin.contacts.index') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalContacts) }}</p>
+            <p class="text-sm text-gray-500">Contact Messages @if($newContacts > 0)<span class="text-red-600">({{ $newContacts }} new)</span>@endif</p>
+        </a>
+        <a href="{{ route('admin.newsletter.index') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($newsletterSubscribers) }}</p>
+            <p class="text-sm text-gray-500">Newsletter Subscribers</p>
+        </a>
+        <a href="{{ route('admin.payments', ['status' => 'pending']) }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($pendingPayments) }}</p>
+            <p class="text-sm text-gray-500">Pending Payments</p>
+        </a>
+        <a href="{{ route('admin.orders') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalOrders) }}</p>
+            <p class="text-sm text-gray-500">Orders</p>
+        </a>
+    </div>
+
     <div class="grid lg:grid-cols-2 gap-6 mb-6">
         {{-- Revenue Chart --}}
         <div class="bg-white rounded-xl border border-gray-200 p-5 min-w-0">
