@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    {{-- Flag read by resources/js/admin-realtime.js to enable the live notification listener. --}}
+    <meta name="admin-realtime" content="1">
     <title>@yield('title', 'Admin') — JOSEOCEANJOBS Admin</title>
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
     <link rel="icon" href="{{ asset('images/favicon-32x32.png') }}" type="image/png" sizes="32x32">
@@ -12,7 +14,7 @@
     {{-- Compiled Tailwind + Alpine from our own origin (no third-party CDN).
          The Tailwind Play CDN left admin pages unstyled / "zoomed out" whenever
          it was slow or blocked, especially on mobile. --}}
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin-realtime.js'])
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -63,20 +65,18 @@
                     <button @click="notifOpen = !notifOpen" title="Notifications"
                             class="relative p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        @if($adminAlertTotal > 0)
-                            <span class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#073057] flex items-center justify-center">{{ $adminAlertTotal > 9 ? '9+' : $adminAlertTotal }}</span>
-                        @endif
+                        <span data-badge="bellTotal" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full ring-2 ring-[#073057] flex items-center justify-center {{ $adminAlertTotal > 0 ? '' : 'hidden' }}">{{ $adminAlertTotal > 9 ? '9+' : $adminAlertTotal }}</span>
                     </button>
                     <div x-show="notifOpen" @click.away="notifOpen = false" x-transition x-cloak
                          class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
                         <div class="flex items-center justify-between px-4 py-2 border-b border-gray-100">
                             <p class="text-sm font-semibold text-gray-900">Needs attention</p>
-                            <span class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $adminAlertTotal > 0 ? 'bg-[#1AAD94]/10 text-[#1AAD94]' : 'bg-gray-100 text-gray-500' }}">{{ $adminAlertTotal }}</span>
+                            <span data-bell-total class="text-xs font-semibold px-2 py-0.5 rounded-full {{ $adminAlertTotal > 0 ? 'bg-[#1AAD94]/10 text-[#1AAD94]' : 'bg-gray-100 text-gray-500' }}">{{ $adminAlertTotal }}</span>
                         </div>
                         @forelse($adminAlerts as $alert)
                             <a href="{{ $alert['url'] }}" class="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-gray-50 transition">
                                 <span class="text-sm text-gray-700">{{ $alert['label'] }}</span>
-                                <span class="text-xs font-bold px-2 py-0.5 rounded-full {{ $alert['count'] > 0 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400' }}">{{ $alert['count'] }}</span>
+                                <span data-bell-cat="{{ $alert['key'] }}" class="text-xs font-bold px-2 py-0.5 rounded-full {{ $alert['count'] > 0 ? 'bg-red-100 text-red-600' : 'bg-gray-100 text-gray-400' }}">{{ $alert['count'] }}</span>
                             </a>
                         @empty
                             <p class="px-4 py-3 text-sm text-gray-400">Nothing pending.</p>
@@ -166,9 +166,7 @@
                {{ str_starts_with($current, 'admin.companies') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 Companies
-                @if(($sidebarCounts['companies'] ?? 0) > 0)
-                    <span title="New companies" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['companies'] > 99 ? '99+' : $sidebarCounts['companies'] }}</span>
-                @endif
+                <span data-badge="companies" title="New companies" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['companies'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['companies'] ?? 0) > 99 ? '99+' : ($sidebarCounts['companies'] ?? 0) }}</span>
             </a>
 
             {{-- Applications --}}
@@ -177,9 +175,7 @@
                {{ str_starts_with($current, 'admin.applications') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                 Applications
-                @if(($sidebarCounts['applications'] ?? 0) > 0)
-                    <span title="New applications" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['applications'] > 99 ? '99+' : $sidebarCounts['applications'] }}</span>
-                @endif
+                <span data-badge="applications" title="New applications" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['applications'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['applications'] ?? 0) > 99 ? '99+' : ($sidebarCounts['applications'] ?? 0) }}</span>
             </a>
 
             {{-- Chat --}}
@@ -188,9 +184,7 @@
                {{ str_starts_with($current, 'admin.chat') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.82L3 20l1.3-3.25A7.33 7.33 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                 Chat
-                @if(($sidebarCounts['chat'] ?? 0) > 0)
-                    <span title="Unread messages" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['chat'] > 99 ? '99+' : $sidebarCounts['chat'] }}</span>
-                @endif
+                <span data-badge="chat" title="Unread messages" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['chat'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['chat'] ?? 0) > 99 ? '99+' : ($sidebarCounts['chat'] ?? 0) }}</span>
             </a>
 
             {{-- Recruitment Requests --}}
@@ -199,9 +193,7 @@
                {{ str_starts_with($current, 'admin.recruitment-requests') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 Recruitment Requests
-                @if(($sidebarCounts['recruitment'] ?? 0) > 0)
-                    <span title="Unopened requests" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['recruitment'] > 99 ? '99+' : $sidebarCounts['recruitment'] }}</span>
-                @endif
+                <span data-badge="recruitment" title="Unopened requests" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['recruitment'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['recruitment'] ?? 0) > 99 ? '99+' : ($sidebarCounts['recruitment'] ?? 0) }}</span>
             </a>
 
             {{-- Contact Submissions --}}
@@ -210,9 +202,7 @@
                {{ str_starts_with($current, 'admin.contacts') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.82L3 20l1.3-3.25A7.33 7.33 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                 Contacts
-                @if(($sidebarCounts['contacts'] ?? 0) > 0)
-                    <span title="New contact messages" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['contacts'] > 99 ? '99+' : $sidebarCounts['contacts'] }}</span>
-                @endif
+                <span data-badge="contacts" title="New contact messages" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['contacts'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['contacts'] ?? 0) > 99 ? '99+' : ($sidebarCounts['contacts'] ?? 0) }}</span>
             </a>
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-white/30 uppercase tracking-wider">Jobs</p>
@@ -223,9 +213,7 @@
                {{ str_starts_with($current, 'admin.jobs') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 Job Listings
-                @if(($sidebarCounts['jobs'] ?? 0) > 0)
-                    <span title="New job listings" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['jobs'] > 99 ? '99+' : $sidebarCounts['jobs'] }}</span>
-                @endif
+                <span data-badge="jobs" title="New job listings" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['jobs'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['jobs'] ?? 0) > 99 ? '99+' : ($sidebarCounts['jobs'] ?? 0) }}</span>
             </a>
 
             {{-- Job Categories --}}
@@ -258,9 +246,7 @@
                {{ str_starts_with($current, 'admin.events') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3M5 11h14M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 Events
-                @if(($sidebarCounts['events'] ?? 0) > 0)
-                    <span title="New event registrations" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['events'] > 99 ? '99+' : $sidebarCounts['events'] }}</span>
-                @endif
+                <span data-badge="events" title="New event registrations" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['events'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['events'] ?? 0) > 99 ? '99+' : ($sidebarCounts['events'] ?? 0) }}</span>
             </a>
 
             {{-- News --}}
@@ -279,9 +265,7 @@
                {{ str_starts_with($current, 'admin.orders') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                 Orders
-                @if(($sidebarCounts['orders'] ?? 0) > 0)
-                    <span title="New orders" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['orders'] > 99 ? '99+' : $sidebarCounts['orders'] }}</span>
-                @endif
+                <span data-badge="orders" title="New orders" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['orders'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['orders'] ?? 0) > 99 ? '99+' : ($sidebarCounts['orders'] ?? 0) }}</span>
             </a>
 
             {{-- Payments --}}
@@ -290,9 +274,7 @@
                {{ str_starts_with($current, 'admin.payments') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 Payments
-                @if(($sidebarCounts['payments'] ?? 0) > 0)
-                    <span title="New payments" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['payments'] > 99 ? '99+' : $sidebarCounts['payments'] }}</span>
-                @endif
+                <span data-badge="payments" title="New payments" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['payments'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['payments'] ?? 0) > 99 ? '99+' : ($sidebarCounts['payments'] ?? 0) }}</span>
             </a>
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-white/30 uppercase tracking-wider">Monetization</p>
@@ -303,9 +285,7 @@
                {{ str_starts_with($current, 'admin.training.') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
                 Training
-                @if(($sidebarCounts['training'] ?? 0) > 0)
-                    <span title="New enrolments" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['training'] > 99 ? '99+' : $sidebarCounts['training'] }}</span>
-                @endif
+                <span data-badge="training" title="New enrolments" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['training'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['training'] ?? 0) > 99 ? '99+' : ($sidebarCounts['training'] ?? 0) }}</span>
             </a>
 
             {{-- Training Categories --}}
@@ -322,9 +302,7 @@
                {{ str_starts_with($current, 'admin.contract-staffing.') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 Contract Staffing
-                @if(($sidebarCounts['contractStaffing'] ?? 0) > 0)
-                    <span title="New contract applications" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['contractStaffing'] > 99 ? '99+' : $sidebarCounts['contractStaffing'] }}</span>
-                @endif
+                <span data-badge="contractStaffing" title="New contract applications" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['contractStaffing'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['contractStaffing'] ?? 0) > 99 ? '99+' : ($sidebarCounts['contractStaffing'] ?? 0) }}</span>
             </a>
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-white/30 uppercase tracking-wider">System</p>
@@ -343,9 +321,7 @@
                {{ str_starts_with($current, 'admin.newsletter') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 Newsletter
-                @if(($sidebarCounts['newsletter'] ?? 0) > 0)
-                    <span title="New subscribers" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{{ $sidebarCounts['newsletter'] > 99 ? '99+' : $sidebarCounts['newsletter'] }}</span>
-                @endif
+                <span data-badge="newsletter" title="New subscribers" class="ml-auto min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center {{ ($sidebarCounts['newsletter'] ?? 0) > 0 ? '' : 'hidden' }}">{{ ($sidebarCounts['newsletter'] ?? 0) > 99 ? '99+' : ($sidebarCounts['newsletter'] ?? 0) }}</span>
             </a>
 
             {{-- Social Media --}}

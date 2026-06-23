@@ -3,6 +3,9 @@
 use App\Models\ChatConversation;
 use Illuminate\Support\Facades\Broadcast;
 
+// Live admin notifications (topbar bell + sidebar badges + toasts). Any admin may listen.
+Broadcast::channel('admin.notifications', fn ($user) => $user->role?->name === 'admin');
+
 Broadcast::channel('chat.conversation.{conversationId}', function ($user, int $conversationId) {
     $conversation = ChatConversation::with(['candidate.user'])->find($conversationId);
 
