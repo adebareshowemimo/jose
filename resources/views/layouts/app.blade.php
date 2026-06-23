@@ -18,6 +18,15 @@
          entire site unstyled / "zoomed out" whenever that CDN was slow or
          blocked on a mobile device. --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @auth
+        @if(auth()->user()->role?->name === 'admin')
+            {{-- Admins get live notifications (toast + chime) even while browsing the
+                 public site, not just inside /admin. Badges are admin-layout only, so the
+                 listener simply skips them here. --}}
+            <meta name="admin-realtime" content="1">
+            @vite('resources/js/admin-realtime.js')
+        @endif
+    @endauth
     <script defer src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

@@ -10,6 +10,13 @@
     <link rel="icon" href="{{ asset('images/favicon-16x16.png') }}" type="image/png" sizes="16x16">
     <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @auth
+        @if(auth()->user()->role?->name === 'admin')
+            {{-- Admins get live notifications (toast + chime) on dashboard pages too. --}}
+            <meta name="admin-realtime" content="1">
+            @vite('resources/js/admin-realtime.js')
+        @endif
+    @endauth
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
