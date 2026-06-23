@@ -64,6 +64,10 @@
          to its admin list page. --}}
     <h3 class="text-base font-semibold text-gray-900 mb-3">Platform Overview</h3>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <a href="{{ route('admin.contract-staffing.index') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
+            <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalContractStaffing) }}</p>
+            <p class="text-sm text-gray-500">Contract Staffing</p>
+        </a>
         <a href="{{ route('admin.applications') }}" class="bg-white rounded-xl border border-gray-200 p-5 min-w-0 hover:border-[#1AAD94] hover:shadow-sm transition">
             <p class="text-xl sm:text-2xl font-bold text-gray-900 break-words">{{ number_format($totalApplications) }}</p>
             <p class="text-sm text-gray-500">Applications</p>

@@ -36,15 +36,18 @@ class AdminController extends Controller
     {
         $totalUsers      = User::count();
         $totalCompanies  = Company::count();
-        $totalJobs       = JobListing::count();
+        // /admin/jobs and the sidebar badge both scope to regular jobs; contract-
+        // staffing roles live on their own page, so they're counted separately below.
+        $totalJobs       = JobListing::regularJobs()->count();
         $totalCandidates = Candidate::count();
         $totalOrders     = Order::count();
         $totalRevenue    = $this->sumPaymentsInDefault(
             Payment::where('status', 'completed')
         );
 
-        $activeJobs      = JobListing::where('status', 'active')->count();
-        $pendingJobs     = JobListing::where('status', 'pending')->count();
+        $activeJobs      = JobListing::regularJobs()->where('status', 'active')->count();
+        $pendingJobs     = JobListing::regularJobs()->where('status', 'pending')->count();
+        $totalContractStaffing = JobListing::contractStaffing()->count();
         $activeSubscriptions = Subscription::where('status', 'active')->count();
 
         // Platform-wide totals so the dashboard reflects the full database, not just
@@ -96,7 +99,8 @@ class AdminController extends Controller
             'revenueChart', 'userChart',
             'totalApplications', 'totalEvents', 'totalEventRegistrations',
             'totalTrainingEnrolments', 'totalRecruitment', 'pendingRecruitment',
-            'totalContacts', 'newContacts', 'newsletterSubscribers', 'pendingPayments'
+            'totalContacts', 'newContacts', 'newsletterSubscribers', 'pendingPayments',
+            'totalContractStaffing'
         ));
     }
 
