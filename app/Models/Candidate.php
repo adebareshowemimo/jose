@@ -46,6 +46,11 @@ class Candidate extends Model
         return $this->hasMany(CandidateBoost::class);
     }
 
+    public function profileViews(): HasMany
+    {
+        return $this->hasMany(CandidateProfileView::class);
+    }
+
     public function orderItems(): MorphMany
     {
         return $this->morphMany(OrderItem::class, 'orderable');

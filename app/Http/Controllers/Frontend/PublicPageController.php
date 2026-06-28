@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Models\Candidate;
+use App\Models\CandidateProfileView;
 use App\Models\Event;
 use App\Models\JobListing;
 use App\Models\NewsArticle;
@@ -508,6 +509,8 @@ class PublicPageController extends BasePageController
                     ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
             }
 
+            CandidateProfileView::record($candidate, $user, 'employer');
+
             return view('pages.candidates.detail', [
                 'pageTitle' => $candidate->user?->name ?? 'Candidate',
                 'pageDescription' => 'Candidate profile: ' . ($candidate->user?->name ?? 'Candidate'),
@@ -536,6 +539,11 @@ class PublicPageController extends BasePageController
         abort_unless($isAdmin || $isOwner, 404);
 
         $name = $candidate->user?->name ?? 'Candidate';
+
+        // record() ignores the candidate viewing their own profile, so this only
+        // counts genuine admin views.
+        $viewSource = $isAdmin ? 'admin' : 'public';
+        CandidateProfileView::record($candidate, $user, $viewSource);
 
         return view('pages.candidates.detail', [
             'pageTitle' => $name,

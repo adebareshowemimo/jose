@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Models\Candidate;
+use App\Models\ChatConversation;
+use App\Models\ChatMessage;
 use App\Models\JobAlert;
 use App\Models\JobApplication;
 use App\Models\JobListing;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -29,10 +32,19 @@ class CandidateDashboardController extends BasePageController
         $savedJobsCount = Wishlist::where('user_id', $user->id)
             ->where('wishlistable_type', JobListing::class)
             ->count();
-        $messagesCount = 0; // Placeholder until chat system is implemented
+
+        // Unread chat messages (messages the candidate has received but not read).
+        $messagesCount = 0;
+        if ($candidate) {
+            $convIds = ChatConversation::where('candidate_id', $candidate->id)->pluck('id');
+            $messagesCount = ChatMessage::whereNull('read_at')
+                ->where('sender_user_id', '!=', $user->id)
+                ->whereIn('chat_conversation_id', $convIds)
+                ->count();
+        }
 
         // Recent applications
-        $recentApplications = $candidate 
+        $recentApplications = $candidate
             ? JobApplication::with(['jobListing.company'])
                 ->where('candidate_id', $candidate->id)
                 ->orderBy('created_at', 'desc')
@@ -40,8 +52,14 @@ class CandidateDashboardController extends BasePageController
                 ->get()
             : collect();
 
-        // Calculate profile completion
-        $profileCompletion = $this->calculateProfileCompletion($candidate, $user);
+        // Recent notifications (Laravel database notifications).
+        $recentNotifications = $user->notifications()->latest()->take(5)->get();
+
+        // Profile-view trend for the last 6 months (labels + counts).
+        $profileViews = $this->profileViewTrend($candidate);
+
+        // Profile completion (shared single source of truth).
+        $profileCompletion = $user->profileCompletion();
 
         return view('pages.dashboard.candidate.dashboard', [
             'appliedJobs' => $appliedJobsCount,
@@ -49,6 +67,8 @@ class CandidateDashboardController extends BasePageController
             'messages' => $messagesCount,
             'savedJobs' => $savedJobsCount,
             'recentApplications' => $recentApplications,
+            'recentNotifications' => $recentNotifications,
+            'profileViews' => $profileViews,
             'profileCompletion' => $profileCompletion,
         ]);
     }
@@ -263,30 +283,34 @@ class CandidateDashboardController extends BasePageController
         return back()->with('success', 'Job removed from saved jobs.');
     }
 
-    private function calculateProfileCompletion($candidate, $user): int
+    /**
+     * Build the profile-view trend for the last 6 calendar months.
+     *
+     * @param  \App\Models\Candidate|null  $candidate
+     * @return array<int, array{label: string, count: int}>
+     */
+    private function profileViewTrend(?Candidate $candidate): array
     {
-        $completion = 0;
-        $fields = 0;
+        $start = Carbon::now()->startOfMonth()->subMonths(5);
 
-        // User fields
-        $fields += 3;
-        if ($user->name) $completion++;
-        if ($user->email) $completion++;
-        if ($user->avatar_id) $completion++;
-
+        $countsByMonth = [];
         if ($candidate) {
-            // Candidate fields
-            $fields += 8;
-            if ($candidate->title) $completion++;
-            if ($candidate->bio) $completion++;
-            if ($candidate->education && count($candidate->education)) $completion++;
-            if ($candidate->experience && count($candidate->experience)) $completion++;
-            if ($candidate->skills()->count()) $completion++;
-            if ($candidate->location_id) $completion++;
-            if ($candidate->resumes()->count()) $completion++;
-            if ($candidate->social_links && count($candidate->social_links)) $completion++;
+            $countsByMonth = $candidate->profileViews()
+                ->where('created_at', '>=', $start)
+                ->get(['created_at'])
+                ->groupBy(fn ($view) => $view->created_at->format('Y-m'))
+                ->map(fn ($group) => $group->count());
         }
 
-        return $fields > 0 ? round(($completion / $fields) * 100) : 0;
+        $trend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->startOfMonth()->subMonths($i);
+            $trend[] = [
+                'label' => $month->format('M'),
+                'count' => (int) ($countsByMonth[$month->format('Y-m')] ?? 0),
+            ];
+        }
+
+        return $trend;
     }
 }
