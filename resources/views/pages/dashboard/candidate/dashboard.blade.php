@@ -5,24 +5,12 @@
 
 @section('sidebar-nav')
     @include('pages.dashboard.candidate.partials.sidebar')
-
-    {{-- Profile Completion --}}
-    <div class="mt-6 p-4 bg-gradient-to-br from-[#073057] to-[#0a4275] rounded-xl text-white">
-        <p class="text-sm font-medium mb-2">Profile Completion</p>
-        <div class="flex items-center gap-3 mb-2">
-            <div class="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
-                <div class="h-full bg-[#1AAD94] rounded-full transition-all" style="width: 65%"></div>
-            </div>
-            <span class="text-sm font-bold">65%</span>
-        </div>
-        <p class="text-xs text-white/70">Complete your profile to get better job matches</p>
-    </div>
 @endsection
 
 @section('content')
     {{-- Welcome Header --}}
     <div class="mb-6">
-        <h2 class="text-2xl font-bold text-[#073057]">Welcome back, {{ auth()->user()->first_name ?? 'Candidate' }}!</h2>
+        <h2 class="text-2xl font-bold text-[#073057]">Welcome back, {{ strtok(auth()->user()->name ?? 'Candidate', ' ') }}!</h2>
         <p class="text-[#6B7280]">Ready to jump back in? Here's what's happening with your job search.</p>
     </div>
 
@@ -35,7 +23,7 @@
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-[#073057]">{{ $appliedJobs ?? 22 }}</p>
+                    <p class="text-2xl font-bold text-[#073057]">{{ $appliedJobs ?? 0 }}</p>
                     <p class="text-sm text-[#6B7280]">Applied Jobs</p>
                 </div>
             </div>
@@ -48,7 +36,7 @@
                     <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-[#073057]">{{ $jobAlerts ?? 15 }}</p>
+                    <p class="text-2xl font-bold text-[#073057]">{{ $jobAlerts ?? 0 }}</p>
                     <p class="text-sm text-[#6B7280]">Job Alerts</p>
                 </div>
             </div>
@@ -61,7 +49,7 @@
                     <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-[#073057]">{{ $messages ?? 7 }}</p>
+                    <p class="text-2xl font-bold text-[#073057]">{{ $messages ?? 0 }}</p>
                     <p class="text-sm text-[#6B7280]">Messages</p>
                 </div>
             </div>
@@ -74,7 +62,7 @@
                     <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-[#073057]">{{ $savedJobs ?? 32 }}</p>
+                    <p class="text-2xl font-bold text-[#073057]">{{ $savedJobs ?? 0 }}</p>
                     <p class="text-sm text-[#6B7280]">Saved Jobs</p>
                 </div>
             </div>
@@ -84,27 +72,41 @@
     {{-- Main Content Grid --}}
     <div class="grid xl:grid-cols-3 gap-6">
         {{-- Profile Views Chart --}}
+        @php
+            $profileViews = $profileViews ?? [];
+            $profileViewCounts = array_column($profileViews, 'count');
+            $profileViewsTotal = array_sum($profileViewCounts);
+            $profileViewsMax = $profileViewCounts ? max($profileViewCounts) : 0;
+            $profileViewsMax = max(1, $profileViewsMax);
+        @endphp
         <div class="xl:col-span-2 bg-white rounded-xl border border-[#E5E7EB]">
             <div class="flex items-center justify-between p-5 border-b border-[#E5E7EB]">
-                <h3 class="text-lg font-semibold text-[#073057]">Profile Views</h3>
-                <select class="text-sm border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-[#4B5563] focus:ring-2 focus:ring-[#1AAD94] outline-none">
-                    <option>Last 6 months</option>
-                    <option>Last 12 months</option>
-                    <option>This year</option>
-                </select>
+                <div>
+                    <h3 class="text-lg font-semibold text-[#073057]">Profile Views</h3>
+                    <p class="text-xs text-[#6B7280] mt-0.5">{{ number_format($profileViewsTotal) }} views in the last 6 months</p>
+                </div>
             </div>
             <div class="p-5">
-                <div class="h-64 flex items-end gap-4">
-                    @php $months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']; $values = [40, 65, 45, 80, 55, 90]; @endphp
-                    @foreach($months as $i => $month)
-                        <div class="flex-1 flex flex-col items-center gap-2">
-                            <div class="w-full bg-[#1AAD94]/20 rounded-t-lg relative" style="height: {{ $values[$i] }}%">
-                                <div class="absolute inset-x-0 bottom-0 bg-[#1AAD94] rounded-t-lg" style="height: {{ $values[$i] }}%"></div>
+                @if($profileViewsTotal === 0)
+                    <div class="h-64 flex flex-col items-center justify-center text-center text-[#6B7280]">
+                        <svg class="w-12 h-12 mb-3 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        <p class="font-medium">No profile views yet</p>
+                        <p class="text-sm">Views appear here when employers open your profile.</p>
+                    </div>
+                @else
+                    <div class="h-64 flex items-end gap-4">
+                        @foreach($profileViews as $point)
+                            @php $barHeight = $point['count'] > 0 ? max(4, round($point['count'] / $profileViewsMax * 100)) : 0; @endphp
+                            <div class="flex-1 flex flex-col items-center gap-2">
+                                <span class="text-xs font-semibold text-[#073057]">{{ $point['count'] }}</span>
+                                <div class="w-full bg-[#1AAD94]/10 rounded-t-lg relative flex-1 flex items-end" title="{{ $point['count'] }} views in {{ $point['label'] }}">
+                                    <div class="w-full bg-[#1AAD94] rounded-t-lg transition-all" style="height: {{ $barHeight }}%"></div>
+                                </div>
+                                <span class="text-xs text-[#6B7280]">{{ $point['label'] }}</span>
                             </div>
-                            <span class="text-xs text-[#6B7280]">{{ $month }}</span>
-                        </div>
-                    @endforeach
-                </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
         </div>
 
@@ -115,50 +117,35 @@
                 <a href="{{ route('user.notifications') }}" class="text-sm text-[#1AAD94] hover:underline">View all</a>
             </div>
             <div class="divide-y divide-[#E5E7EB]">
-                <div class="p-4 hover:bg-[#F9FAFB] transition">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                @forelse($recentNotifications ?? [] as $notification)
+                    @php
+                        $data = $notification->data ?? [];
+                        $title = $data['title'] ?? 'Notification';
+                        $message = $data['message'] ?? '';
+                        $isUnread = is_null($notification->read_at);
+                    @endphp
+                    <a href="{{ route('user.notifications.read', $notification->id) }}"
+                       class="block p-4 transition {{ $isUnread ? 'bg-[#F0FBF8] hover:bg-[#E6F7F2]' : 'hover:bg-[#F9FAFB]' }}">
+                        <div class="flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-full {{ $isUnread ? 'bg-[#1AAD94] text-white' : 'bg-[#E5E7EB] text-[#6B7280]' }} flex items-center justify-center flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-[#374151] font-medium">{{ $title }}</p>
+                                @if($message)
+                                    <p class="text-sm text-[#6B7280] truncate">{{ $message }}</p>
+                                @endif
+                                <p class="text-xs text-[#9CA3AF] mt-0.5">{{ $notification->created_at->diffForHumans() }}</p>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-[#374151]"><strong>Maersk Line</strong> viewed your profile</p>
-                            <p class="text-xs text-[#9CA3AF]">2 hours ago</p>
-                        </div>
+                    </a>
+                @empty
+                    <div class="p-8 text-center text-[#6B7280]">
+                        <svg class="w-10 h-10 mx-auto mb-3 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        <p class="text-sm font-medium">No notifications yet</p>
+                        <p class="text-xs">You'll see updates about your account here.</p>
                     </div>
-                </div>
-                <div class="p-4 hover:bg-[#F9FAFB] transition">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-[#374151]">Application for <strong>Chief Officer</strong> submitted</p>
-                            <p class="text-xs text-[#9CA3AF]">Yesterday</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4 hover:bg-[#F9FAFB] transition">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-[#374151]"><strong>5 new jobs</strong> matching your profile</p>
-                            <p class="text-xs text-[#9CA3AF]">2 days ago</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="p-4 hover:bg-[#F9FAFB] transition">
-                    <div class="flex items-start gap-3">
-                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm text-[#374151]">New message from <strong>MSC Cruises</strong></p>
-                            <p class="text-xs text-[#9CA3AF]">3 days ago</p>
-                        </div>
-                    </div>
-                </div>
+                @endforelse
             </div>
         </div>
     </div>

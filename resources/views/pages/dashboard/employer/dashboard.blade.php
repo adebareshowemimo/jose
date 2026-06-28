@@ -23,7 +23,7 @@
                     <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-[#073057]">{{ $postedJobs ?? 18 }}</p>
+                    <p class="text-2xl font-bold text-[#073057]">{{ $postedJobs ?? 0 }}</p>
                     <p class="text-sm text-[#6B7280]">Posted Jobs</p>
                 </div>
             </div>
@@ -36,7 +36,7 @@
                     <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-[#073057]">{{ $applications ?? 245 }}</p>
+                    <p class="text-2xl font-bold text-[#073057]">{{ $applications ?? 0 }}</p>
                     <p class="text-sm text-[#6B7280]">Applications</p>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                     <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
                 </div>
                 <div>
-                    <p class="text-2xl font-bold text-[#073057]">{{ $shortlisted ?? 48 }}</p>
+                    <p class="text-2xl font-bold text-[#073057]">{{ $shortlisted ?? 0 }}</p>
                     <p class="text-sm text-[#6B7280]">Shortlisted</p>
                 </div>
             </div>
@@ -71,36 +71,44 @@
 
     {{-- Main Content Grid --}}
     <div class="grid xl:grid-cols-3 gap-6">
-        {{-- Profile Views Chart --}}
+        {{-- Applications Chart --}}
+        @php
+            $totalApps = $chartData->sum('applications');
+            $maxApps = $chartData->max('applications') ?: 1;
+        @endphp
         <div class="xl:col-span-2 bg-white rounded-xl border border-[#E5E7EB]">
             <div class="flex items-center justify-between p-5 border-b border-[#E5E7EB]">
-                <h3 class="text-lg font-semibold text-[#073057]">Job Views & Applications</h3>
-                <select class="text-sm border border-[#E5E7EB] rounded-lg px-3 py-1.5 text-[#4B5563] focus:ring-2 focus:ring-[#1AAD94] outline-none">
-                    <option>Last 6 months</option>
-                    <option>Last 12 months</option>
-                    <option>This year</option>
-                </select>
+                <div>
+                    <h3 class="text-lg font-semibold text-[#073057]">Applications</h3>
+                    <p class="text-xs text-[#6B7280] mt-0.5">{{ number_format($totalApps) }} in the last 6 months</p>
+                </div>
             </div>
             <div class="p-5">
-                @php
-                    $maxApps = $chartData->max('applications') ?: 1;
-                @endphp
-                <div class="h-64 flex items-end gap-3">
-                    @foreach($chartData as $point)
-                        <div class="flex-1 flex flex-col items-center gap-2">
-                            <div class="w-full flex gap-1 justify-center">
-                                <div class="flex-1 bg-[#1AAD94] rounded-t" style="height: {{ ($point['applications'] / $maxApps) * 200 }}px"></div>
-                            </div>
-                            <span class="text-xs text-[#6B7280]">{{ $point['month'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-[#E5E7EB]">
-                    <div class="flex items-center gap-2">
-                        <span class="w-3 h-3 bg-[#1AAD94] rounded-sm"></span>
-                        <span class="text-sm text-[#6B7280]">Applications</span>
+                @if($totalApps === 0)
+                    <div class="h-64 flex flex-col items-center justify-center text-center text-[#6B7280]">
+                        <svg class="w-12 h-12 mb-3 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <p class="font-medium">No applications yet</p>
+                        <p class="text-sm">Application activity will appear here once candidates apply.</p>
                     </div>
-                </div>
+                @else
+                    <div class="h-64 flex items-end gap-3">
+                        @foreach($chartData as $point)
+                            <div class="flex-1 flex flex-col items-center gap-2">
+                                <span class="text-xs font-semibold text-[#073057]">{{ $point['applications'] }}</span>
+                                <div class="w-full flex gap-1 justify-center flex-1 items-end">
+                                    <div class="flex-1 bg-[#1AAD94] rounded-t transition-all" style="height: {{ ($point['applications'] / $maxApps) * 100 }}%" title="{{ $point['applications'] }} applications in {{ $point['month'] }}"></div>
+                                </div>
+                                <span class="text-xs text-[#6B7280]">{{ $point['month'] }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-[#E5E7EB]">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 bg-[#1AAD94] rounded-sm"></span>
+                            <span class="text-sm text-[#6B7280]">Applications</span>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
 

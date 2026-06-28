@@ -90,6 +90,42 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Wishlist::class);
     }
 
+    /**
+     * Percentage (0-100) of the candidate profile that is filled in.
+     * Single source of truth shared by the dashboard and the sidebar widget.
+     *
+     * @return int
+     */
+    public function profileCompletion(): int
+    {
+        $candidate = $this->candidate;
+
+        // User-level fields.
+        $checks = [
+            (bool) $this->name,
+            (bool) $this->email,
+            (bool) $this->avatar,
+        ];
+
+        if ($candidate) {
+            $hasItems = fn ($value) => is_array($value) && count($value) > 0;
+
+            $checks[] = (bool) $candidate->title;
+            $checks[] = (bool) $candidate->bio;
+            $checks[] = $hasItems($candidate->education);
+            $checks[] = $hasItems($candidate->experience);
+            $checks[] = $candidate->skills()->count() > 0;
+            $checks[] = (bool) $candidate->location_id;
+            $checks[] = $candidate->resumes()->count() > 0;
+            $checks[] = $hasItems($candidate->social_links);
+        }
+
+        $total = count($checks);
+        $filled = count(array_filter($checks));
+
+        return $total > 0 ? (int) round(($filled / $total) * 100) : 0;
+    }
+
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new TemplatedVerifyEmail());

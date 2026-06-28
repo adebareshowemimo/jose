@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Models\JobApplication;
 use App\Models\JobListing;
 use App\Models\Candidate;
+use App\Models\CandidateProfileView;
 use App\Models\Category;
 use App\Models\JobType;
 use App\Models\Location;
@@ -665,6 +666,8 @@ class EmployerDashboardController extends BasePageController
                 ->route('employer.recruitment-requests.index')
                 ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
         }
+
+        CandidateProfileView::record($candidate, $user, 'employer');
 
         $candidate->load(['user', 'location', 'skills', 'categories', 'resumes' => fn ($q) => $q->latest()]);
 

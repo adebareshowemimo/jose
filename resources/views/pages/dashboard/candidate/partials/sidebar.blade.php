@@ -96,13 +96,18 @@ $navItems = [
 </div>
 
 {{-- Profile Completion --}}
+@php $profileCompletion = auth()->user()->profileCompletion(); @endphp
 <div class="mt-6 p-4 bg-gradient-to-br from-[#073057] to-[#0a4275] rounded-xl text-white">
     <p class="text-sm font-medium mb-2">Profile Completion</p>
     <div class="flex items-center gap-3 mb-2">
         <div class="flex-1 h-2 bg-white/20 rounded-full overflow-hidden">
-            <div class="h-full bg-[#1AAD94] rounded-full transition-all" style="width: 65%"></div>
+            <div class="h-full bg-[#1AAD94] rounded-full transition-all" style="width: {{ $profileCompletion }}%"></div>
         </div>
-        <span class="text-sm font-bold">65%</span>
+        <span class="text-sm font-bold">{{ $profileCompletion }}%</span>
     </div>
-    <p class="text-xs text-white/70">Complete your profile to get better job matches</p>
+    @if($profileCompletion < 100)
+        <p class="text-xs text-white/70">Complete your profile to get better job matches</p>
+    @else
+        <p class="text-xs text-white/70">Your profile is complete — great work!</p>
+    @endif
 </div>
