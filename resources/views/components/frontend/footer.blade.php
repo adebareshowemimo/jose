@@ -132,10 +132,13 @@
                 <div class="text-center text-lg-end">
                     <ul class="list-unstyled mb-0">
                         <li class="display-30 d-inline-block border-end border-color-light-white pe-3 me-2 lh-1">
-                            <a href="#" class="text-white text-primary-hover opacity7">Terms &amp; Conditions</a>
+                            <a href="{{ route('legal.terms') }}" class="text-white text-primary-hover opacity7">Terms &amp; Conditions</a>
+                        </li>
+                        <li class="display-30 d-inline-block border-end border-color-light-white pe-3 me-2 lh-1">
+                            <a href="{{ route('legal.privacy') }}" class="text-white text-primary-hover opacity7">Privacy Policy</a>
                         </li>
                         <li class="display-30 d-inline-block lh-1">
-                            <a href="#" class="text-white text-primary-hover opacity7">Privacy Policy</a>
+                            <a href="{{ route('legal.cookies') }}" class="text-white text-primary-hover opacity7">Cookie Policy</a>
                         </li>
                     </ul>
                 </div>

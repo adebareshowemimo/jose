@@ -486,4 +486,308 @@ class JclLegalContent
             ],
         ];
     }
+
+    /**
+     * Cookie Policy — meta header + ordered sections.
+     *
+     * Content is grounded in an audit of what the Platform actually sets:
+     * three first-party cookies (session, CSRF, optional "remember me") and a
+     * small set of third-party services (Paystack, Google/Microsoft sign-in,
+     * Google Fonts). The Platform runs no analytics, advertising or tracking
+     * cookies — keep this accurate if that ever changes.
+     */
+    public static function cookiePolicy(): array
+    {
+        return [
+            'meta' => [
+                'effective' => 'Effective Date: 2026',
+                'version' => 'Version 1.0',
+                'site' => 'joseoceanjobs.com',
+            ],
+            'sections' => [
+                [
+                    'id' => 'introduction',
+                    'number' => '1',
+                    'title' => 'Introduction',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'This Cookie Policy explains how Jose Consulting Limited (JCL), which owns and operates JoseOceanJobs at joseoceanjobs.com (the "Platform"), uses cookies and similar technologies when you visit or use the Platform.'],
+                        ['type' => 'p', 'text' => 'It should be read together with our Privacy Policy, which explains how we handle your personal data more generally. By using the Platform, you agree to the use of cookies as described in this policy, except where your consent is separately required.'],
+                    ],
+                ],
+                [
+                    'id' => 'what-are-cookies',
+                    'number' => '2',
+                    'title' => 'What Are Cookies',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'Cookies are small text files that a website places on your device (computer, tablet, or phone) when you visit. They are widely used to make websites work, to keep you signed in, and to remember your preferences.'],
+                        ['type' => 'p', 'text' => 'Cookies set by the Platform itself are called "first-party" cookies. Cookies set by another organisation — for example a payment provider whose page you are redirected to — are called "third-party" cookies. Cookies may last only for your current visit ("session" cookies) or remain on your device for a set period ("persistent" cookies).'],
+                    ],
+                ],
+                [
+                    'id' => 'how-we-use-cookies',
+                    'number' => '3',
+                    'title' => 'How We Use Cookies',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We keep our use of cookies to the minimum needed to run the Platform securely. We use cookies in the following categories only:'],
+                        ['type' => 'ul', 'items' => [
+                            'Strictly necessary cookies — required for the Platform to function, such as keeping you signed in and protecting forms against fraud. The Platform cannot work properly without these, so they cannot be switched off through our site.',
+                            'Functional cookies — remember a choice you have made, such as staying signed in when you select "Remember me" at login.',
+                        ]],
+                        ['type' => 'p', 'text' => 'Importantly, the Platform does NOT use analytics cookies, advertising or marketing cookies, social-media tracking pixels, or any cross-site behavioural tracking. We do not build advertising profiles, and we do not sell your data.'],
+                    ],
+                ],
+                [
+                    'id' => 'cookies-we-use',
+                    'number' => '4',
+                    'title' => 'Cookies We Use',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'The Platform sets the following first-party cookies:'],
+                        ['type' => 'table', 'table' => [
+                            'head' => ['Cookie', 'Purpose', 'Category', 'Duration'],
+                            'rows' => [
+                                ['joseoceanjobs-session', 'Identifies your browsing session so you stay signed in and your activity is preserved as you move between pages. It contains only an encrypted reference; your information is stored securely on our server, not in the cookie.', 'Strictly necessary', 'Expires about 2 hours after inactivity (not stored permanently).'],
+                                ['XSRF-TOKEN', 'Protects forms and requests against cross-site request forgery (CSRF), a common security attack.', 'Strictly necessary', 'Session.'],
+                                ['remember_web_*', 'Keeps you signed in between visits, but only if you tick "Remember me" when logging in.', 'Functional', 'Persistent — until you log out (up to several years if not cleared).'],
+                            ],
+                        ]],
+                        ['type' => 'p', 'text' => 'Cookie names may vary slightly depending on configuration, but their purpose remains as described above.'],
+                    ],
+                ],
+                [
+                    'id' => 'third-party-services',
+                    'number' => '5',
+                    'title' => 'Third-Party Services',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'In certain situations the Platform relies on trusted third-party services. These services may set their own cookies or receive limited technical information (such as your IP address) directly, governed by their own privacy and cookie policies — not this one. They are only triggered in the circumstances described below:'],
+                        ['type' => 'ul', 'items' => [
+                            'Paystack (payments) — if you choose to pay online, you are securely redirected to Paystack to complete the transaction. Paystack sets its own cookies on its checkout pages for security and fraud prevention. See paystack.com for details. We do not store your full card details.',
+                            'Google and Microsoft sign-in — if you choose to sign in using your Google or Microsoft account, you are redirected to that provider, which sets its own cookies to authenticate you. See the privacy policies of Google and Microsoft.',
+                            'Google Fonts — the Platform loads fonts from Google\'s servers so pages display consistently. This does not set a cookie, but it does send your IP address and browser information to Google when fonts are requested.',
+                        ]],
+                        ['type' => 'p', 'text' => 'We also use a real-time messaging service to deliver live notifications and chat. This relies on your existing session cookie above to confirm your identity; it does not place any additional cookie on your device.'],
+                    ],
+                ],
+                [
+                    'id' => 'consent',
+                    'number' => '6',
+                    'title' => 'Do We Ask for Your Consent',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'Because the Platform currently uses only strictly necessary and functional cookies — and no analytics, advertising, or tracking cookies — we rely on these cookies being essential to providing a service you have requested, and we do not display a cookie consent banner.'],
+                        ['type' => 'p', 'text' => 'If in future we introduce analytics, advertising, or other non-essential cookies, we will update this policy and ask for your consent before those cookies are placed, in line with applicable data protection law.'],
+                    ],
+                ],
+                [
+                    'id' => 'managing-cookies',
+                    'number' => '7',
+                    'title' => 'Managing and Disabling Cookies',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'You can control and delete cookies through your browser settings. Most browsers let you view what cookies are stored, block all or some cookies, and delete cookies already set. Instructions are available in the help section of your browser (for example Chrome, Safari, Firefox, or Edge).'],
+                        ['type' => 'p', 'text' => 'Please note that blocking strictly necessary cookies will prevent parts of the Platform from working correctly — in particular, you will not be able to sign in or stay signed in.'],
+                    ],
+                ],
+                [
+                    'id' => 'changes-to-this-policy',
+                    'number' => '8',
+                    'title' => 'Changes to This Policy',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We may update this Cookie Policy from time to time to reflect changes in the technologies we use or in the law. Where changes are material, we will provide notice on the Platform. The current version is always available at joseoceanjobs.com.'],
+                    ],
+                ],
+                [
+                    'id' => 'contact-us',
+                    'number' => '9',
+                    'title' => 'Contact Us',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'If you have any questions about how we use cookies, please contact us:'],
+                        ['type' => 'contact', 'contact' => [
+                            'org' => 'Jose Consulting Limited',
+                            'trading' => 'JoseOceanJobs',
+                            'website' => 'joseoceanjobs.com',
+                            'email' => 'info@joseoceanjobs.com',
+                            'whatsapp' => '+234 902 430 4210',
+                            'location' => 'Lagos, Nigeria',
+                        ]],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Privacy Policy — meta header + ordered sections.
+     *
+     * Grounded in what the Platform actually collects (accounts, candidate and
+     * company profiles, CV uploads, applications, payments via Paystack, optional
+     * Google/Microsoft sign-in, chat messages) and aligned with the Nigeria Data
+     * Protection Act 2023 referenced in the Terms of Service.
+     */
+    public static function privacyPolicy(): array
+    {
+        return [
+            'meta' => [
+                'effective' => 'Effective Date: 2026',
+                'version' => 'Version 1.0',
+                'site' => 'joseoceanjobs.com',
+            ],
+            'sections' => [
+                [
+                    'id' => 'introduction',
+                    'number' => '1',
+                    'title' => 'Introduction',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'Jose Consulting Limited (JCL), a company registered in Nigeria and trading as JoseOceanJobs, is committed to protecting your privacy. This Privacy Policy explains what personal data we collect through joseoceanjobs.com (the "Platform"), how we use it, who we share it with, and the rights you have.'],
+                        ['type' => 'p', 'text' => 'We process personal data in accordance with the Nigeria Data Protection Act 2023 (NDPA) and other applicable data protection laws. For information specifically about cookies, please see our Cookie Policy.'],
+                    ],
+                ],
+                [
+                    'id' => 'information-we-collect',
+                    'number' => '2',
+                    'title' => 'Information We Collect',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We collect the following categories of personal data, depending on how you use the Platform:'],
+                        ['type' => 'ul', 'items' => [
+                            'Account information — your name, email address, phone number, password (stored encrypted), and the role you register under (candidate or employer).',
+                            'Candidate profile data — where you register as a job seeker: job title, biography, date of birth, gender, education and work experience, skills, location, expected salary, social or professional links, profile photo, and any CV or resume documents you upload.',
+                            'Employer and company data — where you register as an employer: company name, contact details, logo, location, and related company information.',
+                            'Application and recruitment data — the jobs you apply for, application status, saved jobs, job alerts, and information exchanged during the recruitment process.',
+                            'Payment information — when you make a payment, transactions are processed by our payment provider (Paystack). We receive confirmation and reference details, but we do not collect or store your full card details.',
+                            'Communications — messages you send through the in-platform chat, enquiries you submit through contact or service-request forms, and related correspondence.',
+                            'Sign-in provider data — if you choose to sign in with Google or Microsoft, we receive basic profile information (such as your name and email) from that provider.',
+                            'Technical data — limited information such as your IP address, browser type, and activity on the Platform, including information collected through cookies as described in our Cookie Policy.',
+                        ]],
+                    ],
+                ],
+                [
+                    'id' => 'how-we-use-your-information',
+                    'number' => '3',
+                    'title' => 'How We Use Your Information',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We use your personal data to:'],
+                        ['type' => 'ul', 'items' => [
+                            'Create and manage your account and provide the Platform\'s features',
+                            'Match candidates with employers and process job applications',
+                            'Deliver training, recruitment, and marine or business services you request',
+                            'Process payments and send receipts and related confirmations',
+                            'Enable messaging and send service notifications relevant to your account',
+                            'Verify information and maintain the security and integrity of the Platform',
+                            'Respond to your enquiries, requests, and complaints',
+                            'Comply with our legal and regulatory obligations',
+                        ]],
+                    ],
+                ],
+                [
+                    'id' => 'legal-basis',
+                    'number' => '4',
+                    'title' => 'Legal Basis for Processing',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'Under the NDPA, we rely on one or more of the following legal bases when processing your personal data:'],
+                        ['type' => 'ul', 'items' => [
+                            'Performance of a contract — to provide the services you have requested and operate your account',
+                            'Consent — where you have given clear consent, for example to share your profile with an employer (you may withdraw consent at any time)',
+                            'Legitimate interests — to keep the Platform secure, prevent fraud, and improve our services, provided your rights are not overridden',
+                            'Legal obligation — where we must process data to comply with the law',
+                        ]],
+                    ],
+                ],
+                [
+                    'id' => 'sharing-your-information',
+                    'number' => '5',
+                    'title' => 'Sharing Your Information',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We do not sell your personal data. We share it only where necessary, including with:'],
+                        ['type' => 'ul', 'items' => [
+                            'Employers — candidate profiles and application data are shared with the relevant employer solely for evaluating you for a specific role',
+                            'Delivery partners — where you request marine, training, or business services, we coordinate delivery through our vetted partner network',
+                            'Payment provider — Paystack, to process online payments securely',
+                            'Service providers — trusted providers who help us operate the Platform (for example hosting and email delivery), under appropriate confidentiality obligations',
+                            'Authorities — where required by law, regulation, or valid legal process',
+                        ]],
+                        ['type' => 'p', 'text' => 'Employers who receive candidate data must use it only for the advertised role and must not share, sell, or repurpose it without the candidate\'s explicit consent.'],
+                    ],
+                ],
+                [
+                    'id' => 'data-retention',
+                    'number' => '6',
+                    'title' => 'Data Retention',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We keep your personal data for as long as your account is active and for as long as needed to provide our services, comply with legal obligations, resolve disputes, and enforce our agreements. When data is no longer needed, we securely delete or anonymise it. You may request deletion of your account and data as described below.'],
+                    ],
+                ],
+                [
+                    'id' => 'your-rights',
+                    'number' => '7',
+                    'title' => 'Your Rights',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'Under the NDPA, you have the right to:'],
+                        ['type' => 'ul', 'items' => [
+                            'Access the personal data we hold about you',
+                            'Request correction of inaccurate or incomplete data',
+                            'Request deletion of your personal data',
+                            'Object to or restrict certain processing',
+                            'Request a copy of your data in a portable format',
+                            'Withdraw consent at any time, where processing is based on consent',
+                            'Lodge a complaint with the Nigeria Data Protection Commission',
+                        ]],
+                        ['type' => 'p', 'text' => 'To exercise any of these rights, contact us at info@joseoceanjobs.com. We will respond within the timeframes required by law.'],
+                    ],
+                ],
+                [
+                    'id' => 'data-security',
+                    'number' => '8',
+                    'title' => 'Data Security',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We use appropriate technical and organisational measures to protect your personal data, including encrypted passwords, access controls, and secure handling of payment transactions through our payment provider. However, no method of transmission or storage is completely secure, and we cannot guarantee absolute security.'],
+                    ],
+                ],
+                [
+                    'id' => 'cookies',
+                    'number' => '9',
+                    'title' => 'Cookies',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'The Platform uses a small number of strictly necessary and functional cookies to operate securely and keep you signed in. We do not use analytics, advertising, or tracking cookies. Full details are set out in our Cookie Policy.'],
+                    ],
+                ],
+                [
+                    'id' => 'international-transfers',
+                    'number' => '10',
+                    'title' => 'International Transfers',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'Some of our service providers (such as payment, hosting, or sign-in providers) may process data outside Nigeria. Where this happens, we take reasonable steps to ensure your data remains protected in accordance with the NDPA.'],
+                    ],
+                ],
+                [
+                    'id' => 'childrens-privacy',
+                    'number' => '11',
+                    'title' => 'Children\'s Privacy',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'The Platform is intended for users who are at least 18 years of age. We do not knowingly collect personal data from anyone under 18. If we become aware that we have done so, we will delete that data.'],
+                    ],
+                ],
+                [
+                    'id' => 'changes-to-this-policy',
+                    'number' => '12',
+                    'title' => 'Changes to This Policy',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We may update this Privacy Policy from time to time. Where changes are material, we will notify registered users by email or by prominent notice on the Platform. The current version is always available at joseoceanjobs.com.'],
+                    ],
+                ],
+                [
+                    'id' => 'contact-us',
+                    'number' => '13',
+                    'title' => 'Contact Us',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'If you have any questions about this Privacy Policy or wish to exercise your rights, please contact us:'],
+                        ['type' => 'contact', 'contact' => [
+                            'org' => 'Jose Consulting Limited',
+                            'trading' => 'JoseOceanJobs',
+                            'website' => 'joseoceanjobs.com',
+                            'email' => 'info@joseoceanjobs.com',
+                            'whatsapp' => '+234 902 430 4210',
+                            'location' => 'Lagos, Nigeria',
+                        ]],
+                    ],
+                ],
+            ],
+        ];
+    }
 }
