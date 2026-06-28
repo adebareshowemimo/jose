@@ -8,7 +8,13 @@
 @endsection
 
 @section('content')
-@php $selectedId = $selectedConversation?->id; @endphp
+@php
+    $selectedId = $selectedConversation?->id;
+    // On mobile this is a single-pane master-detail: show the thread only when a
+    // conversation is explicitly opened (the controller auto-selects the first one
+    // for the desktop two-pane view, which we must not let hijack the mobile list).
+    $showThreadOnMobile = request()->has('conversation') && $selectedConversation;
+@endphp
 
 @if($selectedConversation)
     <div data-chat-conversation-id="{{ $selectedConversation->id }}"></div>
@@ -16,7 +22,7 @@
 
 <div class="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
     <div class="flex h-[calc(100vh-200px)] min-h-[560px]">
-        <div class="w-full md:w-80 lg:w-96 border-r border-[#E5E7EB] flex flex-col">
+        <div class="{{ $showThreadOnMobile ? 'hidden md:flex' : 'flex' }} w-full md:w-80 lg:w-96 border-r border-[#E5E7EB] flex-col">
             <div class="p-4 border-b border-[#E5E7EB]">
                 <h2 class="font-bold text-[#073057]">Messages</h2>
                 <p class="text-xs text-[#6B7280] mt-1">Employer and admin conversations assigned to you.</p>
@@ -52,11 +58,16 @@
             </div>
         </div>
 
-        <div class="hidden md:flex flex-1 flex-col">
+        <div class="{{ $showThreadOnMobile ? 'flex' : 'hidden md:flex' }} flex-1 flex-col">
             @if($selectedConversation)
-                <div class="p-4 border-b border-[#E5E7EB]">
-                    <h4 class="font-semibold text-[#073057]">{{ $selectedConversation->type === \App\Models\ChatConversation::TYPE_ADMIN_CANDIDATE ? 'JCL Admin' : ($selectedConversation->company?->name ?? 'Employer') }}</h4>
-                    <p class="text-xs text-[#1AAD94]">{{ $selectedConversation->contextLabel() }}</p>
+                <div class="p-4 border-b border-[#E5E7EB] flex items-center gap-3">
+                    <a href="{{ route('user.chat') }}" class="md:hidden -ml-1 p-1 text-[#073057] hover:text-[#1AAD94]" aria-label="Back to conversations">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    </a>
+                    <div class="min-w-0">
+                        <h4 class="font-semibold text-[#073057] truncate">{{ $selectedConversation->type === \App\Models\ChatConversation::TYPE_ADMIN_CANDIDATE ? 'JCL Admin' : ($selectedConversation->company?->name ?? 'Employer') }}</h4>
+                        <p class="text-xs text-[#1AAD94] truncate">{{ $selectedConversation->contextLabel() }}</p>
+                    </div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-4 space-y-4">
                     @foreach($messages as $message)

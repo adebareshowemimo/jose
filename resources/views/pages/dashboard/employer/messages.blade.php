@@ -12,6 +12,10 @@
     $selectedId = $selectedConversation?->id;
     $isAdminChat = $selectedConversation && $selectedConversation->type === \App\Models\ChatConversation::TYPE_ADMIN_EMPLOYER;
     $adminConversation = $adminConversation ?? null;
+    // On mobile this is a single-pane master-detail: show the thread only when a
+    // conversation is explicitly opened (the controller auto-selects the first one
+    // for the desktop two-pane view, which we must not let hijack the mobile list).
+    $showThreadOnMobile = request()->has('conversation') && $selectedConversation;
 @endphp
 
 @if($selectedConversation)
@@ -20,7 +24,7 @@
 
 <div x-data="{ actionModal: null }" class="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
     <div class="flex h-[calc(100vh-200px)] min-h-[560px]">
-        <div class="w-full md:w-80 lg:w-96 border-r border-[#E5E7EB] flex flex-col">
+        <div class="{{ $showThreadOnMobile ? 'hidden md:flex' : 'flex' }} w-full md:w-80 lg:w-96 border-r border-[#E5E7EB] flex-col">
             <div class="p-4 border-b border-[#E5E7EB] bg-[#F9FAFB]">
                 <h2 class="font-bold text-[#073057] text-sm">Admin Support</h2>
                 @if($adminConversation)
@@ -90,7 +94,7 @@
             </div>
         </div>
 
-        <div class="hidden md:flex flex-1 flex-col">
+        <div class="{{ $showThreadOnMobile ? 'flex' : 'hidden md:flex' }} flex-1 flex-col">
             @if($selectedConversation)
                 @php
                     if ($isAdminChat) {
@@ -102,11 +106,14 @@
                     }
                 @endphp
                 <div class="p-4 border-b border-[#E5E7EB] flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 {{ $isAdminChat ? 'bg-[#073057] text-white' : 'bg-[#073057]/10 text-[#073057]' }} rounded-full flex items-center justify-center font-semibold text-xs">{{ $headerInitials }}</div>
-                        <div>
-                            <h4 class="font-semibold text-[#073057]">{{ $headerName }}</h4>
-                            <p class="text-xs text-[#1AAD94]">{{ $selectedConversation->contextLabel() }}</p>
+                    <div class="flex items-center gap-3 min-w-0">
+                        <a href="{{ route('employer.chat') }}" class="md:hidden -ml-1 p-1 text-[#073057] hover:text-[#1AAD94] shrink-0" aria-label="Back to conversations">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        </a>
+                        <div class="w-10 h-10 {{ $isAdminChat ? 'bg-[#073057] text-white' : 'bg-[#073057]/10 text-[#073057]' }} rounded-full flex items-center justify-center font-semibold text-xs shrink-0">{{ $headerInitials }}</div>
+                        <div class="min-w-0">
+                            <h4 class="font-semibold text-[#073057] truncate">{{ $headerName }}</h4>
+                            <p class="text-xs text-[#1AAD94] truncate">{{ $selectedConversation->contextLabel() }}</p>
                         </div>
                     </div>
                 </div>
