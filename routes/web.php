@@ -116,6 +116,8 @@ Route::get('/plan', [PublicPageController::class, 'plan'])->name('plan.index');
 // Legal pages
 Route::get('/terms-of-service', [PublicPageController::class, 'termsOfService'])->name('legal.terms');
 Route::get('/definition-of-terms', [PublicPageController::class, 'definitions'])->name('legal.definitions');
+Route::get('/privacy-policy', [PublicPageController::class, 'privacyPolicy'])->name('legal.privacy');
+Route::get('/cookie-policy', [PublicPageController::class, 'cookiePolicy'])->name('legal.cookies');
 
 // Auth pages
 Route::prefix('auth')->group(function () {

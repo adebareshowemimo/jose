@@ -100,6 +100,40 @@ class PublicPageController extends BasePageController
         ));
     }
 
+    public function cookiePolicy()
+    {
+        return view('pages.legal.document', $this->buildJclPageData(
+            title: 'Cookie Policy',
+            description: 'How JoseOceanJobs uses cookies and similar technologies, operated by Jose Consulting Limited.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Cookie Policy'],
+            ],
+            extra: [
+                'document' => JclLegalContent::cookiePolicy(),
+                'crossReference' => 'For how we handle your personal data more broadly, see our '
+                    .'<a href="'.route('legal.privacy').'" class="font-bold text-[#073057] underline decoration-[#1AAD94] decoration-2 underline-offset-2 hover:text-[#1AAD94]">Privacy Policy</a>.',
+            ],
+        ));
+    }
+
+    public function privacyPolicy()
+    {
+        return view('pages.legal.document', $this->buildJclPageData(
+            title: 'Privacy Policy',
+            description: 'How JoseOceanJobs collects, uses, and protects your personal data, operated by Jose Consulting Limited.',
+            breadcrumbs: [
+                ['label' => 'Home', 'url' => url('/')],
+                ['label' => 'Privacy Policy'],
+            ],
+            extra: [
+                'document' => JclLegalContent::privacyPolicy(),
+                'crossReference' => 'For details about the cookies we use, see our '
+                    .'<a href="'.route('legal.cookies').'" class="font-bold text-[#073057] underline decoration-[#1AAD94] decoration-2 underline-offset-2 hover:text-[#1AAD94]">Cookie Policy</a>.',
+            ],
+        ));
+    }
+
     public function training(Request $request)
     {
         return $this->renderTrainingListing($request, 'training');
