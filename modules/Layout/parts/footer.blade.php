@@ -55,6 +55,8 @@
             <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-white/55 text-[11px] font-bold uppercase tracking-[0.12em]">
                 <a href="{{ route('legal.terms') }}" class="hover:text-white transition-colors">Terms of Service</a>
                 <a href="{{ route('legal.definitions') }}" class="hover:text-white transition-colors">Definition of Terms</a>
+                <a href="{{ route('legal.privacy') }}" class="hover:text-white transition-colors">Privacy Policy</a>
+                <a href="{{ route('legal.cookies') }}" class="hover:text-white transition-colors">Cookie Policy</a>
             </div>
             <div class="flex flex-wrap items-center gap-6 text-white/30 text-[11px] font-bold uppercase tracking-[0.12em]">
                 <div class="flex items-center gap-2"><iconify-icon icon="lucide:globe" class="text-lg"></iconify-icon><span>Global collaboration</span></div>
