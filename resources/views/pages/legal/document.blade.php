@@ -111,7 +111,7 @@
                                         <p>Email:
                                             <a href="mailto:{{ $c['email'] }}" class="font-semibold text-[#1AAD94] hover:underline">{{ $c['email'] }}</a>
                                         </p>
-                                        <p>WhatsApp:
+                                        <p>{{ $c['phone_label'] ?? 'WhatsApp' }}:
                                             <a href="https://wa.me/{{ preg_replace('/\D/', '', $c['whatsapp']) }}" target="_blank" rel="noopener" class="font-semibold text-[#1AAD94] hover:underline">{{ $c['whatsapp'] }}</a>
                                         </p>
                                         <p>{{ $c['location'] }}</p>

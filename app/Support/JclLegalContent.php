@@ -614,12 +614,11 @@ class JclLegalContent
     }
 
     /**
-     * Privacy Policy — meta header + ordered sections.
+     * Privacy Policy - meta header + ordered sections.
      *
-     * Grounded in what the Platform actually collects (accounts, candidate and
-     * company profiles, CV uploads, applications, payments via Paystack, optional
-     * Google/Microsoft sign-in, chat messages) and aligned with the Nigeria Data
-     * Protection Act 2023 referenced in the Terms of Service.
+     * Grounded in the updated JoseOceanJobs privacy policy document, including
+     * event registrations, training data, partner delivery, third-party sign-in,
+     * marketing communications, complaints, and NDPA rights.
      */
     public static function privacyPolicy(): array
     {
@@ -631,159 +630,235 @@ class JclLegalContent
             ],
             'sections' => [
                 [
-                    'id' => 'introduction',
+                    'id' => 'introduction-and-scope',
                     'number' => '1',
-                    'title' => 'Introduction',
+                    'title' => 'Introduction and Scope',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'Jose Consulting Limited (JCL), a company registered in Nigeria and trading as JoseOceanJobs, is committed to protecting your privacy. This Privacy Policy explains what personal data we collect through joseoceanjobs.com (the "Platform"), how we use it, who we share it with, and the rights you have.'],
-                        ['type' => 'p', 'text' => 'We process personal data in accordance with the Nigeria Data Protection Act 2023 (NDPA) and other applicable data protection laws. For information specifically about cookies, please see our Cookie Policy.'],
+                        ['type' => 'p', 'text' => 'This Privacy Policy explains how Jose Consulting Limited ("JCL", "we", "us", or "our") collects, uses, shares, and protects personal data when you use the JoseOceanJobs platform at joseoceanjobs.com (the "Platform"). Capitalised terms used in this Privacy Policy have the meanings given in our Definition of Terms, available at joseoceanjobs.com/definition-of-terms, unless otherwise defined below.'],
+                        ['type' => 'p', 'text' => 'This Privacy Policy should be read alongside our Terms of Service. Where there is any conflict between the two documents on matters of data protection, this Privacy Policy shall prevail.'],
+                        ['type' => 'p', 'text' => 'JCL is committed to protecting the privacy and personal data of everyone who uses the Platform, including Candidates, Employers, Training Participants, Clients, and Visitors. This Privacy Policy applies to personal data processed through joseoceanjobs.com, our registration and candidate dashboard systems, our contact and enquiry forms, our event registration pages, and any related services described in our Terms of Service.'],
+                        ['type' => 'p', 'text' => 'This Privacy Policy is issued in accordance with the Nigeria Data Protection Act 2023 ("NDPA") and aligns with generally accepted international data protection principles.'],
                     ],
                 ],
                 [
-                    'id' => 'information-we-collect',
+                    'id' => 'who-we-are',
                     'number' => '2',
-                    'title' => 'Information We Collect',
+                    'title' => 'Who We Are (Data Controller)',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'We collect the following categories of personal data, depending on how you use the Platform:'],
+                        ['type' => 'p', 'text' => 'Jose Consulting Limited, trading as JoseOceanJobs, is the data controller responsible for your personal data. Our registered office is:'],
+                        ['type' => 'p', 'text' => '10 Engineering Close, off Idowu Taylor, Victoria Island, Lagos, Nigeria'],
+                        ['type' => 'p', 'text' => 'You can contact us about any data protection matter using the details in Section 19 of this Privacy Policy.'],
+                    ],
+                ],
+                [
+                    'id' => 'what-personal-data-we-collect',
+                    'number' => '3',
+                    'title' => 'What Personal Data We Collect',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'The personal data we collect depends on how you use the Platform. This may include:'],
                         ['type' => 'ul', 'items' => [
-                            'Account information — your name, email address, phone number, password (stored encrypted), and the role you register under (candidate or employer).',
-                            'Candidate profile data — where you register as a job seeker: job title, biography, date of birth, gender, education and work experience, skills, location, expected salary, social or professional links, profile photo, and any CV or resume documents you upload.',
-                            'Employer and company data — where you register as an employer: company name, contact details, logo, location, and related company information.',
-                            'Application and recruitment data — the jobs you apply for, application status, saved jobs, job alerts, and information exchanged during the recruitment process.',
-                            'Payment information — when you make a payment, transactions are processed by our payment provider (Paystack). We receive confirmation and reference details, but we do not collect or store your full card details.',
-                            'Communications — messages you send through the in-platform chat, enquiries you submit through contact or service-request forms, and related correspondence.',
-                            'Sign-in provider data — if you choose to sign in with Google or Microsoft, we receive basic profile information (such as your name and email) from that provider.',
-                            'Technical data — limited information such as your IP address, browser type, and activity on the Platform, including information collected through cookies as described in our Cookie Policy.',
+                            'Account and identity data: full name, email address, phone number, password (stored in encrypted form), and account type (Candidate or Employer).',
+                            'Candidate data: job title, date of birth, gender, profile photo, CV and employment history, education and skills, expected salary, social or professional links, maritime and energy sector certifications (such as STCW, BOSIET, HUET, and OPITO qualifications), identification documents submitted for verification, saved jobs and job alerts, and any other information you choose to include in your profile or application.',
+                            'Employer and organisation data: company name, company logo, business contact details, location, job listing content, and information relating to workforce or staffing requirements.',
+                            'Service and enquiry data: information submitted through our contact form, including your name, email, phone number, subject of enquiry, and message content, as well as messages you send through in-platform chat or messaging features.',
+                            'Event registration data: name, email, and phone number provided when reserving a place at a JCL-hosted or industry event listed on the Platform.',
+                            'Training and certification data: enrolment details, attendance records, and completion status for training programmes booked through the Platform.',
+                            'Payment information: where you make a payment through the Platform, transactions are processed by our payment provider, Paystack. We receive confirmation and reference details for the transaction, but we do not collect or store your full card details.',
+                            'Technical data: IP address, browser type, device information, and usage data collected automatically when you visit the Platform.',
+                        ]],
+                        ['type' => 'p', 'text' => 'We do not knowingly collect sensitive personal data such as health information, biometric data, or government identification numbers unless you voluntarily submit such data as part of a certification document or as required for a specific service (for example, medical fitness certificates required by certain maritime employers). Where this occurs, we treat such data with heightened care in accordance with the NDPA.'],
+                    ],
+                ],
+                [
+                    'id' => 'how-we-collect-your-data',
+                    'number' => '4',
+                    'title' => 'How We Collect Your Data',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We collect personal data in the following ways:'],
+                        ['type' => 'ul', 'items' => [
+                            'Directly from you, when you register an account, complete your profile, apply for a job, enrol in a training programme, submit a contact form enquiry, or register for an event.',
+                            'Automatically, through your use of the Platform, including cookies and similar tracking technologies (see Section 14).',
+                            'From third parties, where you choose to sign in or register using Google or Microsoft (see Section 9), or where an Employer or partner organisation shares information with us in connection with a recruitment, training, or service engagement.',
                         ]],
                     ],
                 ],
                 [
-                    'id' => 'how-we-use-your-information',
-                    'number' => '3',
-                    'title' => 'How We Use Your Information',
+                    'id' => 'why-we-collect-and-use-your-data',
+                    'number' => '5',
+                    'title' => 'Why We Collect and Use Your Data',
                     'blocks' => [
                         ['type' => 'p', 'text' => 'We use your personal data to:'],
                         ['type' => 'ul', 'items' => [
-                            'Create and manage your account and provide the Platform\'s features',
-                            'Match candidates with employers and process job applications',
-                            'Deliver training, recruitment, and marine or business services you request',
-                            'Process payments and send receipts and related confirmations',
-                            'Enable messaging and send service notifications relevant to your account',
-                            'Verify information and maintain the security and integrity of the Platform',
-                            'Respond to your enquiries, requests, and complaints',
+                            'Create and manage your account on the Platform',
+                            'Match Candidates with relevant job opportunities and present applications to Employers',
+                            'Verify professional qualifications and certifications where required for a role',
+                            'Process enrolments and manage delivery of training and certification programmes',
+                            'Coordinate the delivery of marine and business services through our partner network',
+                            'Respond to enquiries submitted through our contact form',
+                            'Process event registrations and manage attendance at JCL-hosted or industry events',
+                            'Process payments and send related receipts and confirmations',
+                            'Communicate with you about your account, applications, or service requests',
+                            'Maintain the security, integrity, and proper functioning of the Platform',
                             'Comply with our legal and regulatory obligations',
                         ]],
                     ],
                 ],
                 [
-                    'id' => 'legal-basis',
-                    'number' => '4',
+                    'id' => 'legal-basis-for-processing',
+                    'number' => '6',
                     'title' => 'Legal Basis for Processing',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'Under the NDPA, we rely on one or more of the following legal bases when processing your personal data:'],
+                        ['type' => 'p', 'text' => 'Under the NDPA, we rely on the following legal bases to process your personal data:'],
                         ['type' => 'ul', 'items' => [
-                            'Performance of a contract — to provide the services you have requested and operate your account',
-                            'Consent — where you have given clear consent, for example to share your profile with an employer (you may withdraw consent at any time)',
-                            'Legitimate interests — to keep the Platform secure, prevent fraud, and improve our services, provided your rights are not overridden',
-                            'Legal obligation — where we must process data to comply with the law',
+                            'Consent: where you have given clear consent for us to process your data for a specific purpose, such as agreeing to this Privacy Policy at registration.',
+                            'Contractual necessity: where processing is necessary to provide the Services you have requested, such as facilitating a job application or training enrolment.',
+                            'Legitimate interest: where processing is necessary for our legitimate business interests, such as improving the Platform or preventing fraud, provided this does not override your fundamental rights.',
+                            'Legal obligation: where processing is necessary to comply with applicable Nigerian law or regulatory requirements.',
                         ]],
+                        ['type' => 'p', 'text' => 'You may withdraw consent at any time where consent is the basis for processing, by contacting us using the details in Section 19. This will not affect the lawfulness of processing carried out before withdrawal.'],
                     ],
                 ],
                 [
-                    'id' => 'sharing-your-information',
-                    'number' => '5',
-                    'title' => 'Sharing Your Information',
+                    'id' => 'who-we-share-your-data-with',
+                    'number' => '7',
+                    'title' => 'Who We Share Your Data With',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'We do not sell your personal data. We share it only where necessary, including with:'],
+                        ['type' => 'p', 'text' => 'We share personal data only where necessary to deliver the Services, and always on a need-to-know basis. This includes:'],
                         ['type' => 'ul', 'items' => [
-                            'Employers — candidate profiles and application data are shared with the relevant employer solely for evaluating you for a specific role',
-                            'Delivery partners — where you request marine, training, or business services, we coordinate delivery through our vetted partner network',
-                            'Payment provider — Paystack, to process online payments securely',
-                            'Service providers — trusted providers who help us operate the Platform (for example hosting and email delivery), under appropriate confidentiality obligations',
-                            'Authorities — where required by law, regulation, or valid legal process',
+                            'Employers and vessel operators: where you apply for a job or are shortlisted for a role, your profile, CV, and application data are shared with the relevant Employer for recruitment evaluation purposes only, in accordance with Section 6.3 of our Terms of Service.',
+                            'Delivery partners: where a service is fulfilled through our vetted partner network (see Section 8 below), relevant data is shared with the partner strictly for the purpose of delivering that service.',
+                            'Payment provider: Paystack, to process online payments securely. Paystack processes your payment details directly; we do not collect or store your full card details.',
+                            'Service providers: we may share data with third parties who provide services on our behalf, such as hosting, email delivery, and identity verification, under appropriate confidentiality and data protection terms.',
+                            'Legal and regulatory authorities: where required by law, court order, or to protect the rights, property, or safety of JCL, our users, or the public.',
                         ]],
-                        ['type' => 'p', 'text' => 'Employers who receive candidate data must use it only for the advertised role and must not share, sell, or repurpose it without the candidate\'s explicit consent.'],
+                        ['type' => 'p', 'text' => 'We do not sell personal data to any third party. We do not permit Employers or partners to use Candidate data for any purpose other than the specific engagement for which it was shared.'],
+                    ],
+                ],
+                [
+                    'id' => 'partner-based-service-delivery',
+                    'number' => '8',
+                    'title' => 'Partner-Based Service Delivery',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'Many of the marine and business services available through the Platform, including crew management, ship chandelling, marine procurement, marine insurance, marine travel management, and mobilisation services, are delivered through a network of vetted third-party partners. As described in Section 3.2 of our Terms of Service, JCL remains the sole client-facing point of contact, and the identity of delivery partners is not disclosed to Clients.'],
+                        ['type' => 'p', 'text' => 'Where your data is shared with a delivery partner to fulfil a service you have requested, JCL requires that partner to handle your data securely and to use it solely for the purpose of delivering that service. JCL remains responsible for coordinating service delivery and for ensuring partner organisations meet appropriate data handling standards.'],
+                        ['type' => 'p', 'text' => 'Because our partner network may change over time as JCL formalises and updates partnership arrangements, we do not name specific partners in this Privacy Policy. If you would like more information about how your data is handled by a specific delivery partner in connection with a service you have requested, you may contact us using the details in Section 19.'],
+                    ],
+                ],
+                [
+                    'id' => 'third-party-sign-in-services',
+                    'number' => '9',
+                    'title' => 'Third-Party Sign-In Services',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'The Platform allows you to register or sign in using your Google or Microsoft account. If you choose this option, those providers will share certain account information with us (such as your name and email address) to create or access your Platform account, in accordance with their own privacy policies and your settings with those providers.'],
+                        ['type' => 'p', 'text' => 'We do not receive your Google or Microsoft account password, and we encourage you to review the privacy practices of Google and Microsoft directly to understand how they handle your data.'],
+                    ],
+                ],
+                [
+                    'id' => 'international-data-transfers',
+                    'number' => '10',
+                    'title' => 'International Data Transfers',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'As JoseOceanJobs connects Nigerian and African talent with international maritime and energy employers, your personal data may be transferred to and processed in countries outside Nigeria, including where an Employer, training provider, or delivery partner is located overseas.'],
+                        ['type' => 'p', 'text' => 'Where such transfers occur, we take reasonable steps to ensure your data continues to receive an appropriate level of protection, consistent with the requirements of the NDPA, including through contractual safeguards with the receiving party where appropriate.'],
                     ],
                 ],
                 [
                     'id' => 'data-retention',
-                    'number' => '6',
+                    'number' => '11',
                     'title' => 'Data Retention',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'We keep your personal data for as long as your account is active and for as long as needed to provide our services, comply with legal obligations, resolve disputes, and enforce our agreements. When data is no longer needed, we securely delete or anonymise it. You may request deletion of your account and data as described below.'],
-                    ],
-                ],
-                [
-                    'id' => 'your-rights',
-                    'number' => '7',
-                    'title' => 'Your Rights',
-                    'blocks' => [
-                        ['type' => 'p', 'text' => 'Under the NDPA, you have the right to:'],
+                        ['type' => 'p', 'text' => 'We retain personal data only for as long as necessary to fulfil the purposes for which it was collected, including to provide the Services, comply with our legal obligations, resolve disputes, and enforce our agreements.'],
                         ['type' => 'ul', 'items' => [
-                            'Access the personal data we hold about you',
-                            'Request correction of inaccurate or incomplete data',
-                            'Request deletion of your personal data',
-                            'Object to or restrict certain processing',
-                            'Request a copy of your data in a portable format',
-                            'Withdraw consent at any time, where processing is based on consent',
-                            'Lodge a complaint with the Nigeria Data Protection Commission',
+                            'Candidate profile and application data is generally retained for as long as your account remains active, and for a reasonable period afterward in case you reapply or re-engage with the Platform.',
+                            'Data relating to a completed service engagement or training programme is retained in accordance with applicable record-keeping obligations.',
+                            'Contact form and event registration data is retained only as long as needed to respond to your enquiry or manage the event.',
                         ]],
-                        ['type' => 'p', 'text' => 'To exercise any of these rights, contact us at info@joseoceanjobs.com. We will respond within the timeframes required by law.'],
+                        ['type' => 'p', 'text' => 'Where you request deletion of your data under Section 13, we will delete or anonymise it unless we are required to retain it for legal, regulatory, or legitimate business purposes.'],
                     ],
                 ],
                 [
                     'id' => 'data-security',
-                    'number' => '8',
+                    'number' => '12',
                     'title' => 'Data Security',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'We use appropriate technical and organisational measures to protect your personal data, including encrypted passwords, access controls, and secure handling of payment transactions through our payment provider. However, no method of transmission or storage is completely secure, and we cannot guarantee absolute security.'],
+                        ['type' => 'p', 'text' => 'We implement appropriate technical and organisational measures to protect personal data against unauthorised access, alteration, disclosure, or destruction. These measures include encrypted password storage, access controls, and secure data transmission.'],
+                        ['type' => 'p', 'text' => 'No method of transmission or storage is completely secure. While we work to protect your personal data, we cannot guarantee its absolute security, and you share information with us at your own risk.'],
                     ],
                 ],
                 [
-                    'id' => 'cookies',
-                    'number' => '9',
-                    'title' => 'Cookies',
+                    'id' => 'your-rights-under-the-ndpa',
+                    'number' => '13',
+                    'title' => 'Your Rights Under the NDPA',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'The Platform uses a small number of strictly necessary and functional cookies to operate securely and keep you signed in. We do not use analytics, advertising, or tracking cookies. Full details are set out in our Cookie Policy.'],
+                        ['type' => 'p', 'text' => 'Subject to applicable law, you have the right to:'],
+                        ['type' => 'ul', 'items' => [
+                            'Access: request a copy of the personal data we hold about you.',
+                            'Correction: request that we correct inaccurate or incomplete personal data.',
+                            'Deletion: request that we delete your personal data, subject to our legal and contractual retention obligations.',
+                            'Restriction: request that we restrict the processing of your data in certain circumstances.',
+                            'Objection: object to our processing of your data where it is based on legitimate interest.',
+                            'Data portability: request a copy of your data in a structured, commonly used format, where technically feasible.',
+                            'Withdraw consent: withdraw consent at any time where processing is based on consent.',
+                        ]],
+                        ['type' => 'p', 'text' => 'To exercise any of these rights, contact us using the details in Section 19. We will respond within the timeframe required by the NDPA. We may need to verify your identity before actioning certain requests.'],
                     ],
                 ],
                 [
-                    'id' => 'international-transfers',
-                    'number' => '10',
-                    'title' => 'International Transfers',
+                    'id' => 'cookies-and-similar-technologies',
+                    'number' => '14',
+                    'title' => 'Cookies and Similar Technologies',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'Some of our service providers (such as payment, hosting, or sign-in providers) may process data outside Nigeria. Where this happens, we take reasonable steps to ensure your data remains protected in accordance with the NDPA.'],
+                        ['type' => 'p', 'text' => 'The Platform uses a small number of strictly necessary and functional cookies to operate securely and keep you signed in. These include session cookies required for you to remain logged in and to protect forms against fraud, and functional cookies that remember a choice you have made, such as staying signed in. The Platform does not use analytics, advertising, or tracking cookies, and we do not build advertising profiles from your activity on the Platform.'],
+                        ['type' => 'p', 'text' => 'Full details of the cookies we use, their purpose, and how you can manage them are set out in our Cookie Policy, available at joseoceanjobs.com/cookie-policy. If we introduce analytics, advertising, or other non-essential cookies in future, we will update our Cookie Policy and this Privacy Policy and ask for your consent before those cookies are placed, in line with applicable data protection law.'],
                     ],
                 ],
                 [
                     'id' => 'childrens-privacy',
-                    'number' => '11',
+                    'number' => '15',
                     'title' => 'Children\'s Privacy',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'The Platform is intended for users who are at least 18 years of age. We do not knowingly collect personal data from anyone under 18. If we become aware that we have done so, we will delete that data.'],
+                        ['type' => 'p', 'text' => 'The Platform is not directed at, and is not intended for use by, individuals under the age of 18. In accordance with Section 4.1 of our Terms of Service, you must be at least 18 years of age to register an account. We do not knowingly collect personal data from anyone under 18. If we become aware that we have inadvertently collected such data, we will take steps to delete it promptly.'],
                     ],
                 ],
                 [
-                    'id' => 'changes-to-this-policy',
-                    'number' => '12',
-                    'title' => 'Changes to This Policy',
+                    'id' => 'marketing-communications',
+                    'number' => '16',
+                    'title' => 'Marketing Communications',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'We may update this Privacy Policy from time to time. Where changes are material, we will notify registered users by email or by prominent notice on the Platform. The current version is always available at joseoceanjobs.com.'],
+                        ['type' => 'p', 'text' => 'We may send you communications relating to your account, applications, or service requests, which are necessary for the operation of the Platform and are not considered marketing. Where we wish to send you optional marketing communications, such as updates about new job opportunities, training programmes, or JCL events, we will only do so with your consent or another appropriate legal basis, and you may opt out at any time by following the unsubscribe instructions in the communication or by contacting us directly.'],
+                    ],
+                ],
+                [
+                    'id' => 'changes-to-this-privacy-policy',
+                    'number' => '17',
+                    'title' => 'Changes to This Privacy Policy',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'We may update this Privacy Policy from time to time to reflect changes in our practices, the Services, or applicable law. Where changes are material, we will notify registered users by email or by prominent notice on the Platform. The current version of this Privacy Policy is always available at joseoceanjobs.com/privacy-policy. Your continued use of the Platform after the effective date of any changes constitutes acceptance of the updated Privacy Policy.'],
+                    ],
+                ],
+                [
+                    'id' => 'complaints-and-regulatory-authority',
+                    'number' => '18',
+                    'title' => 'Complaints and Regulatory Authority',
+                    'blocks' => [
+                        ['type' => 'p', 'text' => 'If you have a concern about how we have handled your personal data, please contact us first using the details in Section 19 so that we can attempt to resolve the matter directly. JCL will endeavour to acknowledge data protection complaints within five (5) business days, consistent with our general complaints procedure under our Terms of Service.'],
+                        ['type' => 'p', 'text' => 'You also have the right to lodge a complaint with the Nigeria Data Protection Commission (NDPC), the regulatory authority responsible for data protection in Nigeria, if you believe your data protection rights have been violated.'],
                     ],
                 ],
                 [
                     'id' => 'contact-us',
-                    'number' => '13',
+                    'number' => '19',
                     'title' => 'Contact Us',
                     'blocks' => [
-                        ['type' => 'p', 'text' => 'If you have any questions about this Privacy Policy or wish to exercise your rights, please contact us:'],
+                        ['type' => 'p', 'text' => 'If you have any questions about this Privacy Policy, wish to exercise any of your data protection rights, or want to raise a complaint, please contact us:'],
                         ['type' => 'contact', 'contact' => [
                             'org' => 'Jose Consulting Limited',
                             'trading' => 'JoseOceanJobs',
                             'website' => 'joseoceanjobs.com',
                             'email' => 'info@joseoceanjobs.com',
+                            'phone_label' => 'WhatsApp / Phone',
                             'whatsapp' => '+234 902 430 4210',
-                            'location' => 'Lagos, Nigeria',
+                            'location' => 'Address: 10 Engineering Close, off Idowu Taylor, Victoria Island, Lagos, Nigeria',
                         ]],
                     ],
                 ],
