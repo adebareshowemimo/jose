@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class JobListing extends Model
 {
@@ -47,6 +48,19 @@ class JobListing extends Model
     public function scopeRegularJobs($query)
     {
         return $query->where('is_contract_staffing', false);
+    }
+
+    public static function uniqueSlugForTitle(string $title): string
+    {
+        $baseSlug = Str::slug($title) ?: 'job';
+        $slug = $baseSlug;
+        $counter = 1;
+
+        while (static::withTrashed()->where('slug', $slug)->exists()) {
+            $slug = $baseSlug.'-'.$counter++;
+        }
+
+        return $slug;
     }
 
     public function company(): BelongsTo

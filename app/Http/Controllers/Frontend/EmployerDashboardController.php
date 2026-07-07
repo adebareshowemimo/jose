@@ -268,18 +268,11 @@ class EmployerDashboardController extends BasePageController
             'submit_action' => ['required', 'in:draft,submit'],
         ]);
 
-        $baseSlug = Str::slug($data['title']);
-        $slug = $baseSlug;
-        $counter = 1;
-        while (JobListing::where('slug', $slug)->exists()) {
-            $slug = $baseSlug.'-'.$counter++;
-        }
-
         JobListing::create([
             'company_id' => $company->id,
             'posted_by' => $request->user()->id,
             'title' => $data['title'],
-            'slug' => $slug,
+            'slug' => JobListing::uniqueSlugForTitle($data['title']),
             'description' => $data['description'],
             'qualification' => $data['qualification'] ?? null,
             'category_id' => $data['category_id'] ?? null,

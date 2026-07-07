@@ -10,7 +10,6 @@ use App\Models\JobType;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ContractStaffingJobController extends Controller
 {
@@ -143,13 +142,7 @@ class ContractStaffingJobController extends Controller
         if ($job) {
             $validated['slug'] = $job->slug;
         } else {
-            $baseSlug = Str::slug($validated['title']);
-            $slug = $baseSlug;
-            $counter = 1;
-            while (JobListing::where('slug', $slug)->exists()) {
-                $slug = $baseSlug.'-'.$counter++;
-            }
-            $validated['slug'] = $slug;
+            $validated['slug'] = JobListing::uniqueSlugForTitle($validated['title']);
         }
 
         $validated['is_contract_staffing'] = true;
