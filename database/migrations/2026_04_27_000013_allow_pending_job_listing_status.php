@@ -40,6 +40,11 @@ return new class extends Migration
     private function rebuildSqliteTable(array $statuses): void
     {
         Schema::disableForeignKeyConstraints();
+        // Keep SQLite from rewriting child-table FK references (e.g. job_applications)
+        // when we rename job_listings -> job_listings_old below. Without this, modern
+        // SQLite re-points those FKs at job_listings_old, which we then drop, leaving a
+        // dangling reference that breaks inserts into the child tables.
+        DB::statement('PRAGMA legacy_alter_table = ON');
 
         if (Schema::hasTable('job_listings_old')) {
             if (Schema::hasTable('job_listings')) {
@@ -106,6 +111,7 @@ return new class extends Migration
         Schema::table('job_listings', function (Blueprint $table) {
             $table->unique('slug');
         });
+        DB::statement('PRAGMA legacy_alter_table = OFF');
         Schema::enableForeignKeyConstraints();
     }
 };
