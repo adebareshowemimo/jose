@@ -540,8 +540,16 @@
                                     </div>
                                 </template>
 
-                                <input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png,.webp" class="w-full text-sm text-[#073057] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1AAD94]/10 file:text-[#1AAD94] hover:file:bg-[#1AAD94]/20" />
-                                <p class="mt-1 text-xs text-[#9CA3AF]"><span x-text="editingCert && editingCert.certificate_path ? 'Upload a new file to replace the current one.' : 'PDF, JPG, PNG, or WEBP · max 8 MB.'"></span></p>
+                                <input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                    @change="
+                                        const f = $event.target.files[0];
+                                        if (f && f.size > {{ config('uploads.certificate_max_mb', 5) }} * 1024 * 1024) {
+                                            alert('That certificate is too large. Maximum size is {{ config('uploads.certificate_max_mb', 5) }} MB.');
+                                            $event.target.value = '';
+                                        }
+                                    "
+                                    class="w-full text-sm text-[#073057] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1AAD94]/10 file:text-[#1AAD94] hover:file:bg-[#1AAD94]/20" />
+                                <p class="mt-1 text-xs text-[#9CA3AF]"><span x-text="editingCert && editingCert.certificate_path ? 'Upload a new file to replace the current one.' : 'PDF, JPG, PNG, or WEBP · max {{ config('uploads.certificate_max_mb', 5) }} MB.'"></span></p>
                             </div>
                         </div>
                     </div>

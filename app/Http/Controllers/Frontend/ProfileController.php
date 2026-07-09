@@ -304,13 +304,19 @@ class ProfileController extends Controller
      */
     public function addCertification(Request $request)
     {
+        $maxMb = (int) config('uploads.certificate_max_mb', 5);
+        $maxKb = $maxMb * 1024;
+
         $request->validate([
             'name' => 'required|string|max:255',
             'issuer' => 'required|string|max:255',
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after_or_equal:issue_date',
             'credential_id' => 'nullable|string|max:255',
-            'certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:8192',
+            'certificate' => "nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:{$maxKb}",
+        ], [
+            'certificate.max' => "The certificate must not be larger than {$maxMb} MB.",
+            'certificate.mimes' => 'The certificate must be a PDF or image (PDF, JPG, PNG, or WEBP).',
         ]);
 
         $user = Auth::user();
@@ -346,13 +352,19 @@ class ProfileController extends Controller
      */
     public function updateCertification(Request $request, string $certId)
     {
+        $maxMb = (int) config('uploads.certificate_max_mb', 5);
+        $maxKb = $maxMb * 1024;
+
         $request->validate([
             'name' => 'required|string|max:255',
             'issuer' => 'required|string|max:255',
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after_or_equal:issue_date',
             'credential_id' => 'nullable|string|max:255',
-            'certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:8192',
+            'certificate' => "nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:{$maxKb}",
+        ], [
+            'certificate.max' => "The certificate must not be larger than {$maxMb} MB.",
+            'certificate.mimes' => 'The certificate must be a PDF or image (PDF, JPG, PNG, or WEBP).',
         ]);
 
         $user = Auth::user();
