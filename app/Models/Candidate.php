@@ -96,6 +96,23 @@ class Candidate extends Model
         return $this->hasMany(JobApplication::class);
     }
 
+    /**
+     * Whether the profile has enough professional detail to stand in for a CV,
+     * i.e. the candidate can apply to a job "with their profile" (no upload).
+     * Deliberately excludes an uploaded resume — that is the point.
+     */
+    public function hasApplyReadyProfile(): bool
+    {
+        $hasItems = fn ($value) => is_array($value) && count($value) > 0;
+
+        $hasSkills = $hasItems($this->skills_list) || $this->skills()->count() > 0;
+
+        return (bool) $this->title
+            && (bool) $this->bio
+            && $hasItems($this->experience)
+            && $hasSkills;
+    }
+
     public function reviews(): MorphMany
     {
         return $this->morphMany(Review::class, 'reviewable');

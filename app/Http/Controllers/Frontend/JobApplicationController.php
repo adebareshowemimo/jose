@@ -21,15 +21,23 @@ class JobApplicationController extends Controller
                 ->with('error', 'You need a candidate profile before applying. Please complete your candidate signup first.');
         }
 
-        $cvRequiredMessage = 'A CV is required to apply. '
-            .'Upload a file or select an existing CV.';
+        // A candidate with an apply-ready profile can apply with their profile
+        // (which is shown to admins/employers) — a CV upload is then optional.
+        $profileReady = $candidate->hasApplyReadyProfile();
+
+        $cvRequiredMessage = 'A CV is required to apply. Upload a file, select an '
+            .'existing CV, or complete your profile to apply with it.';
+
+        $resumeRules = ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:4096'];
+        $resumeIdRules = ['nullable', 'integer'];
+        if (! $profileReady) {
+            $resumeRules[] = 'required_without:resume_id';
+            $resumeIdRules[] = 'required_without:resume';
+        }
 
         $validated = $request->validate([
-            'resume_id' => ['nullable', 'integer', 'required_without:resume'],
-            'resume' => [
-                'nullable', 'file', 'mimes:pdf,doc,docx', 'max:4096',
-                'required_without:resume_id',
-            ],
+            'resume_id' => $resumeIdRules,
+            'resume' => $resumeRules,
             'cover_letter' => ['nullable', 'string', 'max:5000'],
         ], [
             'resume.required_without' => $cvRequiredMessage,
@@ -56,7 +64,7 @@ class JobApplicationController extends Controller
             $resumeId = $resume->id;
         }
 
-        if (! $resumeId) {
+        if (! $resumeId && ! $profileReady) {
             return back()->with('error', $cvRequiredMessage);
         }
 
@@ -72,6 +80,10 @@ class JobApplicationController extends Controller
             return back()->with('error', 'You have already applied to this role.');
         }
 
-        return back()->with('success', 'Application submitted. We will be in touch soon.');
+        $success = $resumeId
+            ? 'Application submitted. We will be in touch soon.'
+            : 'Application submitted with your profile. We will be in touch soon.';
+
+        return back()->with('success', $success);
     }
 }
