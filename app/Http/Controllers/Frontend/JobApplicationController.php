@@ -21,10 +21,19 @@ class JobApplicationController extends Controller
                 ->with('error', 'You need a candidate profile before applying. Please complete your candidate signup first.');
         }
 
+        $cvRequiredMessage = 'A CV is required to apply. '
+            .'Upload a file or select an existing CV.';
+
         $validated = $request->validate([
-            'resume_id' => ['nullable', 'integer'],
-            'resume' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:4096'],
+            'resume_id' => ['nullable', 'integer', 'required_without:resume'],
+            'resume' => [
+                'nullable', 'file', 'mimes:pdf,doc,docx', 'max:4096',
+                'required_without:resume_id',
+            ],
             'cover_letter' => ['nullable', 'string', 'max:5000'],
+        ], [
+            'resume.required_without' => $cvRequiredMessage,
+            'resume_id.required_without' => $cvRequiredMessage,
         ]);
 
         $resumeId = null;
@@ -45,6 +54,10 @@ class JobApplicationController extends Controller
                 return back()->with('error', 'Selected resume not found.');
             }
             $resumeId = $resume->id;
+        }
+
+        if (! $resumeId) {
+            return back()->with('error', $cvRequiredMessage);
         }
 
         try {

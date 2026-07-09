@@ -74,9 +74,10 @@
                 <div>
                     <label class="text-xs font-semibold uppercase tracking-wider text-[#6B7280] mb-2 block">
                         {{ $resumes->isEmpty() ? 'Upload your CV' : 'Or upload a new CV' }}
+                        @if ($resumes->isEmpty())<span class="text-red-500">*</span>@endif
                     </label>
-                    <input type="file" name="resume" accept=".pdf,.doc,.docx" class="w-full text-sm text-[#073057] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1AAD94]/10 file:text-[#1AAD94] hover:file:bg-[#1AAD94]/20">
-                    <p class="mt-1 text-xs text-gray-400">PDF, DOC, or DOCX · max 4 MB</p>
+                    <input type="file" name="resume" accept=".pdf,.doc,.docx" @required($resumes->isEmpty()) class="w-full text-sm text-[#073057] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1AAD94]/10 file:text-[#1AAD94] hover:file:bg-[#1AAD94]/20">
+                    <p class="mt-1 text-xs text-gray-400">PDF, DOC, or DOCX · max 4 MB · required to apply</p>
                 </div>
 
                 <div>
