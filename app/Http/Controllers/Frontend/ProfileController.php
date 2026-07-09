@@ -7,6 +7,7 @@ use App\Models\Candidate;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProfileController extends Controller
@@ -309,10 +310,18 @@ class ProfileController extends Controller
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after_or_equal:issue_date',
             'credential_id' => 'nullable|string|max:255',
+            'certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:8192',
         ]);
 
         $user = Auth::user();
         $candidate = $user->candidate ?? $this->createCandidateProfile($user);
+
+        $certificate = ['certificate_path' => null, 'certificate_name' => null];
+        if ($request->hasFile('certificate')) {
+            $certificate = $this->storeCertificateFile($request->file('certificate'), $candidate->id);
+        }
+
+        $noExpiry = $request->boolean('no_expiry');
 
         $awards = $candidate->awards ?? [];
         $awards[] = [
@@ -320,8 +329,11 @@ class ProfileController extends Controller
             'name' => $request->name,
             'issuer' => $request->issuer,
             'issue_date' => $request->issue_date,
-            'expiry_date' => $request->expiry_date,
+            'expiry_date' => $noExpiry ? null : $request->expiry_date,
+            'no_expiry' => $noExpiry,
             'credential_id' => $request->credential_id,
+            'certificate_path' => $certificate['certificate_path'],
+            'certificate_name' => $certificate['certificate_name'],
         ];
 
         $candidate->update(['awards' => $awards]);
@@ -340,6 +352,7 @@ class ProfileController extends Controller
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after_or_equal:issue_date',
             'credential_id' => 'nullable|string|max:255',
+            'certificate' => 'nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:8192',
         ]);
 
         $user = Auth::user();
@@ -352,11 +365,26 @@ class ProfileController extends Controller
         $awards = $candidate->awards ?? [];
         foreach ($awards as &$cert) {
             if (($cert['id'] ?? null) === $certId) {
+                $noExpiry = $request->boolean('no_expiry');
                 $cert['name'] = $request->name;
                 $cert['issuer'] = $request->issuer;
                 $cert['issue_date'] = $request->issue_date;
-                $cert['expiry_date'] = $request->expiry_date;
+                $cert['expiry_date'] = $noExpiry ? null : $request->expiry_date;
+                $cert['no_expiry'] = $noExpiry;
                 $cert['credential_id'] = $request->credential_id;
+
+                // Replace the certificate file when a new one is uploaded,
+                // or clear it when the user asked to remove it.
+                if ($request->hasFile('certificate')) {
+                    $this->deleteCertificateFile($cert['certificate_path'] ?? null);
+                    $stored = $this->storeCertificateFile($request->file('certificate'), $candidate->id);
+                    $cert['certificate_path'] = $stored['certificate_path'];
+                    $cert['certificate_name'] = $stored['certificate_name'];
+                } elseif ($request->boolean('remove_certificate')) {
+                    $this->deleteCertificateFile($cert['certificate_path'] ?? null);
+                    $cert['certificate_path'] = null;
+                    $cert['certificate_name'] = null;
+                }
                 break;
             }
         }
@@ -379,10 +407,38 @@ class ProfileController extends Controller
             return back()->with('error', 'Profile not found.');
         }
 
-        $awards = collect($candidate->awards ?? [])->reject(fn($cert) => ($cert['id'] ?? null) === $certId)->values()->all();
+        $awards = $candidate->awards ?? [];
+        $removed = collect($awards)->firstWhere('id', $certId);
+        if ($removed) {
+            $this->deleteCertificateFile($removed['certificate_path'] ?? null);
+        }
+
+        $awards = collect($awards)->reject(fn($cert) => ($cert['id'] ?? null) === $certId)->values()->all();
         $candidate->update(['awards' => $awards]);
 
         return back()->with('success', 'Certification deleted successfully.');
+    }
+
+    /**
+     * Store an uploaded certificate file on the public disk and return its
+     * relative path plus the original filename for display.
+     */
+    private function storeCertificateFile(\Illuminate\Http\UploadedFile $file, int $candidateId): array
+    {
+        return [
+            'certificate_path' => $file->store("certificates/{$candidateId}", 'public'),
+            'certificate_name' => $file->getClientOriginalName(),
+        ];
+    }
+
+    /**
+     * Delete a previously stored certificate file from the public disk.
+     */
+    private function deleteCertificateFile(?string $path): void
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
     }
 
     /**

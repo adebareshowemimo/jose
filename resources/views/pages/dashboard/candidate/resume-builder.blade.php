@@ -17,7 +17,8 @@
     editingExp: null,
     editingEdu: null,
     editingCert: null,
-    
+    certNoExpiry: false,
+
     openExpModal(exp = null) {
         this.editingExp = exp;
         this.showExpModal = true;
@@ -28,6 +29,7 @@
     },
     openCertModal(cert = null) {
         this.editingCert = cert;
+        this.certNoExpiry = !!(cert && cert.no_expiry);
         this.showCertModal = true;
     }
 }">
@@ -334,13 +336,19 @@
                         <div class="flex-1">
                             <h4 class="font-semibold text-[#073057]">{{ $cert['name'] ?? 'Certification' }}</h4>
                             <p class="text-sm text-[#1AAD94]">{{ $cert['issuer'] ?? 'Issuing Authority' }}</p>
-                            <p class="text-xs text-[#6B7280] mt-1">{{ $cert['issue_date'] ?? '' }} @if(!empty($cert['expiry_date'])) - {{ $cert['expiry_date'] }} @endif</p>
+                            <p class="text-xs text-[#6B7280] mt-1">{{ $cert['issue_date'] ?? '' }}@if(!empty($cert['expiry_date'])) &ndash; Expires {{ $cert['expiry_date'] }}@elseif(!empty($cert['no_expiry'])) &middot; <span class="text-[#1AAD94] font-medium">No expiry</span>@endif</p>
+                            @if(!empty($cert['certificate_path']))
+                            <a href="{{ asset('storage/'.$cert['certificate_path']) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 mt-2 text-xs font-medium text-[#1AAD94] hover:underline">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                View certificate
+                            </a>
+                            @endif
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
-                            <button @click="openCertModal(@js(array_merge($cert, ['index' => $index])))" type="button" class="p-2 text-[#6B7280] hover:text-[#1AAD94] hover:bg-[#1AAD94]/10 rounded-lg transition cursor-pointer" title="Edit">
+                            <button @click="openCertModal(@js($cert))" type="button" class="p-2 text-[#6B7280] hover:text-[#1AAD94] hover:bg-[#1AAD94]/10 rounded-lg transition cursor-pointer" title="Edit">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             </button>
-                            <form action="{{ route('user.profile.certification.delete', $index) }}" method="POST" onsubmit="return confirm('Delete this certification?')">
+                            <form action="{{ route('user.profile.certification.delete', $cert['id']) }}" method="POST" onsubmit="return confirm('Delete this certification?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="p-2 text-[#6B7280] hover:text-red-500 hover:bg-red-50 rounded-lg transition cursor-pointer" title="Delete">
@@ -481,7 +489,7 @@
             <div x-show="showCertModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showCertModal = false; editingCert = null"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div x-show="showCertModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <form :action="editingCert ? '{{ url('candidate/profile/certification') }}/' + editingCert.index : '{{ route('user.profile.certification.add') }}'" method="POST">
+                <form :action="editingCert ? '{{ url('candidate/profile/certification') }}/' + editingCert.id : '{{ route('user.profile.certification.add') }}'" method="POST" enctype="multipart/form-data">
                     @csrf
                     <template x-if="editingCert">
                         <input type="hidden" name="_method" value="PUT">
@@ -503,13 +511,37 @@
                                     <input type="date" name="issue_date" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none" :value="editingCert?.issue_date || ''" />
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-[#073057] mb-1">Expiry Date</label>
-                                    <input type="date" name="expiry_date" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none" :value="editingCert?.expiry_date || ''" />
+                                    <label class="block text-sm font-medium text-[#073057] mb-1">Expiry Date <span class="text-[#9CA3AF] font-normal">(optional)</span></label>
+                                    <input type="date" name="expiry_date" x-bind:disabled="certNoExpiry" :value="certNoExpiry ? '' : (editingCert?.expiry_date || '')" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed" />
                                 </div>
                             </div>
+                            <label class="flex items-center gap-2 text-sm text-[#6B7280] cursor-pointer -mt-1">
+                                <input type="checkbox" name="no_expiry" value="1" x-model="certNoExpiry" class="rounded border-gray-300 text-[#1AAD94] focus:ring-[#1AAD94]" />
+                                This certificate does not expire
+                            </label>
                             <div>
                                 <label class="block text-sm font-medium text-[#073057] mb-1">Credential ID</label>
                                 <input type="text" name="credential_id" placeholder="Certificate number (optional)" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none" :value="editingCert?.credential_id || ''" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-[#073057] mb-1">Certificate file <span class="text-[#9CA3AF] font-normal">(PDF or image)</span></label>
+
+                                {{-- Current file when editing --}}
+                                <template x-if="editingCert && editingCert.certificate_path">
+                                    <div class="mb-2 flex items-center justify-between gap-3 rounded-lg border border-[#E5E7EB] bg-gray-50 px-3 py-2">
+                                        <a :href="'/storage/' + editingCert.certificate_path" target="_blank" rel="noopener" class="flex items-center gap-2 text-sm text-[#1AAD94] hover:underline truncate">
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                            <span class="truncate" x-text="editingCert.certificate_name || 'View current certificate'"></span>
+                                        </a>
+                                        <label class="flex items-center gap-1.5 text-xs text-red-500 shrink-0 cursor-pointer">
+                                            <input type="checkbox" name="remove_certificate" value="1" class="rounded border-gray-300 text-red-500 focus:ring-red-400" />
+                                            Remove
+                                        </label>
+                                    </div>
+                                </template>
+
+                                <input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png,.webp" class="w-full text-sm text-[#073057] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1AAD94]/10 file:text-[#1AAD94] hover:file:bg-[#1AAD94]/20" />
+                                <p class="mt-1 text-xs text-[#9CA3AF]"><span x-text="editingCert && editingCert.certificate_path ? 'Upload a new file to replace the current one.' : 'PDF, JPG, PNG, or WEBP · max 8 MB.'"></span></p>
                             </div>
                         </div>
                     </div>
