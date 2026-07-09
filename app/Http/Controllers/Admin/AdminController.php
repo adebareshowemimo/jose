@@ -142,7 +142,11 @@ class AdminController extends Controller
 
     public function showUser(User $user)
     {
-        $user->load(['role', 'company', 'candidate', 'subscriptions.plan', 'orders.payments']);
+        $user->load([
+            'role', 'company', 'subscriptions.plan', 'orders.payments',
+            'candidate.resumes' => fn ($q) => $q->latest(),
+            'candidate.skills', 'candidate.categories', 'candidate.location',
+        ]);
         return view('admin.users.show', compact('user'));
     }
 
@@ -611,5 +615,23 @@ class AdminController extends Controller
 
         $applications = $query->latest()->paginate(20)->withQueryString();
         return view('admin.applications.index', compact('applications'));
+    }
+
+    public function showApplication(JobApplication $application)
+    {
+        $application->load([
+            'jobListing.company',
+            'resume',
+            'candidate.user',
+            'candidate.resumes' => fn ($q) => $q->latest(),
+            'candidate.skills', 'candidate.categories', 'candidate.location',
+        ]);
+
+        // Viewing an application clears its "new" badge (without bumping updated_at).
+        if (is_null($application->admin_viewed_at)) {
+            JobApplication::whereKey($application->getKey())->toBase()->update(['admin_viewed_at' => now()]);
+        }
+
+        return view('admin.applications.show', compact('application'));
     }
 }

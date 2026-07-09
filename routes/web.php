@@ -366,6 +366,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Applications
     Route::get('/applications', [AdminController::class, 'applications'])->name('admin.applications');
+    Route::get('/applications/{application}', [AdminController::class, 'showApplication'])->name('admin.applications.show');
 
     // Chat
     Route::get('/chat', [AdminChatController::class, 'index'])->name('admin.chat.index');
