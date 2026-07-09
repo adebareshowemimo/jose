@@ -5,6 +5,10 @@
     $candidate = $user?->candidate;
     $resumes = $candidate?->resumes()->orderByDesc('is_default')->orderByDesc('id')->get() ?? collect();
     $applyReady = $candidate ? $candidate->hasApplyReadyProfile() : false;
+    $profileParts = 'experience, education, skills';
+    if (! empty($candidate?->awards)) {
+        $profileParts .= ', certifications';
+    }
     $alreadyApplied = $candidate
         ? $candidate->applications()->where('job_listing_id', $job->id)->exists()
         : false;
@@ -61,7 +65,7 @@
                         <div>
                             <p class="text-sm font-bold text-[#073057]">Apply with your profile</p>
                             <p class="text-xs text-[#6B7280] mt-0.5">
-                                Your profile{{ $candidate->title ? ' — '.$candidate->title : '' }} (experience, education, skills@if (! empty($candidate->awards)), certifications@endif) will be sent with this application. A CV upload is optional.
+                                Your profile{{ $candidate->title ? ' — '.$candidate->title : '' }} ({{ $profileParts }}) will be sent with this application. A CV upload is optional.
                             </p>
                         </div>
                     </div>
