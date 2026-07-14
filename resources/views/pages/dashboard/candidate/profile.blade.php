@@ -34,6 +34,7 @@
         showExpModal: false,
         showEduModal: false,
         showCertModal: false,
+        certNoExpiry: false,
         editingExp: null,
         editingEdu: null,
         editingCert: null
@@ -315,7 +316,7 @@
         <div x-show="activeTab === 'certifications'" class="space-y-6">
             <div class="flex justify-between items-center">
                 <h3 class="text-lg font-semibold text-[#073057]">Certifications & Licenses</h3>
-                <button @click="showCertModal = true; editingCert = null" type="button" class="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-medium rounded-lg transition">
+                <button @click="showCertModal = true; editingCert = null; certNoExpiry = false" type="button" class="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-medium rounded-lg transition">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                     Add Certification
                 </button>
@@ -354,6 +355,12 @@
                                         <span class="text-xs text-[#6B7280]">Expires: {{ $expiryDate->format('M Y') }}</span>
                                     @endif
                                 </div>
+                                @if(!empty($cert['certificate_path']))
+                                    <a href="{{ asset('storage/'.$cert['certificate_path']) }}" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 mt-3 text-xs font-medium text-[#1AAD94] hover:underline">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                        View certificate
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -362,7 +369,7 @@
                         <svg class="w-16 h-16 text-[#E5E7EB] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
                         <h4 class="font-semibold text-[#073057] mb-2">No Certifications Added</h4>
                         <p class="text-[#6B7280] mb-4">Add your maritime certifications and licenses.</p>
-                        <button @click="showCertModal = true" type="button" class="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-medium rounded-lg transition">
+                        <button @click="showCertModal = true; certNoExpiry = false" type="button" class="inline-flex items-center gap-2 px-4 py-2 bg-[#1AAD94] hover:bg-[#158f7a] text-white text-sm font-medium rounded-lg transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
                             Add Your First Certification
                         </button>
@@ -526,7 +533,7 @@
                 <div x-show="showCertModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showCertModal = false"></div>
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <div x-show="showCertModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="relative inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                    <form action="{{ route('user.profile.certification.add') }}" method="POST">
+                    <form action="{{ route('user.profile.certification.add') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="bg-white px-6 pt-6 pb-4">
                             <h3 class="text-lg font-semibold text-[#073057] mb-4">Add Certification</h3>
@@ -546,12 +553,29 @@
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-[#073057] mb-1">Expiry Date</label>
-                                        <input type="date" name="expiry_date" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none" />
+                                        <input type="date" name="expiry_date" x-bind:disabled="certNoExpiry" x-ref="certExpiryDate" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed" />
                                     </div>
                                 </div>
+                                <label class="flex items-center gap-2 text-sm text-[#6B7280] cursor-pointer -mt-1">
+                                    <input type="checkbox" name="no_expiry" value="1" x-model="certNoExpiry" @change="if (certNoExpiry) $refs.certExpiryDate.value = ''" class="rounded border-gray-300 text-[#1AAD94] focus:ring-[#1AAD94]" />
+                                    This certificate does not expire
+                                </label>
                                 <div>
                                     <label class="block text-sm font-medium text-[#073057] mb-1">Credential ID</label>
                                     <input type="text" name="credential_id" placeholder="Certificate number (optional)" class="w-full px-4 py-2.5 border border-[#E5E7EB] rounded-lg focus:ring-2 focus:ring-[#1AAD94] outline-none" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-[#073057] mb-1">Certificate file * <span class="text-[#9CA3AF] font-normal">(PDF or image)</span></label>
+                                    <input type="file" name="certificate" required accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                        @change="
+                                            const f = $event.target.files[0];
+                                            if (f && f.size > {{ config('uploads.certificate_max_mb', 5) }} * 1024 * 1024) {
+                                                alert('That certificate is too large. Maximum size is {{ config('uploads.certificate_max_mb', 5) }} MB.');
+                                                $event.target.value = '';
+                                            }
+                                        "
+                                        class="w-full text-sm text-[#073057] file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#1AAD94]/10 file:text-[#1AAD94] hover:file:bg-[#1AAD94]/20" />
+                                    <p class="mt-1 text-xs text-[#9CA3AF]">PDF, JPG, PNG, or WEBP · max {{ config('uploads.certificate_max_mb', 5) }} MB.</p>
                                 </div>
                             </div>
                         </div>

@@ -313,8 +313,9 @@ class ProfileController extends Controller
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after_or_equal:issue_date',
             'credential_id' => 'nullable|string|max:255',
-            'certificate' => "nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:{$maxKb}",
+            'certificate' => "required|file|mimes:pdf,jpg,jpeg,png,webp|max:{$maxKb}",
         ], [
+            'certificate.required' => 'Please attach the certificate as a PDF or image.',
             'certificate.max' => "The certificate must not be larger than {$maxMb} MB.",
             'certificate.mimes' => 'The certificate must be a PDF or image (PDF, JPG, PNG, or WEBP).',
         ]);
@@ -355,24 +356,34 @@ class ProfileController extends Controller
         $maxMb = (int) config('uploads.certificate_max_mb', 5);
         $maxKb = $maxMb * 1024;
 
+        $candidate = Auth::user()->candidate;
+
+        if (!$candidate) {
+            return back()->with('error', 'Profile not found.');
+        }
+
+        $existingCertificate = collect($candidate->awards ?? [])->first(
+            fn ($cert) => ($cert['id'] ?? null) === $certId
+        );
+        $hasCertificate = !empty($existingCertificate['certificate_path']);
+
         $request->validate([
             'name' => 'required|string|max:255',
             'issuer' => 'required|string|max:255',
             'issue_date' => 'nullable|date',
             'expiry_date' => 'nullable|date|after_or_equal:issue_date',
             'credential_id' => 'nullable|string|max:255',
-            'certificate' => "nullable|file|mimes:pdf,jpg,jpeg,png,webp|max:{$maxKb}",
+            'certificate' => [
+                $hasCertificate ? 'nullable' : 'required',
+                'file',
+                'mimes:pdf,jpg,jpeg,png,webp',
+                "max:{$maxKb}",
+            ],
         ], [
+            'certificate.required' => 'Please attach the certificate as a PDF or image.',
             'certificate.max' => "The certificate must not be larger than {$maxMb} MB.",
             'certificate.mimes' => 'The certificate must be a PDF or image (PDF, JPG, PNG, or WEBP).',
         ]);
-
-        $user = Auth::user();
-        $candidate = $user->candidate;
-
-        if (!$candidate) {
-            return back()->with('error', 'Profile not found.');
-        }
 
         $awards = $candidate->awards ?? [];
         foreach ($awards as &$cert) {
@@ -392,10 +403,6 @@ class ProfileController extends Controller
                     $stored = $this->storeCertificateFile($request->file('certificate'), $candidate->id);
                     $cert['certificate_path'] = $stored['certificate_path'];
                     $cert['certificate_name'] = $stored['certificate_name'];
-                } elseif ($request->boolean('remove_certificate')) {
-                    $this->deleteCertificateFile($cert['certificate_path'] ?? null);
-                    $cert['certificate_path'] = null;
-                    $cert['certificate_name'] = null;
                 }
                 break;
             }

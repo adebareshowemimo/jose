@@ -533,14 +533,10 @@
                                             <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
                                             <span class="truncate" x-text="editingCert.certificate_name || 'View current certificate'"></span>
                                         </a>
-                                        <label class="flex items-center gap-1.5 text-xs text-red-500 shrink-0 cursor-pointer">
-                                            <input type="checkbox" name="remove_certificate" value="1" class="rounded border-gray-300 text-red-500 focus:ring-red-400" />
-                                            Remove
-                                        </label>
                                     </div>
                                 </template>
 
-                                <input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png,.webp"
+                                <input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png,.webp" x-bind:required="!editingCert || !editingCert.certificate_path"
                                     @change="
                                         const f = $event.target.files[0];
                                         if (f && f.size > {{ config('uploads.certificate_max_mb', 5) }} * 1024 * 1024) {
