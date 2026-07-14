@@ -56,8 +56,8 @@
             </div>
 
             <div class="p-4 border-b border-[#E5E7EB]">
-                <h2 class="font-bold text-[#073057]">Assigned Candidates</h2>
-                <p class="text-xs text-[#6B7280] mt-1">Only candidates delivered by admin are available here.</p>
+                <h2 class="font-bold text-[#073057]">Candidates</h2>
+                <p class="text-xs text-[#6B7280] mt-1">Applicants to approved jobs and candidates delivered by hiring services.</p>
             </div>
 
             <div class="flex-1 overflow-y-auto">
@@ -87,8 +87,8 @@
                         <div class="w-14 h-14 mx-auto rounded-full bg-[#1AAD94]/10 flex items-center justify-center text-[#1AAD94] mb-4">
                             <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.82L3 20l1.3-3.25A7.33 7.33 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
                         </div>
-                        <h3 class="font-bold text-[#073057]">No assigned candidates yet</h3>
-                        <p class="text-sm text-[#6B7280] mt-2">Candidates will appear after admin attaches platform candidates to your recruitment requests.</p>
+                        <h3 class="font-bold text-[#073057]">No candidates yet</h3>
+                        <p class="text-sm text-[#6B7280] mt-2">Candidates appear after they apply to an approved job or are delivered through hiring services.</p>
                     </div>
                 @endforelse
             </div>
@@ -191,7 +191,7 @@
                 <div class="flex-1 flex items-center justify-center p-8 text-center">
                     <div>
                         <h3 class="text-xl font-bold text-[#073057] mb-2">Select a conversation</h3>
-                        <p class="text-[#6B7280]">Assigned candidates will appear on the left.</p>
+                        <p class="text-[#6B7280]">Applicants and assigned candidates will appear on the left.</p>
                     </div>
                 </div>
             @endif

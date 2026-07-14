@@ -17,6 +17,7 @@ class ChatConversation extends Model
         'company_id',
         'candidate_id',
         'recruitment_request_candidate_id',
+        'job_application_id',
         'started_by_user_id',
         'last_message_at',
     ];
@@ -43,6 +44,11 @@ class ChatConversation extends Model
         return $this->belongsTo(RecruitmentRequestCandidate::class);
     }
 
+    public function jobApplication(): BelongsTo
+    {
+        return $this->belongsTo(JobApplication::class);
+    }
+
     public function startedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'started_by_user_id');
@@ -64,6 +70,8 @@ class ChatConversation extends Model
             return 'Admin conversation';
         }
 
-        return $this->recruitmentRequestCandidate?->recruitmentRequest?->job_title ?: 'Recruitment candidate';
+        return $this->jobApplication?->jobListing?->title
+            ?: $this->recruitmentRequestCandidate?->recruitmentRequest?->job_title
+            ?: 'Recruitment candidate';
     }
 }

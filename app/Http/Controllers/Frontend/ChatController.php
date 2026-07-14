@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\ChatConversation;
 use App\Models\ChatMessage;
+use App\Models\JobApplication;
 use App\Models\RecruitmentRequestCandidate;
 use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
@@ -32,6 +33,7 @@ class ChatController extends Controller
         $conversations = ChatConversation::with([
                 'candidate.user',
                 'recruitmentRequestCandidate.recruitmentRequest',
+                'jobApplication.jobListing',
                 'latestMessage.sender',
             ])
             ->where('type', ChatConversation::TYPE_EMPLOYER_CANDIDATE)
@@ -103,6 +105,7 @@ class ChatController extends Controller
                 'company',
                 'candidate.user',
                 'recruitmentRequestCandidate.recruitmentRequest',
+                'jobApplication.jobListing',
                 'latestMessage.sender',
             ])
             ->where('candidate_id', $candidate->id)
@@ -313,6 +316,28 @@ class ChatController extends Controller
                     ]
                 );
             });
+
+        JobApplication::query()
+            ->whereHas('jobListing', fn ($query) => $query
+                ->where('company_id', $companyId)
+                ->where('is_approved', true))
+            ->with('jobListing')
+            ->get()
+            ->each(function (JobApplication $application) use ($companyId, $userId) {
+                ChatConversation::firstOrCreate(
+                    [
+                        'type' => ChatConversation::TYPE_EMPLOYER_CANDIDATE,
+                        'job_application_id' => $application->id,
+                    ],
+                    [
+                        'company_id' => $companyId,
+                        'candidate_id' => $application->candidate_id,
+                        'recruitment_request_candidate_id' => null,
+                        'started_by_user_id' => $userId,
+                        'last_message_at' => $application->created_at ?? now(),
+                    ]
+                );
+            });
     }
 
     private function syncCandidateConversations(int $candidateId, int $userId): void
@@ -333,6 +358,27 @@ class ChatController extends Controller
                         'candidate_id' => $assignment->candidate_id,
                         'started_by_user_id' => $userId,
                         'last_message_at' => $assignment->delivered_at ?? now(),
+                    ]
+                );
+            });
+
+        JobApplication::query()
+            ->where('candidate_id', $candidateId)
+            ->whereHas('jobListing', fn ($query) => $query->where('is_approved', true))
+            ->with('jobListing')
+            ->get()
+            ->each(function (JobApplication $application) use ($userId) {
+                ChatConversation::firstOrCreate(
+                    [
+                        'type' => ChatConversation::TYPE_EMPLOYER_CANDIDATE,
+                        'job_application_id' => $application->id,
+                    ],
+                    [
+                        'company_id' => $application->jobListing->company_id,
+                        'candidate_id' => $application->candidate_id,
+                        'recruitment_request_candidate_id' => null,
+                        'started_by_user_id' => $userId,
+                        'last_message_at' => $application->created_at ?? now(),
                     ]
                 );
             });
@@ -418,7 +464,9 @@ class ChatController extends Controller
             'name' => $conversation->candidate?->user?->name ?? 'Candidate',
             'candidate_name' => $conversation->candidate?->user?->name ?? 'Candidate',
             'company_name' => $conversation->company?->name ?? config('app.name'),
-            'job_title' => $conversation->recruitmentRequestCandidate?->recruitmentRequest?->job_title ?? 'Recruitment opportunity',
+            'job_title' => $conversation->jobApplication?->jobListing?->title
+                ?? $conversation->recruitmentRequestCandidate?->recruitmentRequest?->job_title
+                ?? 'Recruitment opportunity',
             'chat_url' => route('user.chat', ['conversation' => $conversation->id]),
         ];
     }
