@@ -21,27 +21,19 @@ class JobApplicationController extends Controller
                 ->with('error', 'You need a candidate profile before applying. Please complete your candidate signup first.');
         }
 
-        // A candidate with an apply-ready profile can apply with their profile
-        // (which is shown to admins/employers) — a CV upload is then optional.
-        $profileReady = $candidate->hasApplyReadyProfile();
+        // A complete profile is mandatory: it is what admins/employers review.
+        // Only then may the candidate apply, with a CV upload being optional.
+        if (! $candidate->hasApplyReadyProfile()) {
+            $message = 'Complete your profile to apply. Add your professional '
+                .'title, bio, experience and skills, then apply.';
 
-        $cvRequiredMessage = 'A CV is required to apply. Upload a file, select an '
-            .'existing CV, or complete your profile to apply with it.';
-
-        $resumeRules = ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:4096'];
-        $resumeIdRules = ['nullable', 'integer'];
-        if (! $profileReady) {
-            $resumeRules[] = 'required_without:resume_id';
-            $resumeIdRules[] = 'required_without:resume';
+            return back()->with('error', $message);
         }
 
         $validated = $request->validate([
-            'resume_id' => $resumeIdRules,
-            'resume' => $resumeRules,
+            'resume_id' => ['nullable', 'integer'],
+            'resume' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:4096'],
             'cover_letter' => ['nullable', 'string', 'max:5000'],
-        ], [
-            'resume.required_without' => $cvRequiredMessage,
-            'resume_id.required_without' => $cvRequiredMessage,
         ]);
 
         $resumeId = null;
@@ -62,10 +54,6 @@ class JobApplicationController extends Controller
                 return back()->with('error', 'Selected resume not found.');
             }
             $resumeId = $resume->id;
-        }
-
-        if (! $resumeId && ! $profileReady) {
-            return back()->with('error', $cvRequiredMessage);
         }
 
         try {

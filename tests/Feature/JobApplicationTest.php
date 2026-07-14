@@ -85,7 +85,7 @@ class JobApplicationTest extends TestCase
         ]);
     }
 
-    public function test_candidate_with_incomplete_profile_cannot_apply_without_a_cv(): void
+    public function test_candidate_with_incomplete_profile_cannot_apply(): void
     {
         // Missing bio / experience / skills => not apply-ready.
         [$user, $candidate] = $this->candidateUser(['title' => 'Deck Hand']);
@@ -97,13 +97,59 @@ class JobApplicationTest extends TestCase
             'cover_letter' => 'Hello',
         ]);
 
-        $res->assertSessionHasErrors(['resume']);
+        $res->assertSessionHas('error');
         $this->assertDatabaseCount('job_applications', 0);
     }
 
-    public function test_candidate_with_incomplete_profile_can_apply_with_an_uploaded_cv(): void
+    public function test_job_page_renders_a_clean_apply_with_profile_banner(): void
     {
-        [$user, $candidate] = $this->candidateUser(['title' => 'Deck Hand']);
+        [$user] = $this->candidateUser($this->completeProfileAttributes());
+
+        $employer = User::factory()->create([
+            'role_id' => Role::firstOrCreate(['name' => 'employer'])->id,
+        ]);
+        $company = Company::create([
+            'owner_id' => $employer->id,
+            'name' => 'Acme Shipping',
+            'slug' => 'acme-banner',
+        ]);
+        JobListing::create([
+            'company_id' => $company->id,
+            'posted_by' => $employer->id,
+            'title' => 'Engine Cadet',
+            'slug' => 'engine-cadet-banner',
+            'description' => 'A great role.',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $res = $this->actingAs($user)->get(route('job.detail', 'engine-cadet-banner'));
+
+        $res->assertOk();
+        $res->assertSee('Apply with your profile');
+        $res->assertSee('(experience, education, skills)'); // clean, interpolated list
+        $res->assertDontSee('@if');    // no leaked Blade directive
+        $res->assertDontSee('@endif');
+    }
+
+    public function test_candidate_with_incomplete_profile_cannot_apply_even_with_an_uploaded_cv(): void
+    {
+        [$user] = $this->candidateUser(['title' => 'Deck Hand']);
+        $job = $this->job();
+        Storage::fake('public');
+
+        $res = $this->actingAs($user)->post(route('job.apply', $job), [
+            'resume' => UploadedFile::fake()->create('cv.pdf', 100, 'application/pdf'),
+        ]);
+
+        $res->assertSessionHas('error');
+        $this->assertNull(JobApplication::first());
+        $this->assertDatabaseCount('job_applications', 0);
+    }
+
+    public function test_candidate_with_complete_profile_may_still_attach_a_cv(): void
+    {
+        [$user] = $this->candidateUser($this->completeProfileAttributes());
         $job = $this->job();
         Storage::fake('public');
 
@@ -112,8 +158,37 @@ class JobApplicationTest extends TestCase
         ]);
 
         $res->assertSessionHas('success');
-        $app = JobApplication::first();
-        $this->assertNotNull($app);
-        $this->assertNotNull($app->resume_id);
+        $this->assertNotNull(JobApplication::first()?->resume_id);
+    }
+
+    public function test_job_page_hides_the_apply_form_until_the_profile_is_complete(): void
+    {
+        [$user] = $this->candidateUser(['title' => 'Deck Hand']);
+
+        $employer = User::factory()->create([
+            'role_id' => Role::firstOrCreate(['name' => 'employer'])->id,
+        ]);
+        $company = Company::create([
+            'owner_id' => $employer->id,
+            'name' => 'Acme Shipping',
+            'slug' => 'acme-gate',
+        ]);
+        JobListing::create([
+            'company_id' => $company->id,
+            'posted_by' => $employer->id,
+            'title' => 'Deck Cadet',
+            'slug' => 'deck-cadet-gate',
+            'description' => 'A great role.',
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        $res = $this->actingAs($user)->get(route('job.detail', 'deck-cadet-gate'));
+
+        $res->assertOk();
+        $res->assertSee('Complete your profile to apply.');
+        $res->assertDontSee('Upload your CV');
+        $res->assertDontSee('Submit application');
+        $res->assertDontSee('to apply without uploading a CV');
     }
 }
