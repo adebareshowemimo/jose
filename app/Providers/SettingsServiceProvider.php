@@ -35,7 +35,12 @@ class SettingsServiceProvider extends ServiceProvider
             }
 
             $mail = $settings->group('mail');
-            if (! empty($mail) && ! empty($mail['mail.smtp.enabled'] ?? false)) {
+            // An explicitly selected environment mailer (for example SendGrid's
+            // Web API transport) must take precedence over legacy SMTP settings
+            // saved in the admin panel.
+            if (config('mail.default') === 'smtp'
+                && ! empty($mail)
+                && ! empty($mail['mail.smtp.enabled'] ?? false)) {
                 config([
                     'mail.default' => 'smtp',
                     'mail.mailers.smtp.host' => $mail['mail.smtp.host'] ?? config('mail.mailers.smtp.host'),
