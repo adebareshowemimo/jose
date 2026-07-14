@@ -73,6 +73,14 @@ class RecruitmentRequestController extends Controller
         return back()->with('success', 'Request updated.');
     }
 
+    public function destroy(RecruitmentRequest $recruitment)
+    {
+        $recruitment->delete();
+
+        return redirect()->route('admin.recruitment-requests.index')
+            ->with('success', 'Recruitment request deleted successfully.');
+    }
+
     public function quote(QuoteRecruitmentRequest $request, RecruitmentRequest $recruitment, EmailDispatcher $dispatcher)
     {
         $data = $request->validated();

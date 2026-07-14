@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RecruitmentRequest extends Model
 {
+    use SoftDeletes;
+
     public const SERVICE_TYPES = [
         'cv_sourcing' => 'CV Sourcing',
         'partial_recruitment' => 'Partial Recruitment (Screening & Interviews)',

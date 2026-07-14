@@ -367,6 +367,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Applications
     Route::get('/applications', [AdminController::class, 'applications'])->name('admin.applications');
     Route::get('/applications/{application}', [AdminController::class, 'showApplication'])->name('admin.applications.show');
+    Route::delete('/applications/{application}', [AdminController::class, 'destroyApplication'])->name('admin.applications.destroy');
 
     // Chat
     Route::get('/chat', [AdminChatController::class, 'index'])->name('admin.chat.index');
@@ -477,6 +478,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::get('/', [AdminRecruitmentRequestController::class, 'index'])->name('index');
         Route::get('/{recruitment}', [AdminRecruitmentRequestController::class, 'show'])->name('show');
         Route::put('/{recruitment}', [AdminRecruitmentRequestController::class, 'update'])->name('update');
+        Route::delete('/{recruitment}', [AdminRecruitmentRequestController::class, 'destroy'])->name('destroy');
         Route::post('/{recruitment}/quote', [AdminRecruitmentRequestController::class, 'quote'])->name('quote');
         Route::post('/{recruitment}/candidates/platform', [AdminRecruitmentRequestController::class, 'attachCandidate'])->name('attach-candidate');
         Route::post('/{recruitment}/candidates/external', [AdminRecruitmentRequestController::class, 'uploadCv'])->name('upload-cv');

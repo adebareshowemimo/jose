@@ -634,4 +634,12 @@ class AdminController extends Controller
 
         return view('admin.applications.show', compact('application'));
     }
+
+    public function destroyApplication(JobApplication $application)
+    {
+        $application->delete();
+
+        return redirect()->route('admin.applications')
+            ->with('success', 'Application deleted successfully.');
+    }
 }

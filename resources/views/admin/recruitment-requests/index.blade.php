@@ -45,6 +45,10 @@
     </form>
 </div>
 
+@if (session('success'))
+    <div class="mb-4 rounded-lg bg-green-50 border border-green-200 text-green-700 px-4 py-3 text-sm">{{ session('success') }}</div>
+@endif
+
 <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
     <div class="overflow-x-auto">
         <table class="w-full text-sm">
@@ -82,7 +86,14 @@
                         </td>
                         <td class="px-5 py-4 text-gray-500 text-xs">{{ $req->created_at?->format('M d, Y') }}</td>
                         <td class="px-5 py-4 text-right">
-                            <a href="{{ route('admin.recruitment-requests.show', $req) }}" class="inline-flex items-center gap-1 text-sm font-semibold text-[#1AAD94] hover:text-[#0F8B75]">View &rarr;</a>
+                            <div class="inline-flex items-center gap-3">
+                                <a href="{{ route('admin.recruitment-requests.show', $req) }}" class="inline-flex items-center gap-1 text-sm font-semibold text-[#1AAD94] hover:text-[#0F8B75]">View &rarr;</a>
+                                <form method="POST" action="{{ route('admin.recruitment-requests.destroy', $req) }}" onsubmit="return confirm('Delete this recruitment request? It will be removed from the request lists.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 @empty
