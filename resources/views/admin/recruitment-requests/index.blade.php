@@ -18,6 +18,7 @@
     };
 @endphp
 
+<div x-data="{ deleteModalOpen: false, deleteUrl: '', deleteLabel: '' }">
 <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
     <form method="GET" class="flex flex-wrap items-end gap-3">
         <div>
@@ -88,11 +89,9 @@
                         <td class="px-5 py-4 text-right">
                             <div class="inline-flex items-center gap-3">
                                 <a href="{{ route('admin.recruitment-requests.show', $req) }}" class="inline-flex items-center gap-1 text-sm font-semibold text-[#1AAD94] hover:text-[#0F8B75]">View &rarr;</a>
-                                <form method="POST" action="{{ route('admin.recruitment-requests.destroy', $req) }}" onsubmit="return confirm('Delete this recruitment request? It will be removed from the request lists.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Delete</button>
-                                </form>
+                                <button type="button"
+                                    @click="deleteUrl = @js(route('admin.recruitment-requests.destroy', $req)); deleteLabel = @js($req->job_title); deleteModalOpen = true"
+                                    class="px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Delete</button>
                             </div>
                         </td>
                     </tr>
@@ -105,5 +104,29 @@
     @if ($requests->hasPages())
         <div class="px-5 py-3 border-t border-gray-200">{{ $requests->links() }}</div>
     @endif
+</div>
+
+{{-- Delete recruitment request modal --}}
+<div x-show="deleteModalOpen" x-cloak x-transition.opacity
+     class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+     @click.self="deleteModalOpen = false" @keydown.escape.window="deleteModalOpen = false">
+    <div class="w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="delete-request-title">
+        <div class="p-6">
+            <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16a2 2 0 001.73 3z"/></svg>
+            </div>
+            <h3 id="delete-request-title" class="text-lg font-bold text-[#0A1929]">Delete recruitment request?</h3>
+            <p class="mt-2 text-sm leading-6 text-gray-600">The request for <span class="font-semibold text-gray-800" x-text="deleteLabel"></span> will be removed from the request lists. The record can still be recovered from the database.</p>
+        </div>
+        <div class="flex justify-end gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4">
+            <button type="button" @click="deleteModalOpen = false" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-white">Cancel</button>
+            <form method="POST" :action="deleteUrl">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Delete request</button>
+            </form>
+        </div>
+    </div>
+</div>
 </div>
 @endsection

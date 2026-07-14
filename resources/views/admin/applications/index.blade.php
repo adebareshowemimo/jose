@@ -117,11 +117,9 @@
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                         View
                                     </a>
-                                    <form method="POST" action="{{ route('admin.applications.destroy', $app) }}" onsubmit="return confirm('Delete this application? It will be removed from the application lists.')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Delete</button>
-                                    </form>
+                                    <button type="button"
+                                            @click="openDelete(@js(route('admin.applications.destroy', $app)), @js($app->candidate?->user?->name ?? 'this applicant'))"
+                                            class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Delete</button>
                                 </div>
                             </td>
                         </tr>
@@ -134,6 +132,29 @@
         @if($applications->hasPages())
             <div class="px-5 py-3 border-t border-gray-200">{{ $applications->links() }}</div>
         @endif
+    </div>
+
+    {{-- Delete application modal --}}
+    <div x-show="deleteModalOpen" x-cloak x-transition.opacity
+         class="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4"
+         @click.self="closeDelete()" @keydown.escape.window="closeDelete()">
+        <div class="w-full max-w-md overflow-hidden rounded-xl bg-white shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="delete-application-title">
+            <div class="p-6">
+                <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86a2 2 0 001.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16a2 2 0 001.73 3z"/></svg>
+                </div>
+                <h3 id="delete-application-title" class="text-lg font-bold text-[#0A1929]">Delete application?</h3>
+                <p class="mt-2 text-sm leading-6 text-gray-600">The application from <span class="font-semibold text-gray-800" x-text="deleteLabel"></span> will be removed from the application lists. The record can still be recovered from the database.</p>
+            </div>
+            <div class="flex justify-end gap-3 border-t border-gray-100 bg-gray-50 px-6 py-4">
+                <button type="button" @click="closeDelete()" class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-white">Cancel</button>
+                <form method="POST" :action="deleteUrl">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700">Delete application</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     {{-- Send-notification modal --}}
@@ -212,7 +233,20 @@ function bulkApplications() {
     return {
         selected: [],
         modalOpen: false,
+        deleteModalOpen: false,
+        deleteUrl: '',
+        deleteLabel: '',
         pageIds: @json($applications->pluck('id')),
+        openDelete(url, label) {
+            this.deleteUrl = url;
+            this.deleteLabel = label;
+            this.deleteModalOpen = true;
+        },
+        closeDelete() {
+            this.deleteModalOpen = false;
+            this.deleteUrl = '';
+            this.deleteLabel = '';
+        },
         toggleAll(e) {
             this.selected = e.target.checked ? [...this.pageIds] : [];
         },
