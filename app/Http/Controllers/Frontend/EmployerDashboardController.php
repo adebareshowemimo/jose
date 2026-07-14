@@ -642,6 +642,12 @@ class EmployerDashboardController extends BasePageController
         $user = auth()->user();
         $companyId = $user->company?->id;
 
+        $application = JobApplication::with(['jobListing', 'resume'])
+            ->where('candidate_id', $candidate->id)
+            ->whereHas('jobListing', fn ($query) => $query->where('company_id', $companyId))
+            ->latest()
+            ->first();
+
         $isDeliveredToEmployer = RecruitmentRequestCandidate::query()
             ->where('candidate_id', $candidate->id)
             ->whereHas('recruitmentRequest', function ($q) use ($user, $companyId) {
@@ -654,10 +660,10 @@ class EmployerDashboardController extends BasePageController
             })
             ->exists();
 
-        if (! $isDeliveredToEmployer) {
+        if (! $isDeliveredToEmployer && ! $application) {
             return redirect()
-                ->route('employer.recruitment-requests.index')
-                ->with('error', 'Candidate profiles are available through the candidates delivered to your recruitment requests.');
+                ->route('employer.applicants')
+                ->with('error', 'You can only view candidates who applied to your jobs or were delivered through a recruitment request.');
         }
 
         CandidateProfileView::record($candidate, $user, 'employer');
@@ -672,6 +678,7 @@ class EmployerDashboardController extends BasePageController
         return view('pages.dashboard.employer.candidates.show', [
             'candidate' => $candidate,
             'isSaved' => $isSaved,
+            'application' => $application,
         ]);
     }
 

@@ -54,6 +54,49 @@
         </div>
     @endif
 
+    @if ($application)
+        @php
+            $applicationStatusStyles = [
+                'applied' => 'bg-blue-100 text-blue-700',
+                'reviewed' => 'bg-yellow-100 text-yellow-700',
+                'shortlisted' => 'bg-emerald-100 text-emerald-700',
+                'interviewed' => 'bg-purple-100 text-purple-700',
+                'offered' => 'bg-indigo-100 text-indigo-700',
+                'hired' => 'bg-green-100 text-green-700',
+                'rejected' => 'bg-red-100 text-red-700',
+            ];
+            $submittedCv = $application->resume;
+        @endphp
+        <div class="bg-white border border-[#E5E7EB] rounded-xl p-6 mb-6">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="text-xs uppercase tracking-widest text-[#6B7280] font-semibold">Application details</p>
+                    <h2 class="mt-1 text-lg font-bold text-[#073057]">{{ $application->jobListing?->title ?? 'Job application' }}</h2>
+                    <p class="mt-1 text-sm text-[#6B7280]">Applied {{ $application->created_at?->format('M d, Y \a\t g:i A') }}</p>
+                </div>
+                <span class="px-3 py-1 text-xs font-semibold rounded-full {{ $applicationStatusStyles[$application->status] ?? 'bg-gray-100 text-gray-700' }}">{{ ucfirst($application->status) }}</span>
+            </div>
+            @if ($application->cover_letter)
+                <div class="mt-5 pt-5 border-t border-[#E5E7EB]">
+                    <p class="text-xs uppercase tracking-widest text-[#6B7280] font-semibold mb-2">Cover letter</p>
+                    <p class="text-sm leading-6 text-[#4B5563] whitespace-pre-line">{{ $application->cover_letter }}</p>
+                </div>
+            @endif
+            @if ($submittedCv?->url())
+                <div class="mt-5 pt-5 border-t border-[#E5E7EB] flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <p class="text-sm font-semibold text-[#073057]">Submitted CV</p>
+                        <p class="text-xs text-[#6B7280]">{{ $submittedCv->title ?: 'Candidate CV' }}</p>
+                    </div>
+                    <a href="{{ $submittedCv->url() }}" target="_blank" rel="noopener" download class="inline-flex items-center gap-2 px-4 py-2 bg-[#073057] text-white text-sm font-semibold rounded-lg hover:brightness-110">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Open submitted CV
+                    </a>
+                </div>
+            @endif
+        </div>
+    @endif
+
     <div class="grid lg:grid-cols-[1fr_340px] gap-6">
         {{-- Main column --}}
         <div class="space-y-6">

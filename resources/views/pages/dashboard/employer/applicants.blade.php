@@ -72,7 +72,29 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden">
+        <div class="px-5 py-4 border-b border-[#E5E7EB] flex flex-wrap items-center justify-between gap-3">
+            <div>
+                <h3 class="font-semibold text-[#073057]">Applicant Directory</h3>
+                <p class="text-xs text-[#6B7280] mt-0.5">Review candidates across all active job listings</p>
+            </div>
+            <span class="px-3 py-1 bg-[#1AAD94]/10 text-[#1AAD94] text-xs font-semibold rounded-full">{{ number_format($applications->total()) }} applicants</span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[1050px] text-sm">
+                <thead>
+                    <tr class="bg-[#F9FAFB] border-b border-[#E5E7EB] text-left">
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Candidate</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Profile</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Applied Job</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Experience / Location</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Status</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280]">Applied</th>
+                        <th class="px-5 py-3 text-xs font-semibold uppercase tracking-wide text-[#6B7280] text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-[#E5E7EB]">
         @forelse($applications as $application)
             @php
                 $candidate = $application->candidate;
@@ -92,46 +114,44 @@
                 ];
             @endphp
 
-            <div class="bg-white rounded-xl border border-[#E5E7EB] p-5 hover:shadow-md transition">
-                <div class="flex items-start gap-4">
-                    <div class="w-14 h-14 bg-[#073057]/10 rounded-full flex items-center justify-center text-[#073057] font-semibold text-lg shrink-0">
-                        {{ $initials ?: 'C' }}
+            <tr class="hover:bg-[#F9FAFB] transition-colors">
+                <td class="px-5 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-[#073057]/10 rounded-full flex items-center justify-center text-[#073057] font-semibold shrink-0">{{ $initials ?: 'C' }}</div>
+                        <div class="min-w-0">
+                            @if($candidate)
+                                <a href="{{ route('employer.candidates.show', $candidate) }}" class="font-semibold text-[#073057] hover:text-[#1AAD94] hover:underline truncate max-w-[180px] block">{{ $candidateName }}</a>
+                            @else
+                                <p class="font-semibold text-[#073057] truncate max-w-[180px]">{{ $candidateName }}</p>
+                            @endif
+                            <p class="text-xs text-[#6B7280] truncate max-w-[180px]">{{ $candidate?->user?->email ?? 'Email not available' }}</p>
+                        </div>
                     </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-start justify-between gap-3">
-                            <div class="min-w-0">
-                                <h4 class="font-semibold text-[#073057] truncate">{{ $candidateName }}</h4>
-                                <p class="text-sm text-[#1AAD94] truncate">{{ $candidate?->title ?? 'Candidate profile' }}</p>
-                            </div>
-                            <span class="text-xs text-[#6B7280] shrink-0">{{ $application->created_at?->diffForHumans() }}</span>
-                        </div>
-
-                        <div class="flex flex-wrap items-center gap-3 mt-2 text-sm text-[#6B7280]">
-                            <span class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                                {{ $candidate?->experience_years ? $candidate->experience_years.' years' : 'Experience not set' }}
-                            </span>
-                            <span class="flex items-center gap-1">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                {{ $candidate?->location?->name ?? 'Location not set' }}
-                            </span>
-                        </div>
-
-                        <p class="text-xs text-[#6B7280] mt-2">Applied for: <span class="text-[#073057]">{{ $application->jobListing?->title ?? 'Deleted job' }}</span></p>
-
-                        @if($candidate?->skills?->isNotEmpty())
-                            <div class="flex flex-wrap gap-1.5 mt-3">
-                                @foreach($candidate->skills->take(4) as $skill)
-                                    <span class="px-2 py-0.5 bg-[#F3F4F6] text-[#4B5563] text-xs rounded">{{ $skill->name }}</span>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        <div class="flex items-center justify-between gap-3 mt-4">
-                            <span class="px-3 py-1 text-xs font-medium rounded-full {{ $statusStyles[$status] ?? 'bg-gray-100 text-gray-700' }}">{{ ucfirst($status) }}</span>
-                            <div class="flex items-center gap-1">
+                </td>
+                <td class="px-5 py-4">
+                    @if($candidate)
+                        <a href="{{ route('employer.candidates.show', $candidate) }}" class="font-medium text-[#1AAD94] hover:underline">{{ $candidate->title ?? 'Candidate profile' }}</a>
+                    @else
+                        <p class="font-medium text-[#1AAD94]">Candidate profile</p>
+                    @endif
+                    @if($candidate?->skills?->isNotEmpty())
+                        <p class="text-xs text-[#6B7280] mt-1 truncate max-w-[180px]">{{ $candidate->skills->take(3)->pluck('name')->join(', ') }}</p>
+                    @endif
+                </td>
+                <td class="px-5 py-4 font-medium text-[#073057]">{{ $application->jobListing?->title ?? 'Deleted job' }}</td>
+                <td class="px-5 py-4 text-[#6B7280]">
+                    <p>{{ $candidate?->experience_years ? $candidate->experience_years.' years experience' : 'Experience not set' }}</p>
+                    <p class="text-xs mt-1">{{ $candidate?->location?->name ?? 'Location not set' }}</p>
+                </td>
+                <td class="px-5 py-4"><span class="px-3 py-1 text-xs font-medium rounded-full {{ $statusStyles[$status] ?? 'bg-gray-100 text-gray-700' }}">{{ ucfirst($status) }}</span></td>
+                <td class="px-5 py-4 text-[#6B7280] whitespace-nowrap">
+                    <p>{{ $application->created_at?->format('M d, Y') }}</p>
+                    <p class="text-xs mt-1">{{ $application->created_at?->diffForHumans() }}</p>
+                </td>
+                <td class="px-5 py-4 text-right">
+                    <div class="inline-flex items-center gap-1">
                                 @if($candidate?->slug)
-                                    <a href="{{ route('candidate.detail', $candidate->slug) }}" target="_blank" class="p-2 text-[#6B7280] hover:text-[#073057] hover:bg-[#F3F4F6] rounded-lg transition" title="View Profile">
+                                    <a href="{{ route('employer.candidates.show', $candidate) }}" class="p-2 text-[#6B7280] hover:text-[#073057] hover:bg-[#F3F4F6] rounded-lg transition" title="View full candidate details">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                                     </a>
                                 @endif
@@ -140,17 +160,15 @@
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </a>
                                 @endif
-                            </div>
-                        </div>
                     </div>
-                </div>
-            </div>
+                </td>
+            </tr>
         @empty
-            <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E7EB] p-10 text-center">
-                <h3 class="text-lg font-bold text-[#073057]">No applicants found</h3>
-                <p class="mt-2 text-[#6B7280]">Applications submitted to your jobs will appear here. Adjust filters if you expected results.</p>
-            </div>
+            <tr><td colspan="7" class="px-5 py-12 text-center"><h3 class="text-lg font-bold text-[#073057]">No applicants found</h3><p class="mt-2 text-[#6B7280]">Applications submitted to your jobs will appear here. Adjust filters if you expected results.</p></td></tr>
         @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     @if($applications->hasPages() || $applications->total() > 0)
