@@ -38,6 +38,10 @@ class ChatController extends Controller
             ])
             ->where('type', ChatConversation::TYPE_EMPLOYER_CANDIDATE)
             ->where('company_id', $company->id)
+            ->where(fn ($query) => $query
+                ->whereNotNull('recruitment_request_candidate_id')
+                ->orWhereHas('jobApplication', fn ($application) => $application
+                    ->whereNotNull('employer_chat_access_granted_at')))
             ->orderByDesc('last_message_at')
             ->orderByDesc('created_at')
             ->get();
@@ -110,6 +114,11 @@ class ChatController extends Controller
             ])
             ->where('candidate_id', $candidate->id)
             ->whereIn('type', [ChatConversation::TYPE_EMPLOYER_CANDIDATE, ChatConversation::TYPE_ADMIN_CANDIDATE])
+            ->where(fn ($query) => $query
+                ->where('type', ChatConversation::TYPE_ADMIN_CANDIDATE)
+                ->orWhereNotNull('recruitment_request_candidate_id')
+                ->orWhereHas('jobApplication', fn ($application) => $application
+                    ->whereNotNull('employer_chat_access_granted_at')))
             ->orderByDesc('last_message_at')
             ->orderByDesc('created_at')
             ->get();
@@ -318,6 +327,7 @@ class ChatController extends Controller
             });
 
         JobApplication::query()
+            ->whereNotNull('employer_chat_access_granted_at')
             ->whereHas('jobListing', fn ($query) => $query
                 ->where('company_id', $companyId)
                 ->where('is_approved', true))
@@ -364,6 +374,7 @@ class ChatController extends Controller
 
         JobApplication::query()
             ->where('candidate_id', $candidateId)
+            ->whereNotNull('employer_chat_access_granted_at')
             ->whereHas('jobListing', fn ($query) => $query->where('is_approved', true))
             ->with('jobListing')
             ->get()
@@ -414,6 +425,10 @@ class ChatController extends Controller
             && (int) $request->user()->company?->id === (int) $conversation->company_id,
             403
         );
+
+        if ($conversation->job_application_id) {
+            abort_unless($conversation->jobApplication?->employer_chat_access_granted_at, 403);
+        }
     }
 
     private function authorizeCandidate(Request $request, ChatConversation $conversation): void
@@ -423,6 +438,10 @@ class ChatController extends Controller
             && (int) $request->user()->candidate?->id === (int) $conversation->candidate_id,
             403
         );
+
+        if ($conversation->job_application_id) {
+            abort_unless($conversation->jobApplication?->employer_chat_access_granted_at, 403);
+        }
     }
 
     private function createMessage(ChatConversation $conversation, $user, string $role, string $body, ?string $actionType = null, ?array $payload = null): ChatMessage

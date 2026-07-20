@@ -16,10 +16,13 @@ class EmployerApplicantChatTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_approved_job_applicant_is_added_to_employer_and_candidate_chat(): void
+    public function test_admin_granted_applicant_is_added_to_employer_and_candidate_chat(): void
     {
         $employerRole = Role::firstOrCreate(['name' => 'employer']);
         $candidateRole = Role::firstOrCreate(['name' => 'candidate']);
+        $admin = User::factory()->create([
+            'role_id' => Role::firstOrCreate(['name' => 'admin'])->id,
+        ]);
         $employer = User::factory()->create(['role_id' => $employerRole->id]);
         $candidateUser = User::factory()->create(['role_id' => $candidateRole->id, 'name' => 'Approved Applicant']);
         $company = Company::create([
@@ -45,6 +48,11 @@ class EmployerApplicantChatTest extends TestCase
             'status' => 'applied',
         ]);
 
+        $this->actingAs($admin)
+            ->post(route('admin.applications.chat-access.grant', $application))
+            ->assertRedirect();
+        $this->assertNotNull($application->fresh()->employer_chat_access_granted_at);
+
         $this->actingAs($employer)->get(route('employer.chat'))
             ->assertOk()
             ->assertSee('Approved Applicant')
@@ -58,9 +66,20 @@ class EmployerApplicantChatTest extends TestCase
             ->assertOk()
             ->assertSee('Approved Jobs Ltd')
             ->assertSee('Approved Deck Officer');
+
+        $this->actingAs($admin)
+            ->delete(route('admin.applications.chat-access.revoke', $application))
+            ->assertRedirect();
+
+        $this->actingAs($employer)->get(route('employer.chat'))
+            ->assertOk()
+            ->assertDontSee('Approved Applicant');
+        $this->actingAs($employer)
+            ->post(route('employer.chat.messages.store', $conversation), ['body' => 'Should be blocked'])
+            ->assertForbidden();
     }
 
-    public function test_unapproved_job_applicant_is_not_added_to_chat(): void
+    public function test_applicant_without_admin_grant_is_not_added_to_chat(): void
     {
         $employer = User::factory()->create([
             'role_id' => Role::firstOrCreate(['name' => 'employer'])->id,
@@ -80,10 +99,10 @@ class EmployerApplicantChatTest extends TestCase
         $job = JobListing::create([
             'company_id' => $company->id,
             'posted_by' => $employer->id,
-            'title' => 'Pending Approval Job',
-            'slug' => 'pending-approval-job',
-            'description' => 'Not approved.',
-            'is_approved' => false,
+            'title' => 'Approved But Restricted Job',
+            'slug' => 'approved-but-restricted-job',
+            'description' => 'Approved without applicant chat access.',
+            'is_approved' => true,
         ]);
         $application = JobApplication::create([
             'job_listing_id' => $job->id,

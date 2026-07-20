@@ -368,6 +368,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/applications', [AdminController::class, 'applications'])->name('admin.applications');
     Route::get('/applications/{application}', [AdminController::class, 'showApplication'])->name('admin.applications.show');
     Route::delete('/applications/{application}', [AdminController::class, 'destroyApplication'])->name('admin.applications.destroy');
+    Route::post('/applications/{application}/chat-access', [AdminController::class, 'grantApplicationChatAccess'])->name('admin.applications.chat-access.grant');
+    Route::delete('/applications/{application}/chat-access', [AdminController::class, 'revokeApplicationChatAccess'])->name('admin.applications.chat-access.revoke');
 
     // Chat
     Route::get('/chat', [AdminChatController::class, 'index'])->name('admin.chat.index');

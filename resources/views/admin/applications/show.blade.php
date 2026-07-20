@@ -84,6 +84,34 @@
         @endif
     </div>
 
+    <div class="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h3 class="font-semibold text-gray-900">Employer chat access</h3>
+                @if($application->employer_chat_access_granted_at)
+                    <p class="mt-1 text-sm text-green-700">Granted {{ $application->employer_chat_access_granted_at->diffForHumans() }}. This applicant can chat with {{ $job?->company?->name ?? 'the employer' }}.</p>
+                @else
+                    <p class="mt-1 text-sm text-gray-500">This applicant is not visible in the employer's chat.</p>
+                @endif
+            </div>
+            @if($application->employer_chat_access_granted_at)
+                <form method="POST" action="{{ route('admin.applications.chat-access.revoke', $application) }}">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold text-red-600 border border-red-200 rounded-lg hover:bg-red-50">Revoke access</button>
+                </form>
+            @else
+                <form method="POST" action="{{ route('admin.applications.chat-access.grant', $application) }}">
+                    @csrf
+                    <button type="submit" @disabled(!$job?->is_approved) class="px-4 py-2 text-sm font-semibold rounded-lg {{ $job?->is_approved ? 'bg-[#1AAD94] text-white hover:bg-[#158f7a]' : 'bg-gray-100 text-gray-400 cursor-not-allowed' }}">Grant chat access</button>
+                </form>
+            @endif
+        </div>
+        @if(!$job?->is_approved)
+            <p class="mt-3 text-xs text-amber-700">Approve the job before granting employer chat access.</p>
+        @endif
+    </div>
+
     {{-- Full candidate profile: CV, certificates, experience, education, skills, details --}}
     @if ($candidate)
         @include('admin.users.partials.candidate-profile', ['candidate' => $candidate])

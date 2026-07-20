@@ -13,6 +13,7 @@ class JobApplication extends Model
     protected $fillable = [
         'job_listing_id', 'candidate_id', 'resume_id',
         'cover_letter', 'status', 'employer_notes', 'admin_viewed_at', 'employer_viewed_at',
+        'employer_chat_access_granted_at', 'employer_chat_access_granted_by',
     ];
 
     protected function casts(): array
@@ -20,6 +21,7 @@ class JobApplication extends Model
         return [
             'admin_viewed_at' => 'datetime',
             'employer_viewed_at' => 'datetime',
+            'employer_chat_access_granted_at' => 'datetime',
         ];
     }
 

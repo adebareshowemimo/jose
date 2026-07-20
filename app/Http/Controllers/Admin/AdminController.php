@@ -642,4 +642,26 @@ class AdminController extends Controller
         return redirect()->route('admin.applications')
             ->with('success', 'Application deleted successfully.');
     }
+
+    public function grantApplicationChatAccess(JobApplication $application)
+    {
+        abort_unless($application->jobListing?->is_approved, 422, 'The job must be approved before chat access can be granted.');
+
+        $application->update([
+            'employer_chat_access_granted_at' => now(),
+            'employer_chat_access_granted_by' => auth()->id(),
+        ]);
+
+        return back()->with('success', 'Employer chat access granted for this applicant.');
+    }
+
+    public function revokeApplicationChatAccess(JobApplication $application)
+    {
+        $application->update([
+            'employer_chat_access_granted_at' => null,
+            'employer_chat_access_granted_by' => null,
+        ]);
+
+        return back()->with('success', 'Employer chat access revoked for this applicant.');
+    }
 }
