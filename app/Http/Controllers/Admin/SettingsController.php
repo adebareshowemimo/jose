@@ -162,14 +162,13 @@ class SettingsController extends Controller
         try {
             Mail::raw(
                 "This is a test email from " . config('app.name', 'Jose Ocean Jobs') . ".\n\n"
-                . "If you received this, your SMTP configuration is working.\n\n"
+                . "If you received this, your email provider configuration is working.\n\n"
                 . "Sent at: " . now()->toDateTimeString() . " UTC\n"
                 . "From: " . config('mail.from.address') . " (" . config('mail.from.name') . ")\n"
-                . "Mailer: " . config('mail.default') . "\n"
-                . "SMTP host: " . config('mail.mailers.smtp.host') . ":" . config('mail.mailers.smtp.port'),
+                . "Mailer: " . config('mail.default'),
                 function ($message) use ($data) {
                     $message->to($data['test_recipient'])
-                            ->subject('SMTP test from ' . config('app.name', 'Jose Ocean Jobs'));
+                            ->subject('Email test from ' . config('app.name', 'Jose Ocean Jobs'));
                 }
             );
         } catch (\Throwable $e) {
