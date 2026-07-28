@@ -48,10 +48,12 @@ class SettingsSeeder extends Seeder
             ['key' => 'bank.instructions',   'value' => null, 'group' => 'bank', 'is_encrypted' => false],
 
             // Reminder cadence (shared by CV-upload + profile-completion reminders)
+            ['key' => 'reminders.enabled',           'value' => true, 'group' => 'reminders', 'is_encrypted' => false],
             ['key' => 'reminders.first_after_days',  'value' => 3, 'group' => 'reminders', 'is_encrypted' => false],
-            ['key' => 'reminders.repeat_every_days', 'value' => 7, 'group' => 'reminders', 'is_encrypted' => false],
+            ['key' => 'reminders.repeat_every_days', 'value' => 1, 'group' => 'reminders', 'is_encrypted' => false],
             ['key' => 'reminders.max_count',         'value' => 3, 'group' => 'reminders', 'is_encrypted' => false],
             ['key' => 'reminders.profile_threshold_percent', 'value' => 70, 'group' => 'reminders', 'is_encrypted' => false],
+            ['key' => 'reminders.send_at_time',      'value' => '09:00', 'group' => 'reminders', 'is_encrypted' => false],
 
             // Contact form subject -> recipient routing
             ['key' => 'contact.subject_routes', 'value' => ContactRoutes::DEFAULT_ROUTES,           'group' => 'contact_routing', 'is_encrypted' => false],

@@ -209,7 +209,21 @@
 
             {{-- Reminders tab --}}
             <div x-show="tab === 'reminders'" x-cloak class="space-y-5">
-                <p class="text-sm text-gray-600">Cadence for the CV-upload and profile-completion reminder emails. The scheduled task runs daily and sends per these rules.</p>
+                <p class="text-sm text-gray-600">Cadence for the CV-upload and profile-completion reminder emails. The scheduled task runs at the time below and sends per these rules. Edit the email wording under <a href="{{ route('admin.email-templates.index') }}" class="text-[#1AAD94] font-semibold hover:underline">Email Templates</a>.</p>
+
+                <div>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                        <input type="hidden" name="reminders_enabled" value="0">
+                        <input type="checkbox" name="reminders_enabled" value="1"
+                               {{ ($reminders['reminders.enabled'] ?? true) ? 'checked' : '' }}
+                               class="mt-1 w-4 h-4 rounded border-gray-300 text-[#1AAD94] focus:ring-[#1AAD94]">
+                        <span>
+                            <span class="block text-sm font-semibold text-gray-800">Enable reminder emails</span>
+                            <span class="block text-xs text-gray-500">Turn all candidate reminder emails on or off without touching the server cron.</span>
+                        </span>
+                    </label>
+                </div>
+
                 <div class="grid md:grid-cols-3 gap-5">
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">First reminder after (days)</label>
@@ -218,10 +232,17 @@
                         <p class="mt-1 text-xs text-gray-500">Wait this many days after registration before the first reminder.</p>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Repeat every (days)</label>
-                        <input type="number" min="1" max="365" name="reminders_repeat_every_days" value="{{ $reminders['reminders.repeat_every_days'] ?? 7 }}"
-                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none" />
-                        <p class="mt-1 text-xs text-gray-500">Interval between subsequent reminders for the same user.</p>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Frequency</label>
+                        @php $repeat = (int) ($reminders['reminders.repeat_every_days'] ?? 1); @endphp
+                        <select name="reminders_repeat_every_days"
+                                class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none bg-white">
+                            <option value="1"  {{ $repeat === 1 ? 'selected' : '' }}>Daily</option>
+                            <option value="2"  {{ $repeat === 2 ? 'selected' : '' }}>Every 2 days</option>
+                            <option value="3"  {{ $repeat === 3 ? 'selected' : '' }}>Every 3 days</option>
+                            <option value="7"  {{ $repeat === 7 ? 'selected' : '' }}>Weekly</option>
+                            <option value="14" {{ $repeat === 14 ? 'selected' : '' }}>Bi-weekly (every 2 weeks)</option>
+                        </select>
+                        <p class="mt-1 text-xs text-gray-500">How often to re-send while the profile stays incomplete.</p>
                     </div>
                     <div>
                         <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Max reminders per user</label>
@@ -230,11 +251,19 @@
                         <p class="mt-1 text-xs text-gray-500">Stop reminding once this many have been sent.</p>
                     </div>
                 </div>
-                <div class="pt-4 border-t border-gray-100">
-                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Profile completion threshold (%)</label>
-                    <input type="number" min="0" max="100" name="reminders_profile_threshold_percent" value="{{ $reminders['reminders.profile_threshold_percent'] ?? 70 }}"
-                           class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none max-w-xs" />
-                    <p class="mt-1 text-xs text-gray-500">Profile-completion reminders go to candidates whose profile is below this percent.</p>
+                <div class="pt-4 border-t border-gray-100 grid md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Send reminders at</label>
+                        <input type="time" name="reminders_send_at_time" value="{{ $reminders['reminders.send_at_time'] ?? '09:00' }}"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none max-w-xs" />
+                        <p class="mt-1 text-xs text-gray-500">Time of day (server time) the daily reminder run sends emails.</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Profile completion threshold (%)</label>
+                        <input type="number" min="0" max="100" name="reminders_profile_threshold_percent" value="{{ $reminders['reminders.profile_threshold_percent'] ?? 70 }}"
+                               class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1AAD94] focus:border-[#1AAD94] outline-none max-w-xs" />
+                        <p class="mt-1 text-xs text-gray-500">Reminders go to candidates whose profile is below this percent.</p>
+                    </div>
                 </div>
                 <div class="rounded-lg bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 text-xs">
                     <strong>Cron:</strong> Make sure <span class="font-mono">php artisan schedule:run</span> runs every minute (Linux cron / Windows Task Scheduler). Without it, reminders won't fire.

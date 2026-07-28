@@ -9,9 +9,10 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Daily candidate reminders (CV upload + profile completion).
-// Set the schedule:run cron to run every minute and this fires once per day.
+// Set the schedule:run cron to run every minute and this fires once per day,
+// at the admin-configured time (Admin → Settings → Reminders).
 Schedule::command('emails:send-candidate-reminders')
-    ->dailyAt('09:00')
+    ->dailyAt(setting('reminders.send_at_time', '09:00'))
     ->withoutOverlapping();
 
 // Daily event reminders — emails registered attendees per each event's

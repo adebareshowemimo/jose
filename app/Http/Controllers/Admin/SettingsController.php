@@ -48,10 +48,12 @@ class SettingsController extends Controller
             'mail_from_address' => 'nullable|email|max:255',
             'mail_from_name'    => 'nullable|string|max:255',
 
+            'reminders_enabled'                  => 'sometimes|boolean',
             'reminders_first_after_days'         => 'nullable|integer|min:0|max:365',
-            'reminders_repeat_every_days'        => 'nullable|integer|min:1|max:365',
+            'reminders_repeat_every_days'        => 'nullable|integer|in:1,2,3,7,14',
             'reminders_max_count'                => 'nullable|integer|min:1|max:50',
             'reminders_profile_threshold_percent'=> 'nullable|integer|min:0|max:100',
+            'reminders_send_at_time'             => 'nullable|date_format:H:i',
 
             'paystack_enabled'      => 'sometimes|boolean',
             'paystack_public_key'   => 'nullable|string|max:255',
@@ -109,10 +111,12 @@ class SettingsController extends Controller
             'mail.from.address'    => ['mail', false, $data['mail_from_address'] ?? null],
             'mail.from.name'       => ['mail', false, $data['mail_from_name'] ?? null],
 
+            'reminders.enabled'                   => ['reminders', false, $request->boolean('reminders_enabled')],
             'reminders.first_after_days'          => ['reminders', false, $data['reminders_first_after_days'] ?? 3],
-            'reminders.repeat_every_days'         => ['reminders', false, $data['reminders_repeat_every_days'] ?? 7],
+            'reminders.repeat_every_days'         => ['reminders', false, $data['reminders_repeat_every_days'] ?? 1],
             'reminders.max_count'                 => ['reminders', false, $data['reminders_max_count'] ?? 3],
             'reminders.profile_threshold_percent' => ['reminders', false, $data['reminders_profile_threshold_percent'] ?? 70],
+            'reminders.send_at_time'              => ['reminders', false, $data['reminders_send_at_time'] ?? '09:00'],
 
             'paystack.enabled'    => ['paystack', false, $request->boolean('paystack_enabled')],
             'paystack.public_key' => ['paystack', false, $data['paystack_public_key'] ?? null],

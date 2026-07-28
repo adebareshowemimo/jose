@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Candidate;
 use App\Models\EmailLog;
 use App\Models\Role;
 use App\Models\User;
@@ -17,6 +16,11 @@ class SendCandidateReminders extends Command
 
     public function handle(EmailDispatcher $dispatcher): int
     {
+        if (! (bool) setting('reminders.enabled', true)) {
+            $this->info('Reminder emails are disabled in settings. Nothing to do.');
+            return self::SUCCESS;
+        }
+
         $firstAfterDays   = (int) setting('reminders.first_after_days', 3);
         $repeatEveryDays  = max(1, (int) setting('reminders.repeat_every_days', 7));
         $maxCount         = max(1, (int) setting('reminders.max_count', 3));
@@ -60,7 +64,8 @@ class SendCandidateReminders extends Command
             }
 
             // Profile completion reminder ────────────────────────
-            $percent = $this->profileCompletion($user, $candidate);
+            // Canonical completion (same number the candidate sees on their profile).
+            $percent = $user->profileCompletion();
             if ($percent < $profileThreshold) {
                 if ($this->shouldSend($user, 'reminder.profile_completion', $repeatEveryDays, $maxCount)) {
                     $this->line("  → Profile reminder to {$user->email} ({$percent}%)");
@@ -94,28 +99,5 @@ class SendCandidateReminders extends Command
             return false;
         }
         return true;
-    }
-
-    protected function profileCompletion(User $user, ?Candidate $candidate): int
-    {
-        $completion = 0;
-        $fields = 3;
-        if ($user->name) $completion++;
-        if ($user->email) $completion++;
-        if ($user->avatar) $completion++;
-
-        if ($candidate) {
-            $fields += 8;
-            if ($candidate->title) $completion++;
-            if ($candidate->bio) $completion++;
-            if ($candidate->education && count($candidate->education)) $completion++;
-            if ($candidate->experience && count($candidate->experience)) $completion++;
-            if ($candidate->skills->count()) $completion++;
-            if ($candidate->location_id) $completion++;
-            if ($candidate->resumes->count()) $completion++;
-            if ($candidate->social_links && count($candidate->social_links)) $completion++;
-        }
-
-        return $fields > 0 ? (int) round(($completion / $fields) * 100) : 0;
     }
 }
