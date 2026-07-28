@@ -114,7 +114,9 @@ class User extends Authenticatable implements MustVerifyEmail
             $checks[] = (bool) $candidate->bio;
             $checks[] = $hasItems($candidate->education);
             $checks[] = $hasItems($candidate->experience);
-            $checks[] = $candidate->skills()->count() > 0;
+            // Skills are stored in the skills_list JSON column via the profile form;
+            // fall back to the candidate_skill relation for older/pivot-based data.
+            $checks[] = $hasItems($candidate->skills_list) || $candidate->skills()->count() > 0;
             $checks[] = (bool) $candidate->location_id;
             $checks[] = $candidate->resumes()->count() > 0;
             $checks[] = $hasItems($candidate->social_links);
