@@ -105,6 +105,85 @@ class CandidateDashboardController extends BasePageController
         ]);
     }
 
+    /**
+     * List available (active, approved) jobs with filters + applied-status badges.
+     *
+     * @param \Illuminate\Http\Request $request The incoming request with filters.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function availableJobs(Request $request)
+    {
+        $candidate = $this->getCandidate();
+
+        // Active, approved, regular job listings — the same visibility rules as the public board.
+        $query = JobListing::regularJobs()
+            ->where('status', 'active')
+            ->where('is_approved', true)
+            ->with(['company', 'location', 'jobType', 'category']);
+
+        if ($request->filled('keyword')) {
+            $term = (string) $request->input('keyword');
+            $query->where(function ($q) use ($term) {
+                $q->where('title', 'like', "%{$term}%")
+                  ->orWhere('description', 'like', "%{$term}%");
+            });
+        }
+
+        if ($request->filled('location')) {
+            $loc = (string) $request->input('location');
+            $query->where(function ($q) use ($loc) {
+                $q->where('address', 'like', "%{$loc}%")
+                  ->orWhereHas('location', fn ($l) => $l->where('name', 'like', "%{$loc}%"));
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+
+        if ($request->filled('type')) {
+            $query->where('job_type_id', $request->input('type'));
+        }
+
+        // Map of job_listing_id => application status for this candidate, so the
+        // list can show which jobs have already been applied to and their status.
+        $appliedStatuses = $candidate
+            ? JobApplication::where('candidate_id', $candidate->id)
+                ->pluck('status', 'job_listing_id')
+                ->all()
+            : [];
+
+        // Filter to only the jobs the candidate has applied to, when requested.
+        if ($request->input('applied') === '1' && $candidate) {
+            $query->whereIn('id', array_keys($appliedStatuses));
+        }
+
+        $jobs = $query->orderByDesc('is_featured')
+            ->orderByDesc('is_urgent')
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString();
+
+        $categories = \App\Models\Category::where('is_active', true)->orderBy('name')->get();
+        $jobTypes = \App\Models\JobType::orderBy('name')->get();
+
+        // Saved/bookmarked ids so the heart toggle can reflect current state.
+        $savedJobIds = Wishlist::where('user_id', Auth::id())
+            ->where('wishlistable_type', JobListing::class)
+            ->pluck('wishlistable_id')
+            ->all();
+
+        return view('pages.dashboard.candidate.available-jobs', [
+            'jobs' => $jobs,
+            'categories' => $categories,
+            'jobTypes' => $jobTypes,
+            'appliedStatuses' => $appliedStatuses,
+            'savedJobIds' => $savedJobIds,
+            'appliedCount' => count($appliedStatuses),
+        ]);
+    }
+
     public function jobAlerts()
     {
         $user = Auth::user();

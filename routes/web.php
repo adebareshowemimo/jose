@@ -96,21 +96,27 @@ Route::get('/news/{slug}', [PublicPageController::class, 'newsDetail'])->name('n
 
 // Event registration (Phase C)
 Route::get('/events/{event}/register', [\App\Http\Controllers\Frontend\EventRegistrationController::class, 'showForm'])->name('events.register.show');
-Route::post('/events/{event}/register', [\App\Http\Controllers\Frontend\EventRegistrationController::class, 'submit'])->name('events.register.submit');
+Route::post('/events/{event}/register', [\App\Http\Controllers\Frontend\EventRegistrationController::class, 'submit'])
+    ->middleware(['honeypot', 'throttle:8,1'])
+    ->name('events.register.submit');
 Route::get('/events/{event}/registered', [\App\Http\Controllers\Frontend\EventRegistrationController::class, 'thanks'])->name('events.register.thanks');
 
 // Newsletter
 Route::post('/newsletter/subscribe', [\App\Http\Controllers\Frontend\NewsletterController::class, 'subscribe'])
-    ->middleware('throttle:10,1')
+    ->middleware(['honeypot', 'throttle:10,1'])
     ->name('newsletter.subscribe');
 Route::get('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\Frontend\NewsletterController::class, 'unsubscribe'])
     ->name('newsletter.unsubscribe');
 Route::post('/newsletter/unsubscribe/{token}', [\App\Http\Controllers\Frontend\NewsletterController::class, 'unsubscribeConfirm'])
     ->name('newsletter.unsubscribe.confirm');
 Route::get('/contact', [PublicPageController::class, 'contact'])->name('contact.index');
-Route::post('/contact', [ContactSubmissionController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactSubmissionController::class, 'store'])
+    ->middleware(['honeypot', 'throttle:5,1'])
+    ->name('contact.store');
 Route::get('/contact/thread/{token}', [ContactSubmissionController::class, 'thread'])->name('contact.thread');
-Route::post('/contact/thread/{token}', [ContactSubmissionController::class, 'reply'])->name('contact.thread.reply');
+Route::post('/contact/thread/{token}', [ContactSubmissionController::class, 'reply'])
+    ->middleware(['honeypot', 'throttle:8,1'])
+    ->name('contact.thread.reply');
 Route::get('/plan', [PublicPageController::class, 'plan'])->name('plan.index');
 
 // Legal pages
@@ -179,6 +185,7 @@ Route::prefix('user')->middleware(['auth', 'role.selected'])->group(function () 
     Route::post('/candidate/profile/summary', [ProfileController::class, 'updateSummary'])->name('user.profile.summary.update');
     Route::post('/candidate/profile/skills', [ProfileController::class, 'updateSkills'])->name('user.profile.skills.update');
     
+    Route::get('/available-jobs', [CandidateDashboardController::class, 'availableJobs'])->name('user.available-jobs');
     Route::get('/applied-jobs', [CandidateDashboardController::class, 'appliedJobs'])->name('user.applied-jobs');
 
     // Candidate visibility boost (Phase D)

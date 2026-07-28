@@ -14,18 +14,8 @@
     $firstName = $nameParts[0] ?? '';
     $lastName = $nameParts[1] ?? '';
     
-    // Calculate profile completion
-    $completionItems = [
-        'name' => !empty($user->name),
-        'email' => !empty($user->email),
-        'phone' => !empty($user->phone),
-        'avatar' => !empty($user->avatar),
-        'bio' => !empty($candidate?->bio),
-        'experience' => !empty($candidate?->experience),
-        'education' => !empty($candidate?->education),
-        'certifications' => !empty($candidate?->awards),
-    ];
-    $completionPercent = count(array_filter($completionItems)) / count($completionItems) * 100;
+    // Profile completion — shared single source of truth (see User::profileCompletion()).
+    $completionPercent = $user->profileCompletion();
 @endphp
 
 @section('content')
