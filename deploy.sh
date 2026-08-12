@@ -138,22 +138,67 @@ ok "Preflight passed"
 if [ "$RUN_BACKUP" = "1" ]; then
     step "Backing up the database"
 
-    DB_CONN="$(php artisan tinker --execute='echo DB::connection()->getDriverName();' 2>/dev/null | tr -d '\r\n' | tail -c 20 || true)"
+    # Read connection details through Laravel's own config rather than parsing
+    # .env directly. A Laravel .env is NOT ini format - values such as
+    # APP_KEY=base64:...== break parse_ini_file(), which silently yields empty
+    # credentials and sends mysqldump in with no username or password.
+    cfg() {
+        php -r "require 'vendor/autoload.php';
+                \$app = require 'bootstrap/app.php';
+                \$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+                echo (string) config(\$argv[1], \$argv[2] ?? '');" "$1" "${2:-}" 2>/dev/null
+    }
+
+    DB_CONN="$(cfg 'database.default')"
     mkdir -p storage/backups
+    chmod 700 storage/backups 2>/dev/null || true
     STAMP="$(date +%Y%m%d-%H%M%S)"
 
     case "$DB_CONN" in
         mysql|mariadb)
-            DB_DATABASE="$(php -r '$e=parse_ini_file(".env"); echo $e["DB_DATABASE"]??"";')"
-            DB_USERNAME="$(php -r '$e=parse_ini_file(".env"); echo $e["DB_USERNAME"]??"";')"
-            DB_PASSWORD="$(php -r '$e=parse_ini_file(".env"); echo $e["DB_PASSWORD"]??"";')"
-            DB_HOST="$(php -r '$e=parse_ini_file(".env"); echo $e["DB_HOST"]??"127.0.0.1";')"
+            DB_DATABASE="$(cfg "database.connections.$DB_CONN.database")"
+            DB_USERNAME="$(cfg "database.connections.$DB_CONN.username")"
+            DB_PASSWORD="$(cfg "database.connections.$DB_CONN.password")"
+            DB_HOST="$(cfg "database.connections.$DB_CONN.host" '127.0.0.1')"
+            DB_PORT="$(cfg "database.connections.$DB_CONN.port" '3306')"
+
+            # Fail loudly rather than handing mysqldump empty credentials.
+            [ -n "$DB_DATABASE" ] || die "Could not read the database name from config.
+       Check that .env is readable and APP_KEY is set."
+            [ -n "$DB_USERNAME" ] || die "Could not read the database username from config.
+       Check that .env is readable and APP_KEY is set."
+
             if command -v mysqldump >/dev/null; then
-                run bash -c "MYSQL_PWD='$DB_PASSWORD' mysqldump \
-                    --host='$DB_HOST' --user='$DB_USERNAME' \
-                    --single-transaction --quick --routines \
-                    '$DB_DATABASE' > 'storage/backups/db-$STAMP.sql'"
-                ok "storage/backups/db-$STAMP.sql"
+                DUMP_FILE="storage/backups/db-$STAMP.sql"
+                if [ "$DRY_RUN" = "1" ]; then
+                    echo "${C_DIM}  would run:${C_OFF} mysqldump --host=$DB_HOST --port=$DB_PORT --user=$DB_USERNAME $DB_DATABASE > $DUMP_FILE"
+                else
+                    # Password goes via MYSQL_PWD so it never appears in the
+                    # process list. set +e so a failure is caught, not fatal.
+                    set +e
+                    MYSQL_PWD="$DB_PASSWORD" mysqldump \
+                        --host="$DB_HOST" --port="$DB_PORT" --user="$DB_USERNAME" \
+                        --single-transaction --quick --routines \
+                        "$DB_DATABASE" > "$DUMP_FILE" 2> storage/backups/dump-error.log
+                    DUMP_STATUS=$?
+                    set -e
+
+                    if [ "$DUMP_STATUS" != "0" ] || [ ! -s "$DUMP_FILE" ]; then
+                        rm -f "$DUMP_FILE"
+                        warn "mysqldump FAILED - no backup was taken:"
+                        sed 's/^/       /' storage/backups/dump-error.log >&2
+                        echo
+                        echo "     Nothing has been changed. The database was only read from,"
+                        echo "     never written to, and the deploy has not started."
+                        printf "     Continue WITHOUT a backup? [y/N] "
+                        read -r reply
+                        [ "$reply" = "y" ] || [ "$reply" = "Y" ] || die "Aborted - no changes made."
+                    else
+                        chmod 600 "$DUMP_FILE" 2>/dev/null || true
+                        ok "$DUMP_FILE ($(du -h "$DUMP_FILE" | cut -f1))"
+                    fi
+                    rm -f storage/backups/dump-error.log
+                fi
             else
                 warn "mysqldump not found - NO BACKUP TAKEN."
                 printf "     Continue without a backup? [y/N] "
@@ -162,7 +207,7 @@ if [ "$RUN_BACKUP" = "1" ]; then
             fi
             ;;
         sqlite)
-            DB_FILE="$(php -r '$e=parse_ini_file(".env"); echo $e["DB_DATABASE"]??"database/database.sqlite";')"
+            DB_FILE="$(cfg 'database.connections.sqlite.database')"
             [ -f "$DB_FILE" ] || DB_FILE="database/database.sqlite"
             run cp "$DB_FILE" "storage/backups/db-$STAMP.sqlite"
             ok "storage/backups/db-$STAMP.sqlite"
