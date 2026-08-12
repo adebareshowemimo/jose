@@ -36,7 +36,7 @@ class CandidateBoostController extends Controller
             ],
             'candidate' => $candidate,
             'packages' => $packages,
-            'currency' => $group['candidate_boost.currency'] ?: Currency::default(),
+            'currency' => ($group['candidate_boost.currency'] ?? null) ?: Currency::default(),
         ]);
     }
 
@@ -67,7 +67,7 @@ class CandidateBoostController extends Controller
                 'subtotal' => $package['price'],
                 'tax' => 0,
                 'total' => $package['price'],
-                'currency' => $group['candidate_boost.currency'] ?: Currency::default(),
+                'currency' => ($group['candidate_boost.currency'] ?? null) ?: Currency::default(),
                 'gateway' => 'paystack',
                 'status' => 'pending',
             ]);
