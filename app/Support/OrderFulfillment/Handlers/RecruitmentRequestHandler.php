@@ -2,6 +2,7 @@
 
 namespace App\Support\OrderFulfillment\Handlers;
 
+use App\Support\Currency;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\RecruitmentRequest;
@@ -26,7 +27,7 @@ class RecruitmentRequestHandler implements OrderableHandler
             $dispatcher->send('recruitment.payment_confirmed', $order->user, [
                 'job_title' => $request->job_title,
                 'amount' => number_format((float) $order->total, 2),
-                'currency' => $order->currency ?? ($request->salary_currency ?? 'USD'),
+                'currency' => $order->currency ?? ($request->salary_currency ?: Currency::default()),
                 'paid_at' => optional($order->paid_at)->format('M d, Y \a\t g:i A') ?? now()->format('M d, Y \a\t g:i A'),
                 'request_url' => route('employer.recruitment-requests.show', $request),
             ]);

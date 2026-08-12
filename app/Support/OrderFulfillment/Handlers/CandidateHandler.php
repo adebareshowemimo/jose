@@ -2,6 +2,7 @@
 
 namespace App\Support\OrderFulfillment\Handlers;
 
+use App\Support\Currency;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Support\EmailDispatcher;
@@ -34,7 +35,7 @@ class CandidateHandler implements OrderableHandler
             'ends_at' => $endsAt,
             'status' => 'active',
             'price' => $order->total,
-            'currency' => $order->currency ?? 'USD',
+            'currency' => $order->currency ?: Currency::default(),
         ]);
 
         if ($order->user) {
@@ -42,7 +43,7 @@ class CandidateHandler implements OrderableHandler
                 'days' => $days,
                 'ends_at' => $endsAt->format('M d, Y'),
                 'amount' => number_format((float) $order->total, 2),
-                'currency' => $order->currency ?? 'USD',
+                'currency' => $order->currency ?: Currency::default(),
                 'profile_url' => $candidate->slug
                     ? route('candidate.detail', $candidate->slug)
                     : url('/'),

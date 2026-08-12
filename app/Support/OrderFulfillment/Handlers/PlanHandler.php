@@ -2,6 +2,7 @@
 
 namespace App\Support\OrderFulfillment\Handlers;
 
+use App\Support\Currency;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Subscription;
@@ -58,7 +59,7 @@ class PlanHandler implements OrderableHandler
                 'billing_cycle' => $cycle,
                 'ends_at' => $endsAt->format('M d, Y'),
                 'amount' => number_format((float) $order->total, 2),
-                'currency' => $order->currency ?? 'USD',
+                'currency' => $order->currency ?: Currency::default(),
             ]);
         }
     }

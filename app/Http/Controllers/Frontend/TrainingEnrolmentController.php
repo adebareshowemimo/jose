@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Support\Currency;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -48,7 +49,7 @@ class TrainingEnrolmentController extends Controller
                 'starts_at' => optional($program->starts_at)->format('M d, Y') ?? 'Flexible',
                 'duration' => $program->duration ?? 'See programme details',
                 'amount' => '0.00',
-                'currency' => $program->currency ?? 'USD',
+                'currency' => $program->currency ?: Currency::default(),
                 'order_url' => route('training.show', $program->slug),
             ]);
 
@@ -64,7 +65,7 @@ class TrainingEnrolmentController extends Controller
                 'subtotal' => $program->price,
                 'tax' => 0,
                 'total' => $program->price,
-                'currency' => $program->currency ?? 'USD',
+                'currency' => $program->currency ?: Currency::default(),
                 'gateway' => 'paystack',
                 'status' => 'pending',
             ]);

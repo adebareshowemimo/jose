@@ -59,15 +59,18 @@ class Currency
         return self::SYMBOLS[$code] ?? ($code . ' ');
     }
 
+    /**
+     * Format an amount for display.
+     *
+     * This is a single-currency site: every stored amount is already denominated
+     * in the site default, so the amount is rendered as-is and only the symbol is
+     * resolved. Deliberately does NOT convert — converting here would multiply
+     * historical naira totals by the USD rate and corrupt them on display.
+     *
+     * The $currency argument is accepted for call-site compatibility and ignored.
+     */
     public static function format(float $amount, ?string $currency = null): string
     {
-        $source = strtoupper($currency ?: self::default());
-        $target = self::default();
-
-        $value = $source === $target
-            ? $amount
-            : self::convert($amount, $source, $target);
-
-        return self::symbol($target) . number_format(round($value, 2), 2);
+        return self::symbol(self::default()) . number_format(round($amount, 2), 2);
     }
 }

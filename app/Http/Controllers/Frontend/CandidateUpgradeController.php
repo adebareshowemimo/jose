@@ -8,6 +8,7 @@ use App\Models\OrderItem;
 use App\Models\Plan;
 use App\Models\Role;
 use App\Models\Subscription;
+use App\Support\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -64,7 +65,7 @@ class CandidateUpgradeController extends Controller
                 'subtotal' => $price,
                 'tax' => 0,
                 'total' => $price,
-                'currency' => 'USD',
+                'currency' => Currency::default(),
                 'gateway' => 'paystack',
                 'status' => 'pending',
             ]);

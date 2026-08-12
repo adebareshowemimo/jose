@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Support\Currency;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use App\Models\Receipt;
@@ -33,7 +34,7 @@ class ReceiptController extends Controller
             'user_id' => $order->user_id,
             'number' => Receipt::nextNumberFor($payment),
             'amount' => $payment->amount,
-            'currency' => $payment->currency ?? 'USD',
+            'currency' => $payment->currency ?: Currency::default(),
             'issued_at' => now(),
             'issued_by_admin_id' => auth()->id(),
         ]);

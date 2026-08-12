@@ -2,6 +2,7 @@
 
 namespace App\Support\OrderFulfillment\Handlers;
 
+use App\Support\Currency;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Support\EmailDispatcher;
@@ -35,7 +36,7 @@ class TrainingProgramHandler implements OrderableHandler
                 'starts_at' => optional($program->starts_at)->format('M d, Y') ?? 'Flexible',
                 'duration' => $program->duration ?? 'See programme details',
                 'amount' => number_format((float) $order->total, 2),
-                'currency' => $order->currency ?? 'USD',
+                'currency' => $order->currency ?: Currency::default(),
                 'order_url' => route('order.detail', $order->id),
             ]);
         }

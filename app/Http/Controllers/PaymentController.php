@@ -35,7 +35,7 @@ class PaymentController extends Controller
         $data = $paystack->initialize(
             email: $order->user->email,
             amount: (float) $order->total,
-            currency: $order->currency ?? 'USD',
+            currency: $order->currency ?: Currency::default(),
             reference: $reference,
             callbackUrl: route('payment.paystack.callback'),
             metadata: [
@@ -54,7 +54,7 @@ class PaymentController extends Controller
             'gateway' => 'paystack',
             'transaction_id' => $reference,
             'amount' => $order->total,
-            'currency' => $order->currency ?? 'USD',
+            'currency' => $order->currency ?: Currency::default(),
             'status' => 'pending',
             'gateway_response' => ['init' => $data],
         ]);
@@ -118,7 +118,7 @@ class PaymentController extends Controller
         DB::transaction(function () use ($payment, $order, $data) {
             $payment->update([
                 'status' => 'completed',
-                'exchange_rate' => Currency::rate($payment->currency ?? 'USD', Currency::default()),
+                'exchange_rate' => Currency::rate($payment->currency ?: Currency::default(), Currency::default()),
                 'gateway_response' => array_merge($payment->gateway_response ?? [], ['verified' => $data]),
             ]);
             $order->update([
@@ -165,7 +165,7 @@ class PaymentController extends Controller
             'gateway' => 'manual',
             'transaction_id' => $data['transaction_id'],
             'amount' => $order->total,
-            'currency' => $order->currency ?? 'USD',
+            'currency' => $order->currency ?: Currency::default(),
             'status' => 'pending',
             'gateway_response' => [
                 'paid_at' => $data['paid_at'] ?? null,
@@ -206,7 +206,7 @@ class PaymentController extends Controller
         $dispatcher->send('payment.confirmed', $order->user, [
             'order_number' => $order->order_number,
             'amount' => number_format((float) $order->total, 2),
-            'currency' => $order->currency ?? 'USD',
+            'currency' => $order->currency ?: Currency::default(),
             'gateway' => ucfirst($order->gateway ?? 'manual'),
             'paid_at' => optional($order->paid_at)->format('M d, Y \a\t g:i A') ?? now()->format('M d, Y \a\t g:i A'),
             'order_url' => route('order.detail', $order->id),
@@ -219,7 +219,7 @@ class PaymentController extends Controller
             $dispatcher->send('payment.received', $order->user, [
                 'order_number' => $order->order_number,
                 'amount' => number_format((float) $order->total, 2),
-                'currency' => $order->currency ?? 'USD',
+                'currency' => $order->currency ?: Currency::default(),
                 'transaction_id' => $transactionId,
                 'order_url' => route('order.detail', $order->id),
             ]);
@@ -232,7 +232,7 @@ class PaymentController extends Controller
                 'customer_name' => $order->user?->name ?? '—',
                 'customer_email' => $order->user?->email ?? '—',
                 'amount' => number_format((float) $order->total, 2),
-                'currency' => $order->currency ?? 'USD',
+                'currency' => $order->currency ?: Currency::default(),
                 'transaction_id' => $transactionId,
                 'admin_url' => route('admin.orders.show', $order->id),
             ]);

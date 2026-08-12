@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Support\Currency;
 use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventRegistration;
@@ -132,7 +133,7 @@ class EventRegistrationController extends Controller
                 'subtotal' => $total,
                 'tax' => 0,
                 'total' => $total,
-                'currency' => $event->currency ?? 'USD',
+                'currency' => $event->currency ?: Currency::default(),
                 'gateway' => 'paystack',
                 'status' => 'pending',
             ]);

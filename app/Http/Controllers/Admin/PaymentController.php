@@ -133,7 +133,7 @@ class PaymentController extends Controller
             'gateway_response' => $gatewayResponse,
         ];
         if ($becomingCompleted) {
-            $updates['exchange_rate'] = Currency::rate($payment->currency ?? 'USD', Currency::default());
+            $updates['exchange_rate'] = Currency::rate($payment->currency ?: Currency::default(), Currency::default());
         }
         $payment->update($updates);
 
@@ -173,7 +173,7 @@ class PaymentController extends Controller
 
         $payment->update([
             'status' => 'completed',
-            'exchange_rate' => Currency::rate($payment->currency ?? 'USD', Currency::default()),
+            'exchange_rate' => Currency::rate($payment->currency ?: Currency::default(), Currency::default()),
             'gateway_response' => array_merge($payment->gateway_response ?? [], [
                 'verified_by_admin_id' => auth()->id(),
                 'verified_at' => now()->toIso8601String(),
@@ -199,7 +199,7 @@ class PaymentController extends Controller
         $dispatcher->send('payment.confirmed', $order->user, [
             'order_number' => $order->order_number,
             'amount' => number_format((float) $order->total, 2),
-            'currency' => $order->currency ?? 'USD',
+            'currency' => $order->currency ?: Currency::default(),
             'gateway' => ucfirst($order->gateway ?? 'manual'),
             'paid_at' => optional($order->paid_at)->format('M d, Y \a\t g:i A') ?? now()->format('M d, Y \a\t g:i A'),
             'order_url' => route('order.detail', $order->id),

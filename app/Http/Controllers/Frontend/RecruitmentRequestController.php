@@ -13,6 +13,7 @@ use App\Models\RecruitmentRequestCandidate;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Wishlist;
+use App\Support\Currency;
 use App\Support\EmailDispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -87,7 +88,7 @@ class RecruitmentRequestController extends Controller
             'experience_level' => $request->input('experience_level'),
             'salary_min' => $request->input('salary_min'),
             'salary_max' => $request->input('salary_max'),
-            'salary_currency' => $request->input('salary_currency') ?: 'USD',
+            'salary_currency' => $request->input('salary_currency') ?: Currency::default(),
             'description' => $request->input('description'),
             'skills_list' => $skills ?: null,
             'certificates' => $certificates ?: null,

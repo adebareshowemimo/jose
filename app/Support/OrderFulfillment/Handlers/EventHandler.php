@@ -2,6 +2,7 @@
 
 namespace App\Support\OrderFulfillment\Handlers;
 
+use App\Support\Currency;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Support\EmailDispatcher;
@@ -58,7 +59,7 @@ class EventHandler implements OrderableHandler
                 'event_location' => $event->location ?? '',
                 'ticket_count' => $ticketCount,
                 'total_amount' => number_format((float) $order->total, 2),
-                'currency' => $order->currency ?? 'USD',
+                'currency' => $order->currency ?: Currency::default(),
                 'registration_id' => $order->id,
             ]);
         }

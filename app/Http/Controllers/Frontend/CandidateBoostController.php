@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Frontend;
 
+use App\Support\Currency;
 use App\Http\Controllers\Controller;
 use App\Models\Candidate;
 use App\Models\Order;
@@ -35,7 +36,7 @@ class CandidateBoostController extends Controller
             ],
             'candidate' => $candidate,
             'packages' => $packages,
-            'currency' => $group['candidate_boost.currency'] ?? 'USD',
+            'currency' => $group['candidate_boost.currency'] ?: Currency::default(),
         ]);
     }
 
@@ -66,7 +67,7 @@ class CandidateBoostController extends Controller
                 'subtotal' => $package['price'],
                 'tax' => 0,
                 'total' => $package['price'],
-                'currency' => $group['candidate_boost.currency'] ?? 'USD',
+                'currency' => $group['candidate_boost.currency'] ?: Currency::default(),
                 'gateway' => 'paystack',
                 'status' => 'pending',
             ]);
