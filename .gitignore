@@ -30,3 +30,14 @@ Thumbs.db
 /public/images/premium/New/certificate/
 /public/images/premium/New/coursecertificate/
 *cs-page.html
+
+# Local responsive-audit workspace: Playwright scripts plus ~40MB of
+# screenshots. Kept out of history deliberately - committed binaries cannot
+# easily be removed afterwards.
+/.mobile-audit/
+
+# Documents dropped into the project root rather than a document store.
+/*.docx
+
+# Dev-server logs written by deploy/serve helpers.
+/storage/logs/serve-*.log
