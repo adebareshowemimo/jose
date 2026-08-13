@@ -30,6 +30,7 @@ class CandidateHandler implements OrderableHandler
         \App\Models\CandidateBoost::create([
             'candidate_id' => $candidate->id,
             'order_id' => $order->id,
+            'boost_package_id' => $item->meta['boost_package_id'] ?? null,
             'days' => $days,
             'starts_at' => $startsAt,
             'ends_at' => $endsAt,

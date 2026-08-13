@@ -279,6 +279,14 @@
 
             <p class="px-3 pt-4 pb-1 text-xs font-semibold text-white/30 uppercase tracking-wider">Monetization</p>
 
+            {{-- Boost Packages --}}
+            <a href="{{ route('admin.boosts.packages.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition
+               {{ str_starts_with($current, 'admin.boosts.') ? 'bg-[#1AAD94] text-white' : 'text-white/60 hover:text-white hover:bg-white/5' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                Boost Packages
+            </a>
+
             {{-- Training --}}
             <a href="{{ route('admin.training.index') }}"
                class="flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition

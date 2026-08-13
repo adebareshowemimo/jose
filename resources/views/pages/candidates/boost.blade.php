@@ -34,37 +34,38 @@
 
 <div class="grid md:grid-cols-3 gap-5">
     @foreach ($packages as $pkg)
-        @php $isBest = $pkg['days'] === 30; @endphp
+        @php $isBest = $pkg->hasPerk('most_popular'); @endphp
         <form method="POST" action="{{ route('candidate.boost.purchase') }}" class="bg-white border-2 {{ $isBest ? 'border-[#1AAD94] shadow-xl' : 'border-[#E0E0E0]' }} rounded-2xl p-6 flex flex-col relative">
             @csrf
-            <input type="hidden" name="days" value="{{ $pkg['days'] }}">
+            <input type="hidden" name="package_id" value="{{ $pkg->id }}">
 
             @if ($isBest)
                 <span class="absolute -top-3 left-1/2 -translate-x-1/2 inline-flex px-3 py-1 rounded-full bg-[#1AAD94] text-white text-[10px] font-bold uppercase tracking-widest shadow">Most popular</span>
             @endif
 
             <div class="text-center pt-2">
-                <p class="text-xs font-bold uppercase tracking-widest text-[#1AAD94] mb-1">{{ $pkg['label'] }}</p>
-                <p class="text-4xl font-extrabold text-[#073057] mb-1">{{ $pkg['days'] }}<span class="text-base font-normal text-[#6B7280]"> days</span></p>
-                <p class="text-xs text-[#6B7280] mb-5">{{ $pkg['tagline'] }}</p>
+                <p class="text-xs font-bold uppercase tracking-widest text-[#1AAD94] mb-1">{{ $pkg->label }}</p>
+                <p class="text-4xl font-extrabold text-[#073057] mb-1">{{ $pkg->days }}<span class="text-base font-normal text-[#6B7280]"> days</span></p>
+                <p class="text-xs text-[#6B7280] mb-5">{{ $pkg->tagline }}</p>
 
                 <div class="my-5 py-4 border-y border-gray-100">
-                    <p class="text-3xl font-extrabold text-[#073057]">{{ money($pkg['price'], $currency ?? 'USD') }}</p>
+                    <p class="text-3xl font-extrabold text-[#073057]">{{ money($pkg->price) }}</p>
                     <p class="text-xs text-[#6B7280] mt-1">One-time payment</p>
                 </div>
 
                 <ul class="space-y-2 text-sm text-[#4B5563] text-left mb-6">
-                    <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-[#1AAD94] mt-0.5"></iconify-icon> Top of search results for {{ $pkg['days'] }} days</li>
+                    <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-[#1AAD94] mt-0.5"></iconify-icon> Top of search results for {{ $pkg->days }} days</li>
                     <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-[#1AAD94] mt-0.5"></iconify-icon> "Featured" badge on your profile</li>
                     <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-[#1AAD94] mt-0.5"></iconify-icon> Stacks with active boosts</li>
-                    @if ($pkg['days'] >= 30)
+                    {{-- Only advertise perks the package actually grants. --}}
+                    @if ($pkg->hasPerk('homepage_spotlight'))
                         <li class="flex items-start gap-2"><iconify-icon icon="lucide:check" class="text-[#1AAD94] mt-0.5"></iconify-icon> Priority slot in homepage carousel</li>
                     @endif
                 </ul>
             </div>
 
             <button type="submit" class="mt-auto w-full px-5 py-3 {{ $isBest ? 'bg-[#1AAD94]' : 'bg-[#073057]' }} hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
-                Boost for {{ $pkg['days'] }} days
+                Boost for {{ $pkg->days }} days
             </button>
         </form>
     @endforeach

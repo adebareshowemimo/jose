@@ -410,6 +410,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/contacts/{contact}', [AdminContactSubmissionController::class, 'destroy'])->name('admin.contacts.destroy');
     Route::post('/contacts/{contact}/respond', [AdminContactSubmissionController::class, 'respond'])->name('admin.contacts.respond');
 
+    // Candidate boost packages
+    Route::get('/boosts/packages', [\App\Http\Controllers\Admin\BoostPackageController::class, 'index'])->name('admin.boosts.packages.index');
+    Route::get('/boosts/packages/create', [\App\Http\Controllers\Admin\BoostPackageController::class, 'create'])->name('admin.boosts.packages.create');
+    Route::post('/boosts/packages', [\App\Http\Controllers\Admin\BoostPackageController::class, 'store'])->name('admin.boosts.packages.store');
+    Route::get('/boosts/packages/{package}/edit', [\App\Http\Controllers\Admin\BoostPackageController::class, 'edit'])->name('admin.boosts.packages.edit');
+    Route::put('/boosts/packages/{package}', [\App\Http\Controllers\Admin\BoostPackageController::class, 'update'])->name('admin.boosts.packages.update');
+    Route::delete('/boosts/packages/{package}', [\App\Http\Controllers\Admin\BoostPackageController::class, 'destroy'])->name('admin.boosts.packages.destroy');
+
     // Settings
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('admin.settings.index');
     Route::put('/settings', [AdminSettingsController::class, 'update'])->name('admin.settings.update');
