@@ -235,6 +235,10 @@ fi
 ok "Site is in maintenance mode"
 
 step "Pulling latest code (origin/$BRANCH)"
+# NOTE: 'git reset --hard' below discards local edits to TRACKED FILES ONLY -
+# PHP, Blade, config. It has no access to the database and cannot alter a
+# single row. The database is only ever touched by 'migrate' further down,
+# which applies new migrations and never drops or recreates anything.
 BEFORE_SHA="$(git rev-parse HEAD)"
 run git fetch origin "$BRANCH"
 run git reset --hard "origin/$BRANCH"
@@ -263,8 +267,33 @@ else
 fi
 
 step "Running database migrations"
+
+# 'migrate' only applies pending migrations; it never drops or recreates the
+# schema. Guard against a destructive command reaching production by accident
+# anyway - via a bad merge, a stray commit, or a mistyped edit to this script.
+# Matches only lines that would EXECUTE such a command (a 'run' wrapper or a
+# bare 'php artisan'), so the rollback advice printed at the end of this
+# script - and this check itself - do not trip it.
+if grep -nE '^[[:space:]]*(run[[:space:]]+)?php[[:space:]]+artisan[[:space:]]+(migrate:(fresh|reset|refresh)|db:wipe)' "$0"; then
+    die "This script contains a destructive database command (listed above).
+       Deployment stopped. Production data must never be dropped by a deploy.
+       Remove the command before running this again."
+fi
+
+# Show what is about to be applied, so the operator sees it before it happens.
+# Match the STATUS column, not the word "pending" anywhere on the line - a
+# migration whose filename contains "pending" would otherwise be reported as
+# unapplied when it has already run.
+PENDING_LIST="$(php artisan migrate:status 2>/dev/null | grep -E '\bPending\b[[:space:]]*$' || true)"
+if [ -n "$PENDING_LIST" ]; then
+    echo "${C_DIM}  pending migrations:${C_OFF}"
+    echo "$PENDING_LIST" | sed 's/^/    /'
+else
+    ok "No pending migrations"
+fi
+
 run php artisan migrate --force
-ok "Migrations complete"
+ok "Migrations complete (no data dropped: 'migrate' only adds)"
 
 step "Clearing and rebuilding caches"
 run php artisan config:clear
@@ -311,7 +340,7 @@ if [ "$DRY_RUN" = "0" ]; then
         warn "Could not resolve the site currency - check it manually."
     fi
 
-    PENDING="$(php artisan migrate:status 2>/dev/null | grep -c "Pending" || true)"
+    PENDING="$(php artisan migrate:status 2>/dev/null | grep -cE '\bPending\b[[:space:]]*$' || true)"
     if [ "${PENDING:-0}" != "0" ]; then
         warn "$PENDING migration(s) still pending - review 'php artisan migrate:status'."
     else
