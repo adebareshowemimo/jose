@@ -1,7 +1,16 @@
 # Candidate Boost — analysis and build plan
 
-Status: proposed, not yet built.
 Scope agreed: full build, phased. Packages stored in the database.
+
+| Phase | Status |
+|---|---|
+| 1 — Packages become data | Done (`aac65cc`) |
+| 2 — Expiry sweep | Done (`aac65cc`) |
+| 3 — Admin subscribers | Done (`eeced46`) |
+| 4 — Lifecycle emails | Done (`0e4530c`) |
+| 5 — Gating | **Not started** |
+
+Phase 5 is blocked on the open questions in section 5 below.
 
 ---
 
