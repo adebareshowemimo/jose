@@ -28,3 +28,10 @@ Schedule::command('emails:send-event-reminders')
 Schedule::command('boosts:expire')
     ->hourly()
     ->withoutOverlapping();
+
+// Boost expiry warnings and post-expiry notices.
+// Runs after the hourly sweep above so an "expired" notice only goes out
+// once the boost has actually been closed.
+Schedule::command('boosts:send-reminders')
+    ->dailyAt(setting('boost.reminder_send_at', '09:30'))
+    ->withoutOverlapping();

@@ -15,6 +15,7 @@ class CandidateBoost extends Model
     protected $fillable = [
         'candidate_id', 'order_id', 'boost_package_id', 'days', 'starts_at',
         'ends_at', 'status', 'price', 'currency',
+        'expiring_reminder_sent_at', 'expired_notice_sent_at',
     ];
 
     protected function casts(): array
@@ -22,6 +23,8 @@ class CandidateBoost extends Model
         return [
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
+            'expiring_reminder_sent_at' => 'datetime',
+            'expired_notice_sent_at' => 'datetime',
             'days' => 'integer',
             'price' => 'decimal:2',
         ];

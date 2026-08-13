@@ -98,6 +98,34 @@ HTML,
 <p>No action needed — everything keeps running. Reply to this email if you'd like to make any changes.</p>
 HTML,
             ],
+            [
+                'key' => 'candidate.boost_expiring',
+                'name' => 'Candidate Boost Expiring Soon',
+                'category' => 'Monetization',
+                'subject' => "Your profile boost ends in {{days_left}} days",
+                'variables' => ['name', 'days_left', 'ends_at', 'package_label', 'renew_url'],
+                'body_html' => <<<'HTML'
+<h2>Your boost is ending soon</h2>
+<p>Hi {{name}}, your <strong>{{package_label}}</strong> profile boost ends on <strong>{{ends_at}}</strong> — that's {{days_left}} day(s) away.</p>
+<p>When it ends, your profile returns to standard placement in the candidate listing. Employers searching for talent will no longer see you at the top.</p>
+<p>Renew now and your new boost stacks on top of the time you have left, so nothing you have already paid for is lost.</p>
+<div class="btn-wrap"><a href="{{renew_url}}" class="btn">Renew my boost</a></div>
+HTML,
+            ],
+            [
+                'key' => 'candidate.boost_expired',
+                'name' => 'Candidate Boost Expired',
+                'category' => 'Monetization',
+                'subject' => 'Your profile boost has ended',
+                'variables' => ['name', 'ends_at', 'package_label', 'renew_url'],
+                'body_html' => <<<'HTML'
+<h2>Your boost has ended</h2>
+<p>Hi {{name}}, your <strong>{{package_label}}</strong> profile boost ended on <strong>{{ends_at}}</strong>.</p>
+<p>Your profile is still live and employers can still find you — it simply no longer appears at the top of the candidate listing.</p>
+<p>Boost again whenever you like to regain featured placement.</p>
+<div class="btn-wrap"><a href="{{renew_url}}" class="btn">Boost my profile again</a></div>
+HTML,
+            ],
         ];
 
         foreach ($templates as $row) {
