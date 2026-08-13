@@ -63,6 +63,15 @@ $navItems = [
     ['route' => 'candidate.boost.index', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>', 'label' => 'Boost Profile'],
     ['route' => 'candidate.upgrade.show', 'icon' => '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l3.057 6.196L15 10.31l-5 4.873 1.18 6.879L5 18.866 -1.18 22.062 0 15.183 -5 10.31l6.943-1.114L5 3z" transform="translate(7 0)"/>', 'label' => 'Premium'],
 ];
+
+// Boosts can be switched off site-wide; without this the link would point at
+// a page that now returns 404.
+if (! app(\App\Support\BoostEligibility::class)->featureEnabled()) {
+    $navItems = array_values(array_filter(
+        $navItems,
+        fn ($item) => $item['route'] !== 'candidate.boost.index'
+    ));
+}
 @endphp
 
 {{-- Navigation Links --}}

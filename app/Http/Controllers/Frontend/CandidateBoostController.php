@@ -7,6 +7,7 @@ use App\Models\BoostPackage;
 use App\Models\Candidate;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Support\BoostEligibility;
 use App\Support\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -14,8 +15,10 @@ use Illuminate\Support\Str;
 
 class CandidateBoostController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, BoostEligibility $eligibility)
     {
+        abort_unless($eligibility->featureEnabled(), 404);
+
         $user = $request->user();
         $candidate = $user->candidate ?? null;
 
@@ -34,16 +37,29 @@ class CandidateBoostController extends Controller
             'candidate' => $candidate,
             'packages' => BoostPackage::active()->ordered()->get(),
             'currency' => Currency::default(),
+            // Shown as an explanation on the page, so a candidate is told why
+            // they cannot buy rather than hitting a dead button.
+            'blockers' => $eligibility->blockers($user, $candidate),
+            'remainingDays' => $eligibility->remainingDays($candidate),
         ]);
     }
 
-    public function purchase(Request $request)
+    public function purchase(Request $request, BoostEligibility $eligibility)
     {
+        abort_unless($eligibility->featureEnabled(), 404);
+
         $user = $request->user();
         $candidate = $user->candidate ?? null;
         if (! $candidate) {
             return redirect()->route('user.candidate.profile')
                 ->with('error', 'Complete your candidate profile before boosting.');
+        }
+
+        // Re-checked here, not just on the page: the rules must hold even if
+        // the form was submitted directly.
+        $blockers = $eligibility->blockers($user, $candidate);
+        if ($blockers !== []) {
+            return back()->with('error', $blockers[0]);
         }
 
         $data = $request->validate([
@@ -53,6 +69,10 @@ class CandidateBoostController extends Controller
         $package = BoostPackage::find($data['package_id']);
         if (! $package || ! $package->isPurchasable()) {
             return back()->with('error', 'This boost package is not available right now.');
+        }
+
+        if ($eligibility->exceedsStackCap($candidate, $package)) {
+            return back()->with('error', 'That package would take you past the maximum boost time allowed. Try a shorter one.');
         }
 
         // The price is copied onto the order and never read back through the

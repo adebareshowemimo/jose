@@ -8,9 +8,13 @@ Scope agreed: full build, phased. Packages stored in the database.
 | 2 — Expiry sweep | Done (`aac65cc`) |
 | 3 — Admin subscribers | Done (`eeced46`) |
 | 4 — Lifecycle emails | Done (`0e4530c`) |
-| 5 — Gating | **Not started** |
+| 5 — Gating | Done, except perks (`pending`) |
 
-Phase 5 is blocked on the open questions in section 5 below.
+Phase 5 shipped the feature switch, eligibility rules and caps. The
+per-tier **perks** are deliberately unbuilt: only `top_of_search` and the
+`most_popular` badge are real today, and the admin form offers only those
+two. Homepage spotlight and employer-search priority need work in the
+search and homepage layers first — see open question 2.
 
 ---
 

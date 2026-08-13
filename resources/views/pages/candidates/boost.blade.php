@@ -32,6 +32,21 @@
     </div>
 @endif
 
+@if (!empty($blockers))
+    <div class="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4">
+        <p class="text-sm font-bold text-amber-900 mb-1">You can't boost your profile just yet</p>
+        <ul class="text-sm text-amber-800 space-y-1 mt-2">
+            @foreach ($blockers as $blocker)
+                <li class="flex items-start gap-2">
+                    <iconify-icon icon="lucide:alert-circle" class="mt-0.5 shrink-0"></iconify-icon>
+                    <span>{{ $blocker }}</span>
+                </li>
+            @endforeach
+        </ul>
+        <a href="{{ route('user.candidate.profile') }}" class="inline-flex mt-3 text-sm font-semibold text-amber-900 underline">Update my profile</a>
+    </div>
+@endif
+
 <div class="grid md:grid-cols-3 gap-5">
     @foreach ($packages as $pkg)
         @php $isBest = $pkg->hasPerk('most_popular'); @endphp
@@ -64,9 +79,16 @@
                 </ul>
             </div>
 
-            <button type="submit" class="mt-auto w-full px-5 py-3 {{ $isBest ? 'bg-[#1AAD94]' : 'bg-[#073057]' }} hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
-                Boost for {{ $pkg->days }} days
-            </button>
+            @if (!empty($blockers))
+                <button type="button" disabled aria-disabled="true"
+                        class="mt-auto w-full px-5 py-3 bg-gray-200 text-gray-500 text-sm font-bold uppercase tracking-widest rounded-xl cursor-not-allowed">
+                    Unavailable
+                </button>
+            @else
+                <button type="submit" class="mt-auto w-full px-5 py-3 {{ $isBest ? 'bg-[#1AAD94]' : 'bg-[#073057]' }} hover:brightness-110 text-white text-sm font-bold uppercase tracking-widest rounded-xl transition shadow">
+                    Boost for {{ $pkg->days }} days
+                </button>
+            @endif
         </form>
     @endforeach
 </div>

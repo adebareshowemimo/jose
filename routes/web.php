@@ -417,6 +417,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/boosts/subscriber/{boost}/extend', [\App\Http\Controllers\Admin\BoostSubscriberController::class, 'extend'])->name('admin.boosts.subscribers.extend');
     Route::post('/boosts/subscriber/{boost}/cancel', [\App\Http\Controllers\Admin\BoostSubscriberController::class, 'cancel'])->name('admin.boosts.subscribers.cancel');
 
+    // Candidate boost settings
+    Route::get('/boosts/settings', [\App\Http\Controllers\Admin\BoostSettingsController::class, 'index'])->name('admin.boosts.settings.index');
+    Route::put('/boosts/settings', [\App\Http\Controllers\Admin\BoostSettingsController::class, 'update'])->name('admin.boosts.settings.update');
+
     // Candidate boost packages
     Route::get('/boosts/packages', [\App\Http\Controllers\Admin\BoostPackageController::class, 'index'])->name('admin.boosts.packages.index');
     Route::get('/boosts/packages/create', [\App\Http\Controllers\Admin\BoostPackageController::class, 'create'])->name('admin.boosts.packages.create');
