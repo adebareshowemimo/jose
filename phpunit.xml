@@ -10,6 +10,15 @@
         </testsuite>
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
+            <!--
+                Excluded from the default run: this suite drives the real
+                development database, which the in-memory test schema cannot
+                provide. Run it deliberately against a real database with
+
+                  DB_DATABASE=database/database.sqlite php artisan test \
+                      tests/Feature/BoostRealDataSmokeTest.php
+            -->
+            <exclude>tests/Feature/BoostRealDataSmokeTest.php</exclude>
         </testsuite>
     </testsuites>
     <source>
