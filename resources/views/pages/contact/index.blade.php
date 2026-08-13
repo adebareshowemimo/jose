@@ -67,6 +67,7 @@
                 @endif
                 <form method="POST" action="{{ route('contact.store') }}" class="grid gap-6 md:grid-cols-2">
                     @csrf
+                    <x-honeypot />
                     <div class="space-y-2">
                         <label class="text-[11px] font-bold uppercase tracking-widest text-[#073057]/60">Full Name</label>
                         <input type="text" name="name" value="{{ old('name') }}" placeholder="John Doe" required class="w-full rounded-xl border border-[#E0E0E0] bg-[#F9FAFB] px-5 py-4 focus:border-[#1AAD94] focus:outline-none focus:ring-1 focus:ring-[#1AAD94] transition-all" />

@@ -45,6 +45,7 @@
                   class="bg-white rounded-2xl border border-[#E0E0E0] shadow-sm p-6 md:p-8 space-y-5"
                   x-data="{ tickets: {{ (int) old('ticket_count', 1) }}, unit: {{ $unitInDefault }} }">
                 @csrf
+                <x-honeypot />
 
                 <div>
                     <h2 class="text-base font-extrabold text-[#073057] mb-3 pb-2 border-b border-gray-100">Your details</h2>

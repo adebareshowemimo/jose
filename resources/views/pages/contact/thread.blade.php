@@ -33,6 +33,7 @@
             @if($submission->status !== 'closed')
                 <form method="POST" action="{{ route('contact.thread.reply', $submission->reply_token) }}" class="mt-8 space-y-4">
                     @csrf
+                    <x-honeypot />
                     <label class="text-[11px] font-bold uppercase tracking-widest text-[#073057]/60">Reply</label>
                     <textarea name="message" rows="5" required class="w-full rounded-xl border border-[#E0E0E0] bg-[#F9FAFB] px-5 py-4 focus:border-[#1AAD94] focus:outline-none focus:ring-1 focus:ring-[#1AAD94]">{{ old('message') }}</textarea>
                     <button type="submit" class="rounded-xl bg-[#073057] px-6 py-3 text-sm font-bold uppercase tracking-widest text-white">Send Reply</button>

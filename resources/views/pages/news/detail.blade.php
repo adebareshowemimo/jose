@@ -283,6 +283,8 @@
                     <div class="bg-white border border-gray-200 rounded-2xl p-6"
                          x-data="{
                             email: '',
+                            website: '',
+                            hpToken: '{{ \Illuminate\Support\Facades\Crypt::encryptString((string) time()) }}',
                             loading: false,
                             success: '',
                             error: '',
@@ -297,7 +299,7 @@
                                             'Accept': 'application/json',
                                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                         },
-                                        body: JSON.stringify({ email: this.email, source: 'news_detail' })
+                                        body: JSON.stringify({ email: this.email, source: 'news_detail', website: this.website, _hpt: this.hpToken })
                                     });
                                     const data = await res.json().catch(() => ({}));
                                     if (!res.ok) {
@@ -327,6 +329,10 @@
                         </template>
 
                         <form @submit.prevent="submit()" class="space-y-2">
+                            <div style="position:absolute;left:-9999px;top:-9999px;height:0;width:0;overflow:hidden;" aria-hidden="true">
+                                <label for="nl_website">Leave this field empty</label>
+                                <input type="text" id="nl_website" x-model="website" tabindex="-1" autocomplete="off" />
+                            </div>
                             <input type="email" x-model="email" required placeholder="you@company.com"
                                    :disabled="loading"
                                    class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#1AAD94] focus:border-transparent outline-none disabled:opacity-50">
